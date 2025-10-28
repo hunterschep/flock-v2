@@ -260,7 +260,7 @@ REVOKE ALL ON user_connections FROM anon;
 
 -- Grant specific permissions to authenticated users only
 GRANT SELECT ON institutions TO authenticated;
-GRANT SELECT, INSERT, UPDATE ON users TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON users TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON user_connections TO authenticated;
 
 -- ===================================
@@ -295,6 +295,12 @@ CREATE POLICY "Users can insert own data"
   ON users FOR INSERT
   TO authenticated
   WITH CHECK (auth.uid() = id);
+
+-- Users: Can delete own data (account deletion)
+CREATE POLICY "Users can delete own data"
+  ON users FOR DELETE
+  TO authenticated
+  USING (auth.uid() = id);
 
 -- Users: Can view classmates and nearby users
 -- Optimized with security definer function

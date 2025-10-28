@@ -23,6 +23,8 @@ interface OnboardingData {
   instagram_url: string
   personal_website: string
   looking_for_roommate: boolean
+  show_employer: boolean
+  show_school: boolean
 }
 
 export default function OnboardingPage() {
@@ -49,6 +51,8 @@ export default function OnboardingPage() {
     instagram_url: '',
     personal_website: '',
     looking_for_roommate: false,
+    show_employer: true,
+    show_school: true,
   })
 
   const [locationSearch, setLocationSearch] = useState('')
@@ -155,11 +159,20 @@ export default function OnboardingPage() {
 
       // Get institution from email domain
       const emailDomain = user.email?.split('@')[1]
+      
+      if (!emailDomain) {
+        throw new Error('Invalid email format')
+      }
+
       const { data: institution } = await supabase
         .from('institutions')
-        .select('id')
+        .select('id, name')
         .eq('domain', emailDomain)
         .single()
+
+      if (!institution) {
+        throw new Error(`Institution not found for domain: ${emailDomain}. Please contact support to add your university.`)
+      }
 
       // Insert user data (merged with profile data in V2)
       const { error: userError } = await supabase
@@ -168,7 +181,7 @@ export default function OnboardingPage() {
           id: user.id,
           email: user.email!,
           full_name: data.full_name,
-          institution_id: institution?.id || null,
+          institution_id: institution.id,
           grad_year: data.grad_year,
           city: data.city || null,
           state: data.state || null,
@@ -189,25 +202,18 @@ export default function OnboardingPage() {
           onboarding_completed: true,
           email_verified: true,
           profile_visible: true, // Always true
-          show_employer: true, // Default to showing
-          show_school: true, // Default to showing
+          show_employer: data.show_employer,
+          show_school: data.show_school,
         })
 
       if (userError) {
-        console.error('User insert error details:', {
-          code: userError.code,
-          message: userError.message,
-          details: userError.details,
-          hint: userError.hint
-        })
-        
         // If user already exists, update instead
         if (userError.code === '23505') {
           const { error: updateError } = await supabase
             .from('users')
             .update({
               full_name: data.full_name,
-              institution_id: institution?.id || null,
+              institution_id: institution.id,
               grad_year: data.grad_year,
               city: data.city || null,
               state: data.state || null,
@@ -228,8 +234,8 @@ export default function OnboardingPage() {
               onboarding_completed: true,
               email_verified: true,
               profile_visible: true, // Always true
-              show_employer: true, // Default to showing
-              show_school: true, // Default to showing
+              show_employer: data.show_employer,
+              show_school: data.show_school,
             })
             .eq('id', user.id)
 
