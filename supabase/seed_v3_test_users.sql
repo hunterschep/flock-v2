@@ -104,7 +104,7 @@ FROM (VALUES
 INSERT INTO users (
   id, email, full_name, institution_id, grad_year,
   city, state, country, latitude, longitude,
-  status, employer, job_title, bio, linkedin_url,
+  status, employer, job_title, grad_school, bio, linkedin_url,
   looking_for_roommate, roommate_budget_min, roommate_budget_max,
   onboarding_completed, email_verified, profile_visible,
   show_employer, show_school, last_location_update
@@ -118,7 +118,7 @@ VALUES
     (SELECT id FROM institutions WHERE domain = 'stanford.edu'),
     2023,
     'San Francisco', 'CA', 'United States', 37.7749, -122.4194,
-    'employed', 'Google', 'Software Engineer',
+    'employed', 'Google', 'Software Engineer', NULL,
     'Stanford CS grad working at Google. Love hiking, coffee, and building cool products. Always down to connect with fellow alumni!',
     'https://linkedin.com/in/sarah-chen',
     true, 1500, 2500,
@@ -134,7 +134,7 @@ VALUES
     (SELECT id FROM institutions WHERE domain = 'stanford.edu'),
     2022,
     'Palo Alto', 'CA', 'United States', 37.4419, -122.1430,
-    'employed', 'Meta', 'Product Manager',
+    'employed', 'Meta', 'Product Manager', NULL,
     'Product manager at Meta. Stanford GSB alum. Passionate about building products that scale.',
     'https://linkedin.com/in/mike-johnson',
     false, NULL, NULL,
@@ -150,7 +150,7 @@ VALUES
     (SELECT id FROM institutions WHERE domain = 'berkeley.edu'),
     2023,
     'Berkeley', 'CA', 'United States', 37.8715, -122.2730,
-    'grad_school', NULL, NULL,
+    'grad_school', NULL, NULL, 'Stanford University',
     'PhD student in Computer Science. Researching ML and NLP. Always excited to meet fellow researchers and alumni!',
     'https://linkedin.com/in/priya-patel',
     true, 1200, 2000,
@@ -166,7 +166,7 @@ VALUES
     (SELECT id FROM institutions WHERE domain = 'stanford.edu'),
     2024,
     'San Jose', 'CA', 'United States', 37.3382, -121.8863,
-    'looking', NULL, NULL,
+    'looking', NULL, NULL, NULL,
     'Recent Stanford grad exploring opportunities in tech. Interested in AI/ML and product roles.',
     'https://linkedin.com/in/alex-rodriguez',
     true, 1000, 1800,
@@ -182,7 +182,7 @@ VALUES
     (SELECT id FROM institutions WHERE domain = 'mit.edu'),
     2022,
     'Cambridge', 'MA', 'United States', 42.3736, -71.1097,
-    'employed', 'Stripe', 'Data Scientist',
+    'employed', 'Stripe', 'Data Scientist', NULL,
     'MIT EECS grad. Data scientist at Stripe. Love running, reading, and finding the best ramen spots in Cambridge.',
     'https://linkedin.com/in/emma-wilson',
     false, NULL, NULL,
@@ -197,7 +197,7 @@ VALUES
     (SELECT id FROM institutions WHERE domain = 'harvard.edu'),
     2023,
     'Boston', 'MA', 'United States', 42.3601, -71.0589,
-    'employed', 'McKinsey', 'Management Consultant',
+    'employed', 'McKinsey', 'Management Consultant', NULL,
     'Harvard MBA. Management consultant helping companies transform. Fitness enthusiast and coffee snob.',
     'https://linkedin.com/in/james-brown',
     false, NULL, NULL,
@@ -212,7 +212,7 @@ VALUES
     (SELECT id FROM institutions WHERE domain = 'mit.edu'),
     2024,
     'Somerville', 'MA', 'United States', 42.3876, -71.0995,
-    'grad_school', NULL, NULL,
+    'grad_school', NULL, NULL, 'MIT Sloan School of Management',
     'MBA candidate at MIT Sloan. Former software engineer. Passionate about startups and innovation.',
     'https://linkedin.com/in/lisa-kim',
     false, NULL, NULL,
@@ -228,7 +228,7 @@ VALUES
     (SELECT id FROM institutions WHERE domain = 'uw.edu'),
     2023,
     'Seattle', 'WA', 'United States', 47.6062, -122.3321,
-    'employed', 'Amazon', 'Software Development Engineer',
+    'employed', 'Amazon', 'Software Development Engineer', NULL,
     'UW CS grad working at Amazon. Love hiking, board games, and exploring Seattle food scene.',
     'https://linkedin.com/in/david-lee',
     true, 2000, 3000,
@@ -243,7 +243,7 @@ VALUES
     (SELECT id FROM institutions WHERE domain = 'uw.edu'),
     2022,
     'Bellevue', 'WA', 'United States', 47.6101, -122.2015,
-    'employed', 'Microsoft', 'Program Manager',
+    'employed', 'Microsoft', 'Program Manager', NULL,
     'Program manager at Microsoft. UW Foster alum. Love travel, photography, and connecting with fellow Huskies.',
     'https://linkedin.com/in/sophia-martinez',
     false, NULL, NULL,
@@ -259,7 +259,7 @@ VALUES
     (SELECT id FROM institutions WHERE domain = 'utexas.edu'),
     2023,
     'Austin', 'TX', 'United States', 30.2672, -97.7431,
-    'looking', NULL, NULL,
+    'looking', NULL, NULL, NULL,
     'UT Austin grad looking for opportunities in tech. Interested in product management and startups. Hook ''em!',
     'https://linkedin.com/in/ryan-taylor',
     true, 1200, 2000,
@@ -274,7 +274,7 @@ VALUES
     (SELECT id FROM institutions WHERE domain = 'utexas.edu'),
     2024,
     'Austin', 'TX', 'United States', 30.3072, -97.7559,
-    'looking', NULL, NULL,
+    'looking', NULL, NULL, NULL,
     'Recent UT grad. Exploring roles in consulting and tech. Love live music, tacos, and the Austin vibe!',
     'https://linkedin.com/in/olivia-garcia',
     true, 1000, 1800,
@@ -290,7 +290,7 @@ VALUES
     (SELECT id FROM institutions WHERE domain = 'gatech.edu'),
     2022,
     'Atlanta', 'GA', 'United States', 33.7490, -84.3880,
-    'grad_school', NULL, NULL,
+    'grad_school', NULL, NULL, 'Georgia Institute of Technology',
     'Mechanical Engineering MS at Georgia Tech. Former aerospace engineer. Love robotics and making things.',
     'https://linkedin.com/in/ethan-white',
     false, NULL, NULL,
@@ -305,7 +305,7 @@ VALUES
     (SELECT id FROM institutions WHERE domain = 'cmu.edu'),
     2023,
     'Pittsburgh', 'PA', 'United States', 40.4406, -79.9959,
-    'grad_school', NULL, NULL,
+    'grad_school', NULL, NULL, 'Carnegie Mellon University',
     'Machine Learning PhD at CMU. Researching computer vision. Love art, museums, and Pittsburgh bridges.',
     'https://linkedin.com/in/maya-singh',
     true, 1400, 2200,
@@ -320,7 +320,7 @@ VALUES
     (SELECT id FROM institutions WHERE domain = 'umich.edu'),
     2024,
     'Ann Arbor', 'MI', 'United States', 42.2808, -83.7430,
-    'looking', NULL, NULL,
+    'looking', NULL, NULL, NULL,
     'Recent Michigan grad. Exploring opportunities in finance and consulting. Go Blue!',
     'https://linkedin.com/in/noah-anderson',
     true, 1000, 1800,
@@ -336,7 +336,7 @@ VALUES
     (SELECT id FROM institutions WHERE domain = 'ucla.edu'),
     2023,
     'Los Angeles', 'CA', 'United States', 34.0522, -118.2437,
-    'looking', NULL, NULL,
+    'looking', NULL, NULL, NULL,
     'UCLA grad looking for opportunities in entertainment and media. Love film, beaches, and exploring LA.',
     'https://linkedin.com/in/ava-thomas',
     true, 1500, 2500,
@@ -351,7 +351,7 @@ VALUES
     (SELECT id FROM institutions WHERE domain = 'ucla.edu'),
     2022,
     'Santa Monica', 'CA', 'United States', 34.0195, -118.4912,
-    'employed', 'Netflix', 'UI/UX Designer',
+    'employed', 'Netflix', 'UI/UX Designer', NULL,
     'UI/UX designer at Netflix. UCLA Design grad. Love surfing, design, and good coffee.',
     'https://linkedin.com/in/lucas-moore',
     true, 1800, 2800,
@@ -367,7 +367,7 @@ VALUES
     (SELECT id FROM institutions WHERE domain = 'stanford.edu'),
     2024,
     'Mountain View', 'CA', 'United States', 37.3861, -122.0839,
-    NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL,
     NULL, NULL,
     false, NULL, NULL,
     false, true, true,
@@ -381,7 +381,7 @@ VALUES
     (SELECT id FROM institutions WHERE domain = 'mit.edu'),
     2023,
     NULL, NULL, 'United States', NULL, NULL,
-    NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL,
     NULL, NULL,
     false, NULL, NULL,
     false, true, true,
@@ -396,7 +396,7 @@ VALUES
     (SELECT id FROM institutions WHERE domain = 'stanford.edu'),
     2022,
     'New York', 'NY', 'United States', 40.7128, -74.0060,
-    'employed', 'Goldman Sachs', 'Investment Analyst',
+    'employed', 'Goldman Sachs', 'Investment Analyst', NULL,
     'Stanford grad working in finance in NYC. Love the city life, jazz, and trying new restaurants.',
     'https://linkedin.com/in/william-jackson',
     false, NULL, NULL,
@@ -411,7 +411,7 @@ VALUES
     (SELECT id FROM institutions WHERE domain = 'berkeley.edu'),
     2023,
     'Denver', 'CO', 'United States', 39.7392, -104.9903,
-    'looking', NULL, NULL,
+    'looking', NULL, NULL, NULL,
     'Berkeley grad exploring opportunities in sustainability and cleantech. Love hiking, skiing, and the mountains.',
     'https://linkedin.com/in/isabella-martin',
     true, 1200, 2000,
@@ -420,16 +420,16 @@ VALUES
   );
 
 -- Update program/degree for grad school users (manual update since it's in the merged table)
-UPDATE users SET program = 'Computer Science PhD', degree = 'PhD' 
+UPDATE users SET program = 'Computer Science', degree = 'PhD', grad_school = 'Stanford University'
 WHERE email = 'priya.patel@berkeley.edu';
 
-UPDATE users SET program = 'MBA', degree = 'MBA'
+UPDATE users SET program = 'MBA', degree = 'MBA', grad_school = 'MIT Sloan School of Management'
 WHERE email = 'lisa.kim@mit.edu';
 
-UPDATE users SET program = 'Mechanical Engineering MS', degree = 'MS'
+UPDATE users SET program = 'Mechanical Engineering', degree = 'MS', grad_school = 'Georgia Institute of Technology'
 WHERE email = 'ethan.white@gatech.edu';
 
-UPDATE users SET program = 'Machine Learning PhD', degree = 'PhD'
+UPDATE users SET program = 'Machine Learning', degree = 'PhD', grad_school = 'Carnegie Mellon University'
 WHERE email = 'maya.singh@cmu.edu';
 
 -- ===================================

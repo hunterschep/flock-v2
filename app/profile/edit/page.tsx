@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { UNIVERSITIES, DEGREE_TYPES, PROGRAM_NAMES } from '@/lib/constants/universities'
 
 export default function EditProfilePage() {
   const [loading, setLoading] = useState(true)
@@ -21,6 +22,7 @@ export default function EditProfilePage() {
     status: '' as 'employed' | 'grad_school' | 'looking' | '',
     employer: '',
     job_title: '',
+    grad_school: '',
     program: '',
     degree: '',
     city: '',
@@ -53,9 +55,58 @@ export default function EditProfilePage() {
   const [canUpdateLocation, setCanUpdateLocation] = useState(true)
   const [daysUntilLocationUpdate, setDaysUntilLocationUpdate] = useState(0)
 
+  // Autocomplete state for university, program, and degree
+  const [universitySearch, setUniversitySearch] = useState('')
+  const [universitySuggestions, setUniversitySuggestions] = useState<string[]>([])
+  const [showUniversitySuggestions, setShowUniversitySuggestions] = useState(false)
+
+  const [programSearch, setProgramSearch] = useState('')
+  const [programSuggestions, setProgramSuggestions] = useState<string[]>([])
+  const [showProgramSuggestions, setShowProgramSuggestions] = useState(false)
+
+  const [degreeSearch, setDegreeSearch] = useState('')
+  const [degreeSuggestions, setDegreeSuggestions] = useState<string[]>([])
+  const [showDegreeSuggestions, setShowDegreeSuggestions] = useState(false)
+
   useEffect(() => {
     loadProfile()
   }, [])
+
+  // Filter universities as user types
+  useEffect(() => {
+    if (universitySearch.length > 0) {
+      const filtered = UNIVERSITIES.filter(uni =>
+        uni.toLowerCase().includes(universitySearch.toLowerCase())
+      ).slice(0, 10)
+      setUniversitySuggestions(filtered)
+    } else {
+      setUniversitySuggestions([])
+    }
+  }, [universitySearch])
+
+  // Filter programs as user types
+  useEffect(() => {
+    if (programSearch.length > 0) {
+      const filtered = PROGRAM_NAMES.filter(prog =>
+        prog.toLowerCase().includes(programSearch.toLowerCase())
+      ).slice(0, 10)
+      setProgramSuggestions(filtered)
+    } else {
+      setProgramSuggestions([])
+    }
+  }, [programSearch])
+
+  // Filter degrees as user types
+  useEffect(() => {
+    if (degreeSearch.length > 0) {
+      const filtered = DEGREE_TYPES.filter(deg =>
+        deg.toLowerCase().includes(degreeSearch.toLowerCase())
+      ).slice(0, 10)
+      setDegreeSuggestions(filtered)
+    } else {
+      setDegreeSuggestions([])
+    }
+  }, [degreeSearch])
 
   // Location search with debouncing
   useEffect(() => {
@@ -150,6 +201,7 @@ export default function EditProfilePage() {
         status: profile.status || '',
         employer: profile.employer || '',
         job_title: profile.job_title || '',
+        grad_school: profile.grad_school || '',
         program: profile.program || '',
         degree: profile.degree || '',
         city: profile.city || '',
@@ -234,6 +286,7 @@ export default function EditProfilePage() {
         status: data.status || null,
         employer: data.employer || null,
         job_title: data.job_title || null,
+        grad_school: data.grad_school || null,
         program: data.program || null,
         degree: data.degree || null,
         linkedin_url: data.linkedin_url || null,
@@ -429,20 +482,110 @@ export default function EditProfilePage() {
 
               {data.status === 'grad_school' && (
                 <div className="space-y-4 mt-4">
-                  <input
-                    type="text"
-                    placeholder="Program"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    value={data.program}
-                    onChange={(e) => setData({ ...data, program: e.target.value })}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Degree"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    value={data.degree}
-                    onChange={(e) => setData({ ...data, degree: e.target.value })}
-                  />
+                  {/* University Autocomplete */}
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="School (e.g., Stanford University)"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      value={universitySearch || data.grad_school}
+                      onChange={(e) => {
+                        setUniversitySearch(e.target.value)
+                        setData({ ...data, grad_school: e.target.value })
+                        setShowUniversitySuggestions(true)
+                      }}
+                      onFocus={() => setShowUniversitySuggestions(true)}
+                      onBlur={() => setTimeout(() => setShowUniversitySuggestions(false), 200)}
+                      autoComplete="off"
+                    />
+                    {showUniversitySuggestions && universitySuggestions.length > 0 && (
+                      <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                        {universitySuggestions.map((uni, idx) => (
+                          <div
+                            key={idx}
+                            onClick={() => {
+                              setData({ ...data, grad_school: uni })
+                              setUniversitySearch(uni)
+                              setShowUniversitySuggestions(false)
+                            }}
+                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                          >
+                            {uni}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Program Autocomplete */}
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Program (e.g., Computer Science)"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      value={programSearch || data.program}
+                      onChange={(e) => {
+                        setProgramSearch(e.target.value)
+                        setData({ ...data, program: e.target.value })
+                        setShowProgramSuggestions(true)
+                      }}
+                      onFocus={() => setShowProgramSuggestions(true)}
+                      onBlur={() => setTimeout(() => setShowProgramSuggestions(false), 200)}
+                      autoComplete="off"
+                    />
+                    {showProgramSuggestions && programSuggestions.length > 0 && (
+                      <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                        {programSuggestions.map((prog, idx) => (
+                          <div
+                            key={idx}
+                            onClick={() => {
+                              setData({ ...data, program: prog })
+                              setProgramSearch(prog)
+                              setShowProgramSuggestions(false)
+                            }}
+                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                          >
+                            {prog}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Degree Autocomplete */}
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Degree (e.g., PhD, MS, MBA)"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      value={degreeSearch || data.degree}
+                      onChange={(e) => {
+                        setDegreeSearch(e.target.value)
+                        setData({ ...data, degree: e.target.value })
+                        setShowDegreeSuggestions(true)
+                      }}
+                      onFocus={() => setShowDegreeSuggestions(true)}
+                      onBlur={() => setTimeout(() => setShowDegreeSuggestions(false), 200)}
+                      autoComplete="off"
+                    />
+                    {showDegreeSuggestions && degreeSuggestions.length > 0 && (
+                      <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                        {degreeSuggestions.map((deg, idx) => (
+                          <div
+                            key={idx}
+                            onClick={() => {
+                              setData({ ...data, degree: deg })
+                              setDegreeSearch(deg)
+                              setShowDegreeSuggestions(false)
+                            }}
+                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                          >
+                            {deg}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                   
                   {/* Option to hide school */}
                   <label className="flex items-center space-x-3 pt-2">

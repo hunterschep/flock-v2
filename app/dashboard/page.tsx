@@ -16,6 +16,7 @@ interface UserProfile {
   status: string | null;
   employer: string | null;
   job_title: string | null;
+  grad_school: string | null;
   program: string | null;
   degree: string | null;
   show_employer: boolean;
@@ -329,7 +330,7 @@ export default function DashboardPage() {
                   {currentUser?.status === 'grad_school' && currentUser.program && (
                     <p className="text-sm text-gray-700">
                       {currentUser.degree} in {currentUser.program}
-                      {currentUser.show_school !== false && currentUser.institutions?.name && ` at ${currentUser.institutions.name}`}
+                      {currentUser.show_school !== false && currentUser.grad_school && ` at ${currentUser.grad_school}`}
                     </p>
                   )}
                   {currentUser?.status === 'looking' && (
@@ -437,7 +438,7 @@ export default function DashboardPage() {
                         <p className="text-sm text-gray-700">
                           {person.degree && `${person.degree} in `}
                           {person.program}
-                          {person.show_school !== false && person.institutions?.name && ` at ${person.institutions.name}`}
+                          {person.show_school !== false && person.grad_school && ` at ${person.grad_school}`}
                         </p>
                       )}
                       {person.status === 'looking' && (

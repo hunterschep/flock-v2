@@ -68,6 +68,7 @@ export interface Database {
           job_title: string | null
           
           // Grad school
+          grad_school: string | null
           program: string | null
           degree: string | null
           
@@ -132,6 +133,7 @@ export interface Database {
           job_title?: string | null
           
           // Grad school
+          grad_school?: string | null
           program?: string | null
           degree?: string | null
           
@@ -196,6 +198,7 @@ export interface Database {
           job_title?: string | null
           
           // Grad school
+          grad_school?: string | null
           program?: string | null
           degree?: string | null
           

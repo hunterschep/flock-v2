@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { UNIVERSITIES, DEGREE_TYPES, PROGRAM_NAMES } from '@/lib/constants/universities'
 
 type OnboardingStep = 1 | 2 | 3 | 4 | 5
 
@@ -12,6 +13,7 @@ interface OnboardingData {
   status: 'employed' | 'grad_school' | 'looking' | ''
   employer: string
   job_title: string
+  grad_school: string
   program: string
   degree: string
   city: string
@@ -40,6 +42,7 @@ export default function OnboardingPage() {
     status: '',
     employer: '',
     job_title: '',
+    grad_school: '',
     program: '',
     degree: '',
     city: '',
@@ -60,9 +63,58 @@ export default function OnboardingPage() {
   const [searchingLocation, setSearchingLocation] = useState(false)
   const [isLocationSelected, setIsLocationSelected] = useState(false)
 
+  // Autocomplete state for university, program, and degree
+  const [universitySearch, setUniversitySearch] = useState('')
+  const [universitySuggestions, setUniversitySuggestions] = useState<string[]>([])
+  const [showUniversitySuggestions, setShowUniversitySuggestions] = useState(false)
+
+  const [programSearch, setProgramSearch] = useState('')
+  const [programSuggestions, setProgramSuggestions] = useState<string[]>([])
+  const [showProgramSuggestions, setShowProgramSuggestions] = useState(false)
+
+  const [degreeSearch, setDegreeSearch] = useState('')
+  const [degreeSuggestions, setDegreeSuggestions] = useState<string[]>([])
+  const [showDegreeSuggestions, setShowDegreeSuggestions] = useState(false)
+
   const updateData = (field: keyof OnboardingData, value: any) => {
     setData(prev => ({ ...prev, [field]: value }))
   }
+
+  // Filter universities as user types
+  useEffect(() => {
+    if (universitySearch.length > 0) {
+      const filtered = UNIVERSITIES.filter(uni =>
+        uni.toLowerCase().includes(universitySearch.toLowerCase())
+      ).slice(0, 10)
+      setUniversitySuggestions(filtered)
+    } else {
+      setUniversitySuggestions([])
+    }
+  }, [universitySearch])
+
+  // Filter programs as user types
+  useEffect(() => {
+    if (programSearch.length > 0) {
+      const filtered = PROGRAM_NAMES.filter(prog =>
+        prog.toLowerCase().includes(programSearch.toLowerCase())
+      ).slice(0, 10)
+      setProgramSuggestions(filtered)
+    } else {
+      setProgramSuggestions([])
+    }
+  }, [programSearch])
+
+  // Filter degrees as user types
+  useEffect(() => {
+    if (degreeSearch.length > 0) {
+      const filtered = DEGREE_TYPES.filter(deg =>
+        deg.toLowerCase().includes(degreeSearch.toLowerCase())
+      ).slice(0, 10)
+      setDegreeSuggestions(filtered)
+    } else {
+      setDegreeSuggestions([])
+    }
+  }, [degreeSearch])
 
   // Location search with debouncing
   useEffect(() => {
@@ -126,21 +178,50 @@ export default function OnboardingPage() {
 
   const handleNext = () => {
     setError(null)
-    if (step === 1 && (!data.full_name || !data.grad_year)) {
-      setError('Please fill in all required fields')
-      return
-    }
-    if (step === 1 && data.grad_year) {
+    
+    // Step 1: Basic Info validation
+    if (step === 1) {
+      if (!data.full_name || !data.grad_year) {
+        setError('Please fill in all required fields')
+        return
+      }
       const yearStr = data.grad_year.toString()
       if (yearStr.length !== 4 || data.grad_year < 1950 || data.grad_year > 2100) {
         setError('Please enter a valid 4-digit graduation year (1950-2100)')
         return
       }
     }
+    
+    // Step 2: Status validation
     if (step === 2 && !data.status) {
       setError('Please select your current status')
       return
     }
+    
+    // Step 3: Status-specific fields validation
+    if (step === 3) {
+      if (data.status === 'employed') {
+        if (!data.employer || !data.job_title) {
+          setError('Please provide your employer and job title')
+          return
+        }
+      }
+      if (data.status === 'grad_school') {
+        if (!data.grad_school || !data.program || !data.degree) {
+          setError('Please provide your school, program, and degree')
+          return
+        }
+      }
+    }
+    
+    // Step 4: Location validation
+    if (step === 4) {
+      if (!data.city || !data.state || !data.latitude || !data.longitude) {
+        setError('Please select a location from the search dropdown')
+        return
+      }
+    }
+    
     if (step < 5) setStep((step + 1) as OnboardingStep)
   }
 
@@ -192,6 +273,7 @@ export default function OnboardingPage() {
           status: data.status || null,
           employer: data.employer || null,
           job_title: data.job_title || null,
+          grad_school: data.grad_school || null,
           program: data.program || null,
           degree: data.degree || null,
           linkedin_url: data.linkedin_url || null,
@@ -224,6 +306,7 @@ export default function OnboardingPage() {
               status: data.status || null,
               employer: data.employer || null,
               job_title: data.job_title || null,
+              grad_school: data.grad_school || null,
               program: data.program || null,
               degree: data.degree || null,
               linkedin_url: data.linkedin_url || null,
@@ -375,11 +458,12 @@ export default function OnboardingPage() {
                 <>
                   <div>
                     <label htmlFor="employer" className="block text-sm font-medium text-gray-700 mb-2">
-                      Employer
+                      Employer *
                     </label>
                     <input
                       type="text"
                       id="employer"
+                      required
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       value={data.employer}
                       onChange={(e) => updateData('employer', e.target.value)}
@@ -388,11 +472,12 @@ export default function OnboardingPage() {
                   </div>
                   <div>
                     <label htmlFor="job_title" className="block text-sm font-medium text-gray-700 mb-2">
-                      Job Title
+                      Job Title *
                     </label>
                     <input
                       type="text"
                       id="job_title"
+                      required
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       value={data.job_title}
                       onChange={(e) => updateData('job_title', e.target.value)}
@@ -416,32 +501,126 @@ export default function OnboardingPage() {
               )}
               {data.status === 'grad_school' && (
                 <>
-                  <div>
+                  {/* University Autocomplete */}
+                  <div className="relative">
+                    <label htmlFor="grad_school" className="block text-sm font-medium text-gray-700 mb-2">
+                      School *
+                    </label>
+                    <input
+                      type="text"
+                      id="grad_school"
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      value={universitySearch || data.grad_school}
+                      onChange={(e) => {
+                        setUniversitySearch(e.target.value)
+                        updateData('grad_school', e.target.value)
+                        setShowUniversitySuggestions(true)
+                      }}
+                      onFocus={() => setShowUniversitySuggestions(true)}
+                      onBlur={() => setTimeout(() => setShowUniversitySuggestions(false), 200)}
+                      placeholder="Start typing university name..."
+                      autoComplete="off"
+                    />
+                    {showUniversitySuggestions && universitySuggestions.length > 0 && (
+                      <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                        {universitySuggestions.map((uni, idx) => (
+                          <div
+                            key={idx}
+                            onClick={() => {
+                              updateData('grad_school', uni)
+                              setUniversitySearch(uni)
+                              setShowUniversitySuggestions(false)
+                            }}
+                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                          >
+                            {uni}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Program Autocomplete */}
+                  <div className="relative">
                     <label htmlFor="program" className="block text-sm font-medium text-gray-700 mb-2">
-                      Program
+                      Program *
                     </label>
                     <input
                       type="text"
                       id="program"
+                      required
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      value={data.program}
-                      onChange={(e) => updateData('program', e.target.value)}
-                      placeholder="Computer Science"
+                      value={programSearch || data.program}
+                      onChange={(e) => {
+                        setProgramSearch(e.target.value)
+                        updateData('program', e.target.value)
+                        setShowProgramSuggestions(true)
+                      }}
+                      onFocus={() => setShowProgramSuggestions(true)}
+                      onBlur={() => setTimeout(() => setShowProgramSuggestions(false), 200)}
+                      placeholder="Start typing program name..."
+                      autoComplete="off"
                     />
+                    {showProgramSuggestions && programSuggestions.length > 0 && (
+                      <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                        {programSuggestions.map((prog, idx) => (
+                          <div
+                            key={idx}
+                            onClick={() => {
+                              updateData('program', prog)
+                              setProgramSearch(prog)
+                              setShowProgramSuggestions(false)
+                            }}
+                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                          >
+                            {prog}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                  <div>
+
+                  {/* Degree Autocomplete */}
+                  <div className="relative">
                     <label htmlFor="degree" className="block text-sm font-medium text-gray-700 mb-2">
-                      Degree
+                      Degree *
                     </label>
                     <input
                       type="text"
                       id="degree"
+                      required
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      value={data.degree}
-                      onChange={(e) => updateData('degree', e.target.value)}
-                      placeholder="PhD"
+                      value={degreeSearch || data.degree}
+                      onChange={(e) => {
+                        setDegreeSearch(e.target.value)
+                        updateData('degree', e.target.value)
+                        setShowDegreeSuggestions(true)
+                      }}
+                      onFocus={() => setShowDegreeSuggestions(true)}
+                      onBlur={() => setTimeout(() => setShowDegreeSuggestions(false), 200)}
+                      placeholder="Start typing degree..."
+                      autoComplete="off"
                     />
+                    {showDegreeSuggestions && degreeSuggestions.length > 0 && (
+                      <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                        {degreeSuggestions.map((deg, idx) => (
+                          <div
+                            key={idx}
+                            onClick={() => {
+                              updateData('degree', deg)
+                              setDegreeSearch(deg)
+                              setShowDegreeSuggestions(false)
+                            }}
+                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                          >
+                            {deg}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
+
                   <div className="flex items-start">
                     <input
                       type="checkbox"
@@ -472,11 +651,12 @@ export default function OnboardingPage() {
             <div className="space-y-6">
               <div className="relative">
                 <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
-                  Location
+                  Location *
                 </label>
                 <input
                   type="text"
                   id="location"
+                  required
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={locationSearch}
                   onChange={(e) => {
@@ -524,7 +704,7 @@ export default function OnboardingPage() {
                 </div>
               )}
               <p className="text-sm text-gray-500">
-                Your exact location will not be shared. We use this to connect you with grads nearby (within 50 miles) or from your institution.
+                * Required field. Your exact location will not be shared. We use this to connect you with grads nearby (within 50 miles) or from your institution.
               </p>
             </div>
           )}
@@ -532,9 +712,12 @@ export default function OnboardingPage() {
           {/* Step 5: Social & Preferences */}
           {step === 5 && (
             <div className="space-y-6">
+              <p className="text-sm text-gray-600 mb-4">
+                All fields on this page are optional. Add social links to help classmates connect with you.
+              </p>
               <div>
                 <label htmlFor="linkedin_url" className="block text-sm font-medium text-gray-700 mb-2">
-                  LinkedIn URL
+                  LinkedIn URL (optional)
                 </label>
                 <input
                   type="url"
@@ -547,7 +730,7 @@ export default function OnboardingPage() {
               </div>
               <div>
                 <label htmlFor="twitter_url" className="block text-sm font-medium text-gray-700 mb-2">
-                  Twitter/X URL
+                  Twitter/X URL (optional)
                 </label>
                 <input
                   type="url"
@@ -560,7 +743,7 @@ export default function OnboardingPage() {
               </div>
               <div>
                 <label htmlFor="personal_website" className="block text-sm font-medium text-gray-700 mb-2">
-                  Personal Website
+                  Personal Website (optional)
                 </label>
                 <input
                   type="url"

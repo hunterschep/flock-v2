@@ -62,6 +62,7 @@ CREATE TABLE users (
   job_title TEXT,
   
   -- Grad school info
+  grad_school TEXT,
   program TEXT,
   degree TEXT,
   
