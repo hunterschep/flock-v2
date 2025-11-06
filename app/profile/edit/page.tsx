@@ -19,7 +19,8 @@ export default function EditProfilePage() {
   const [data, setData] = useState({
     full_name: '',
     grad_year: new Date().getFullYear(),
-    status: '' as 'employed' | 'grad_school' | 'looking' | '',
+    personal_email: '',
+    status: '' as 'employed' | 'grad_school' | 'looking' | 'internship' | '',
     employer: '',
     job_title: '',
     grad_school: '',
@@ -198,6 +199,7 @@ export default function EditProfilePage() {
       setData({
         full_name: profile.full_name || '',
         grad_year: profile.grad_year || new Date().getFullYear(),
+        personal_email: profile.personal_email || '',
         status: profile.status || '',
         employer: profile.employer || '',
         job_title: profile.job_title || '',
@@ -276,6 +278,7 @@ export default function EditProfilePage() {
       const updateData: any = {
         full_name: data.full_name,
         grad_year: data.grad_year,
+        personal_email: data.personal_email || null,
         city: data.city || null,
         state: data.state || null,
         latitude: data.latitude,
@@ -424,6 +427,23 @@ export default function EditProfilePage() {
                   maxLength={4}
                 />
               </div>
+
+              <div>
+                <label htmlFor="personal_email" className="block text-sm font-medium text-gray-700 mb-2">
+                  Personal Email (optional)
+                </label>
+                <input
+                  type="email"
+                  id="personal_email"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={data.personal_email}
+                  onChange={(e) => setData({ ...data, personal_email: e.target.value })}
+                  placeholder="your.name@gmail.com"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Keep your personal email updated so classmates can reach you after graduation
+                </p>
+              </div>
             </div>
 
             {/* Status */}
@@ -433,6 +453,7 @@ export default function EditProfilePage() {
               <div className="space-y-3">
                 {[
                   { value: 'employed', label: 'Employed' },
+                  { value: 'internship', label: 'Internship' },
                   { value: 'grad_school', label: 'Grad School' },
                   { value: 'looking', label: 'Looking' },
                 ].map((option) => (
@@ -450,7 +471,7 @@ export default function EditProfilePage() {
                 ))}
               </div>
 
-              {data.status === 'employed' && (
+              {(data.status === 'employed' || data.status === 'internship') && (
                 <div className="space-y-4 mt-4">
                   <input
                     type="text"
@@ -461,7 +482,7 @@ export default function EditProfilePage() {
                   />
                   <input
                     type="text"
-                    placeholder="Job Title"
+                    placeholder={data.status === 'internship' ? 'Internship Title (e.g. Software Engineer Intern)' : 'Job Title'}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     value={data.job_title}
                     onChange={(e) => setData({ ...data, job_title: e.target.value })}
@@ -475,7 +496,7 @@ export default function EditProfilePage() {
                       onChange={(e) => setData({ ...data, show_employer: !e.target.checked })}
                       className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700">Hide my employer name (job title will still show)</span>
+                    <span className="text-sm text-gray-700">Hide my employer name ({data.status === 'internship' ? 'internship' : 'job'} title will still show)</span>
                   </label>
                 </div>
               )}

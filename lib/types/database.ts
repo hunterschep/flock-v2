@@ -46,6 +46,7 @@ export interface Database {
           // Identity
           id: string
           email: string
+          personal_email: string | null
           full_name: string
           
           // Institution
@@ -61,7 +62,7 @@ export interface Database {
           location: unknown | null // PostGIS geography type
           
           // Status
-          status: 'employed' | 'grad_school' | 'looking' | 'other' | null
+          status: 'employed' | 'grad_school' | 'looking' | 'internship' | 'other' | null
           
           // Employment
           employer: string | null
@@ -111,6 +112,7 @@ export interface Database {
           // Identity (required)
           id: string
           email: string
+          personal_email?: string | null
           full_name: string
           
           // Institution
@@ -126,7 +128,7 @@ export interface Database {
           location?: unknown | null
           
           // Status
-          status?: 'employed' | 'grad_school' | 'looking' | 'other' | null
+          status?: 'employed' | 'grad_school' | 'looking' | 'internship' | 'other' | null
           
           // Employment
           employer?: string | null
@@ -176,6 +178,7 @@ export interface Database {
           // Identity
           id?: string
           email?: string
+          personal_email?: string | null
           full_name?: string
           
           // Institution
@@ -191,7 +194,7 @@ export interface Database {
           location?: unknown | null
           
           // Status
-          status?: 'employed' | 'grad_school' | 'looking' | 'other' | null
+          status?: 'employed' | 'grad_school' | 'looking' | 'internship' | 'other' | null
           
           // Employment
           employer?: string | null

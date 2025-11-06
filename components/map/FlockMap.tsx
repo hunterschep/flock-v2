@@ -39,13 +39,16 @@ function isLocationResponse(data: unknown): data is LocationResponse {
 const stateGeoUrl =
   'https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json';
 
+const countriesGeoUrl = 
+  'https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json';
+
 const layerStyle = (colorExpression: PropertyValueSpecification<string>): LayerProps => ({
   id: 'states-fill',
   type: 'fill',
   paint: {
     'fill-color': colorExpression,
-    'fill-opacity': 0.8,
-    'fill-outline-color': '#E5E5E5',
+    'fill-opacity': 0.4,
+    'fill-outline-color': '#333333',
   },
 });
 
@@ -68,11 +71,13 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
   const [viewState, setViewState] = React.useState({
     longitude: -97,
     latitude: 38,
-    zoom: 3,
+    zoom: 3.5,
     transitionDuration: 500,
   });
 
   const [selectedState, setSelectedState] = React.useState<string | null>(null);
+  const [selectedCountry, setSelectedCountry] = React.useState<string | null>('United States');
+  const [viewLevel, setViewLevel] = React.useState<'world' | 'country' | 'state'>('country');
   const [hoveredStateId, setHoveredStateId] = React.useState<number | null>(null);
   const [hoveredCity, setHoveredCity] = React.useState<{
     city: string;
@@ -92,12 +97,14 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
   const [cityCoordinates, setCityCoordinates] = React.useState<CityCoordinates>({});
 
   const { data: apiResponse, isLoading } = useQuery({
-    queryKey: ['locationData', selectedState],
+    queryKey: ['locationData', selectedCountry, selectedState],
     queryFn: async () => {
       const params = new URLSearchParams();
 
       if (selectedState) {
         params.append('state', STATE_NAME_TO_ABBREV[selectedState]);
+      } else if (selectedCountry) {
+        params.append('country', selectedCountry);
       }
 
       const response = await fetch(`/api/locations?${params.toString()}`);
@@ -124,11 +131,16 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
   }, [apiResponse]);
 
   const [geoJson, setGeoJson] = React.useState<any>(null);
+  const [countriesGeoJson, setCountriesGeoJson] = React.useState<any>(null);
 
   React.useEffect(() => {
     fetch(stateGeoUrl)
       .then((res) => res.json())
       .then((data) => setGeoJson(data));
+    
+    fetch(countriesGeoUrl)
+      .then((res) => res.json())
+      .then((data) => setCountriesGeoJson(data));
   }, []);
 
   const maxValue =
@@ -152,13 +164,13 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
     .range(colorRange);
 
   const fillColorExpression = React.useMemo(() => {
-    if (!locationData || Object.keys(locationData).length === 0 || selectedState) {
+    if (!locationData || Object.keys(locationData).length === 0 || selectedState || (selectedCountry && viewLevel === 'state')) {
       // Return a simple color when no data
       return '#cccccc' as PropertyValueSpecification<string>;
     }
 
     const pairs = Object.entries(locationData)
-      .map(([state, value]) => [state, colorScale(value)])
+      .map(([location, value]) => [location, colorScale(value)])
       .flat();
 
     // Only return match expression if we have data
@@ -172,7 +184,7 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
       ...pairs,
       '#cccccc', // fallback for "no data"
     ] as unknown as PropertyValueSpecification<string>;
-  }, [locationData, selectedState, colorScale]);
+  }, [locationData, selectedState, selectedCountry, viewLevel, colorScale]);
 
   const renderLegendSkeleton = () => (
     <div className="space-y-2.5">
@@ -187,6 +199,53 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
     </div>
   );
 
+  const handleCountryClick = (feature: any) => {
+    const clickedCountry = feature.properties?.name;
+    if (!clickedCountry) return;
+
+    const centroid = center(feature);
+    const [lon, lat] = centroid.geometry.coordinates;
+
+    // Special handling for USA - zoom to show states
+    if (clickedCountry === 'United States of America') {
+      setSelectedCountry('United States');
+      setViewLevel('country');
+      setZoomedIn(true);
+
+      if (mapRef.current) {
+        mapRef.current.flyTo({
+          center: [-97, 38],
+          zoom: 3.5,
+          pitch: 0,
+          speed: 1.2,
+          curve: 1.5,
+          easing: (t: any) => t,
+          essential: true,
+        });
+      }
+    } else {
+      // For other countries, zoom to country level and show cities
+      setSelectedCountry(clickedCountry);
+      setViewLevel('country');
+      setZoomedIn(true);
+
+      if (mapRef.current) {
+        mapRef.current.flyTo({
+          center: [lon, lat],
+          zoom: 5,
+          pitch: 0,
+          speed: 1.2,
+          curve: 1.5,
+          easing: (t: any) => t,
+          essential: true,
+        });
+      }
+
+      // Notify parent of country selection
+      onLocationSelect('', clickedCountry);
+    }
+  };
+
   const handleStateClick = (feature: any) => {
     const clickedState = feature.properties?.name;
     if (!clickedState) return;
@@ -198,6 +257,7 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
     const [lon, lat] = centroid.geometry.coordinates;
 
     setSelectedState(clickedState);
+    setViewLevel('state');
     setZoomedIn(true);
 
     if (mapRef.current) {
@@ -275,7 +335,7 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
         {...viewState}
         ref={mapRef}
         style={{ width: '100%', height: '100%' }}
-        mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
+        mapStyle="https://tiles.stadiamaps.com/styles/outdoors.json"
         cursor={hoveredStateId !== null ? 'pointer' : 'grab'}
         onMove={(evt) => {
           setViewState((prev) => ({
@@ -283,12 +343,16 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
             transitionDuration: prev.transitionDuration,
           }));
         }}
-        interactiveLayerIds={['states-fill']}
+        interactiveLayerIds={viewLevel === 'world' ? ['countries-fill'] : viewLevel === 'country' ? ['states-fill'] : []}
         onLoad={() => setMapLoaded(true)}
         onClick={(event) => {
           const feature = event.features?.[0];
-          if (feature && !selectedState) {
-            handleStateClick(feature);
+          if (feature) {
+            if (viewLevel === 'world') {
+              handleCountryClick(feature);
+            } else if (viewLevel === 'country' && !selectedState) {
+              handleStateClick(feature);
+            }
           }
         }}
         onMouseMove={handleMouseMove}
@@ -297,7 +361,18 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
           setHoverInfo(null);
         }}
       >
-        {geoJson && !selectedState && (
+        {/* World view - show countries */}
+        {countriesGeoJson && viewLevel === 'world' && (
+          <Source id="countries" type="geojson" data={countriesGeoJson}>
+            <Layer {...layerStyle(fillColorExpression)} id="countries-fill" />
+            {hoveredStateId !== null && (
+              <Layer {...hoverLayerStyle} filter={['==', '$id', hoveredStateId]} />
+            )}
+          </Source>
+        )}
+
+        {/* Country view (USA) - show states */}
+        {geoJson && viewLevel === 'country' && selectedCountry === 'United States' && !selectedState && (
           <Source id="states" type="geojson" data={geoJson}>
             <Layer {...layerStyle(fillColorExpression)} />
             {hoveredStateId !== null && (
@@ -306,7 +381,8 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
           </Source>
         )}
 
-        {selectedState &&
+        {/* City bubbles - show when we have a state selected OR a non-US country selected */}
+        {(selectedState || (selectedCountry && selectedCountry !== 'United States')) &&
           locationData &&
           Object.entries(locationData).map(([city, value]) => {
             const coords = cityCoordinates[city];
@@ -319,7 +395,7 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
               <Marker key={city} longitude={coords[0]} latitude={coords[1]}>
                 <div
                   className="bubble"
-                  onClick={() => onLocationSelect(city, STATE_NAME_TO_ABBREV[selectedState])}
+                  onClick={() => onLocationSelect(city, selectedState ? STATE_NAME_TO_ABBREV[selectedState] : selectedCountry || '')}
                   onMouseEnter={(e) => {
                     setHoveredCity({
                       city,
@@ -408,10 +484,17 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
       {/* Legend */}
       <div className="absolute top-4 left-4 bg-white rounded-lg shadow-md border border-gray-100 p-3 z-10 max-w-xs">
         <div className="text-sm font-semibold text-gray-900 mb-1">
-          {selectedState ? `${selectedState} Cities` : 'Classmates by State'}
+          {selectedState 
+            ? `${selectedState} Cities` 
+            : selectedCountry && selectedCountry !== 'United States'
+              ? `${selectedCountry} Cities`
+              : selectedCountry === 'United States'
+                ? 'USA States'
+                : 'Classmates by Country'
+          }
         </div>
         <div className="text-xs text-gray-600 mb-3">
-          {selectedState 
+          {selectedState || (selectedCountry && selectedCountry !== 'United States')
             ? 'Institution + 50mi radius' 
             : 'From your institution'
           }
@@ -420,27 +503,47 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
       </div>
 
       {/* Back Button */}
-      {selectedState && (
+      {(selectedState || selectedCountry) && (
         <button
           onClick={() => {
-            setSelectedState(null);
-            onLocationSelect('', '');
-            setZoomedIn(false);
-            if (mapRef.current) {
-              mapRef.current.flyTo({
-                center: [-97, 38],
-                zoom: 3,
-                speed: 1.2,
-                pitch: 0,
-                curve: 1.5,
-                easing: (t: any) => t,
-                essential: true,
-              });
+            if (selectedState) {
+              // Go back to country view (USA states)
+              setSelectedState(null);
+              setViewLevel('country');
+              onLocationSelect('', '');
+              if (mapRef.current) {
+                mapRef.current.flyTo({
+                  center: [-97, 38],
+                  zoom: 3.5,
+                  speed: 1.2,
+                  pitch: 0,
+                  curve: 1.5,
+                  easing: (t: any) => t,
+                  essential: true,
+                });
+              }
+            } else if (selectedCountry) {
+              // Go back to world view
+              setSelectedCountry(null);
+              setViewLevel('world');
+              setZoomedIn(false);
+              onLocationSelect('', '');
+              if (mapRef.current) {
+                mapRef.current.flyTo({
+                  center: [0, 20],
+                  zoom: 1.5,
+                  speed: 1.2,
+                  pitch: 0,
+                  curve: 1.5,
+                  easing: (t: any) => t,
+                  essential: true,
+                });
+              }
             }
           }}
           className="absolute top-4 right-16 px-4 py-2 bg-white rounded-lg shadow-md border hover:bg-gray-50 transition z-10 text-gray-900 cursor-pointer text-sm font-medium"
         >
-          ← Back to USA
+          ← Back to {selectedState ? 'USA' : 'World'}
         </button>
       )}
 

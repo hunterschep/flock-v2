@@ -39,7 +39,8 @@ CREATE INDEX idx_institutions_domain ON institutions(domain);
 CREATE TABLE users (
   -- Identity
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  email TEXT NOT NULL UNIQUE,
+  email TEXT NOT NULL UNIQUE, -- .edu email for auth
+  personal_email TEXT, -- Personal/permanent email (optional)
   full_name TEXT NOT NULL,
   
   -- Institution
@@ -55,7 +56,7 @@ CREATE TABLE users (
   location GEOGRAPHY(POINT, 4326), -- PostGIS point for proximity queries
   
   -- Current status
-  status TEXT CHECK (status IN ('employed', 'grad_school', 'looking', 'other')),
+  status TEXT CHECK (status IN ('employed', 'grad_school', 'looking', 'internship', 'other')),
   
   -- Employment info
   employer TEXT,

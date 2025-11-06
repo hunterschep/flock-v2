@@ -102,7 +102,7 @@ FROM (VALUES
 
 -- San Francisco Bay Area Users
 INSERT INTO users (
-  id, email, full_name, institution_id, grad_year,
+  id, email, personal_email, full_name, institution_id, grad_year,
   city, state, country, latitude, longitude,
   status, employer, job_title, grad_school, bio, linkedin_url,
   looking_for_roommate, roommate_budget_min, roommate_budget_max,
@@ -114,6 +114,7 @@ VALUES
   (
     (SELECT id FROM auth.users WHERE email = 'sarah.chen@stanford.edu'),
     'sarah.chen@stanford.edu',
+    'sarah.chen.personal@gmail.com',
     'Sarah Chen',
     (SELECT id FROM institutions WHERE domain = 'stanford.edu'),
     2023,
@@ -126,16 +127,17 @@ VALUES
     true, true, NOW() - INTERVAL '45 days'  -- Location set 45 days ago, can update
   ),
   
-  -- Mike Johnson - Employed, Palo Alto (hides employer)
+  -- Mike Johnson - Internship, Palo Alto (hides employer) - Summer intern
   (
     (SELECT id FROM auth.users WHERE email = 'mike.johnson@stanford.edu'),
     'mike.johnson@stanford.edu',
+    'mikej.work@gmail.com',
     'Mike Johnson',
     (SELECT id FROM institutions WHERE domain = 'stanford.edu'),
-    2022,
+    2025,
     'Palo Alto', 'CA', 'United States', 37.4419, -122.1430,
-    'employed', 'Meta', 'Product Manager', NULL,
-    'Product manager at Meta. Stanford GSB alum. Passionate about building products that scale.',
+    'internship', 'Meta', 'Product Manager Intern', NULL,
+    'PM intern at Meta for the summer. Stanford undergrad. Passionate about building products that scale.',
     'https://linkedin.com/in/mike-johnson',
     false, NULL, NULL,
     true, true, true,
@@ -146,6 +148,7 @@ VALUES
   (
     (SELECT id FROM auth.users WHERE email = 'priya.patel@berkeley.edu'),
     'priya.patel@berkeley.edu',
+    'priya.patel.phd@gmail.com',
     'Priya Patel',
     (SELECT id FROM institutions WHERE domain = 'berkeley.edu'),
     2023,
@@ -158,16 +161,17 @@ VALUES
     true, false, NOW() - INTERVAL '10 days'  -- Hides school name, can't update location for 20 more days
   ),
   
-  -- Alex Rodriguez - Looking for work, San Jose
+  -- Alex Rodriguez - Internship, San Jose - Summer SWE Intern
   (
     (SELECT id FROM auth.users WHERE email = 'alex.rodriguez@stanford.edu'),
     'alex.rodriguez@stanford.edu',
+    'alex.r.dev@gmail.com',
     'Alex Rodriguez',
     (SELECT id FROM institutions WHERE domain = 'stanford.edu'),
-    2024,
+    2025,
     'San Jose', 'CA', 'United States', 37.3382, -121.8863,
-    'looking', NULL, NULL, NULL,
-    'Recent Stanford grad exploring opportunities in tech. Interested in AI/ML and product roles.',
+    'internship', 'Apple', 'Software Engineer Intern', NULL,
+    'SWE intern at Apple for the summer. Stanford CS junior. Interested in AI/ML and iOS development.',
     'https://linkedin.com/in/alex-rodriguez',
     true, 1000, 1800,
     true, true, true,
@@ -178,6 +182,7 @@ VALUES
   (
     (SELECT id FROM auth.users WHERE email = 'emma.wilson@mit.edu'),
     'emma.wilson@mit.edu',
+    'emma.wilson.data@gmail.com',
     'Emma Wilson',
     (SELECT id FROM institutions WHERE domain = 'mit.edu'),
     2022,
@@ -193,6 +198,7 @@ VALUES
   (
     (SELECT id FROM auth.users WHERE email = 'james.brown@harvard.edu'),
     'james.brown@harvard.edu',
+    'james.brown.consult@gmail.com',
     'James Brown',
     (SELECT id FROM institutions WHERE domain = 'harvard.edu'),
     2023,
@@ -208,6 +214,7 @@ VALUES
   (
     (SELECT id FROM auth.users WHERE email = 'lisa.kim@mit.edu'),
     'lisa.kim@mit.edu',
+    NULL,
     'Lisa Kim',
     (SELECT id FROM institutions WHERE domain = 'mit.edu'),
     2024,
@@ -224,6 +231,7 @@ VALUES
   (
     (SELECT id FROM auth.users WHERE email = 'david.lee@uw.edu'),
     'david.lee@uw.edu',
+    'davidlee.swe@gmail.com',
     'David Lee',
     (SELECT id FROM institutions WHERE domain = 'uw.edu'),
     2023,
@@ -239,6 +247,7 @@ VALUES
   (
     (SELECT id FROM auth.users WHERE email = 'sophia.martinez@uw.edu'),
     'sophia.martinez@uw.edu',
+    'sophia.m.pm@outlook.com',
     'Sophia Martinez',
     (SELECT id FROM institutions WHERE domain = 'uw.edu'),
     2022,
@@ -255,6 +264,7 @@ VALUES
   (
     (SELECT id FROM auth.users WHERE email = 'ryan.taylor@utexas.edu'),
     'ryan.taylor@utexas.edu',
+    'ryan.taylor.pm@gmail.com',
     'Ryan Taylor',
     (SELECT id FROM institutions WHERE domain = 'utexas.edu'),
     2023,
@@ -270,6 +280,7 @@ VALUES
   (
     (SELECT id FROM auth.users WHERE email = 'olivia.garcia@utexas.edu'),
     'olivia.garcia@utexas.edu',
+    'olivia.garcia.consult@gmail.com',
     'Olivia Garcia',
     (SELECT id FROM institutions WHERE domain = 'utexas.edu'),
     2024,
@@ -286,6 +297,7 @@ VALUES
   (
     (SELECT id FROM auth.users WHERE email = 'ethan.white@gatech.edu'),
     'ethan.white@gatech.edu',
+    'ethan.white.eng@gmail.com',
     'Ethan White',
     (SELECT id FROM institutions WHERE domain = 'gatech.edu'),
     2022,
@@ -301,6 +313,7 @@ VALUES
   (
     (SELECT id FROM auth.users WHERE email = 'maya.singh@cmu.edu'),
     'maya.singh@cmu.edu',
+    'maya.singh.ml@gmail.com',
     'Maya Singh',
     (SELECT id FROM institutions WHERE domain = 'cmu.edu'),
     2023,
@@ -316,6 +329,7 @@ VALUES
   (
     (SELECT id FROM auth.users WHERE email = 'noah.anderson@umich.edu'),
     'noah.anderson@umich.edu',
+    'noah.anderson.finance@gmail.com',
     'Noah Anderson',
     (SELECT id FROM institutions WHERE domain = 'umich.edu'),
     2024,
@@ -332,6 +346,7 @@ VALUES
   (
     (SELECT id FROM auth.users WHERE email = 'ava.thomas@ucla.edu'),
     'ava.thomas@ucla.edu',
+    'ava.thomas.media@gmail.com',
     'Ava Thomas',
     (SELECT id FROM institutions WHERE domain = 'ucla.edu'),
     2023,
@@ -347,6 +362,7 @@ VALUES
   (
     (SELECT id FROM auth.users WHERE email = 'lucas.moore@ucla.edu'),
     'lucas.moore@ucla.edu',
+    'lucas.moore.design@gmail.com',
     'Lucas Moore',
     (SELECT id FROM institutions WHERE domain = 'ucla.edu'),
     2022,
@@ -363,6 +379,7 @@ VALUES
   (
     (SELECT id FROM auth.users WHERE email = 'jordan.clark@stanford.edu'),
     'jordan.clark@stanford.edu',
+    NULL,
     'Jordan Clark',
     (SELECT id FROM institutions WHERE domain = 'stanford.edu'),
     2024,
@@ -377,6 +394,7 @@ VALUES
   (
     (SELECT id FROM auth.users WHERE email = 'mia.harris@mit.edu'),
     'mia.harris@mit.edu',
+    NULL,
     'Mia Harris',
     (SELECT id FROM institutions WHERE domain = 'mit.edu'),
     2023,
@@ -392,6 +410,7 @@ VALUES
   (
     (SELECT id FROM auth.users WHERE email = 'william.jackson@stanford.edu'),
     'william.jackson@stanford.edu',
+    'william.jackson.nyc@gmail.com',
     'William Jackson',
     (SELECT id FROM institutions WHERE domain = 'stanford.edu'),
     2022,
@@ -407,6 +426,7 @@ VALUES
   (
     (SELECT id FROM auth.users WHERE email = 'isabella.martin@berkeley.edu'),
     'isabella.martin@berkeley.edu',
+    'isabella.martin.cleantech@gmail.com',
     'Isabella Martin',
     (SELECT id FROM institutions WHERE domain = 'berkeley.edu'),
     2023,

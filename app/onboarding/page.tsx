@@ -10,7 +10,8 @@ type OnboardingStep = 1 | 2 | 3 | 4 | 5
 interface OnboardingData {
   full_name: string
   grad_year: number
-  status: 'employed' | 'grad_school' | 'looking' | ''
+  personal_email: string
+  status: 'employed' | 'grad_school' | 'looking' | 'internship' | ''
   employer: string
   job_title: string
   grad_school: string
@@ -39,6 +40,7 @@ export default function OnboardingPage() {
   const [data, setData] = useState<OnboardingData>({
     full_name: '',
     grad_year: new Date().getFullYear(),
+    personal_email: '',
     status: '',
     employer: '',
     job_title: '',
@@ -200,7 +202,7 @@ export default function OnboardingPage() {
     
     // Step 3: Status-specific fields validation
     if (step === 3) {
-      if (data.status === 'employed') {
+      if (data.status === 'employed' || data.status === 'internship') {
         if (!data.employer || !data.job_title) {
           setError('Please provide your employer and job title')
           return
@@ -261,6 +263,7 @@ export default function OnboardingPage() {
         .insert({
           id: user.id,
           email: user.email!,
+          personal_email: data.personal_email || null,
           full_name: data.full_name,
           institution_id: institution.id,
           grad_year: data.grad_year,
@@ -294,6 +297,7 @@ export default function OnboardingPage() {
           const { error: updateError } = await supabase
             .from('users')
             .update({
+              personal_email: data.personal_email || null,
               full_name: data.full_name,
               institution_id: institution.id,
               grad_year: data.grad_year,
@@ -408,6 +412,22 @@ export default function OnboardingPage() {
                   maxLength={4}
                 />
               </div>
+              <div>
+                <label htmlFor="personal_email" className="block text-sm font-medium text-gray-700 mb-2">
+                  Personal Email (optional)
+                </label>
+                <input
+                  type="email"
+                  id="personal_email"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={data.personal_email}
+                  onChange={(e) => updateData('personal_email', e.target.value)}
+                  placeholder="your.name@gmail.com"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Recommended: Add a personal email so classmates can reach you after you lose access to your .edu email
+                </p>
+              </div>
             </div>
           )}
 
@@ -421,6 +441,7 @@ export default function OnboardingPage() {
                 <div className="space-y-3">
                   {[
                     { value: 'employed', label: 'Employed', desc: 'Working full-time or part-time' },
+                    { value: 'internship', label: 'Internship', desc: 'Summer or part-time internship' },
                     { value: 'grad_school', label: 'Grad School', desc: 'Pursuing further education' },
                     { value: 'looking', label: 'Looking', desc: 'Seeking opportunities' },
                   ].map((option) => (
@@ -454,7 +475,7 @@ export default function OnboardingPage() {
           {/* Step 3: Details based on status */}
           {step === 3 && (
             <div className="space-y-6">
-              {data.status === 'employed' && (
+              {(data.status === 'employed' || data.status === 'internship') && (
                 <>
                   <div>
                     <label htmlFor="employer" className="block text-sm font-medium text-gray-700 mb-2">
@@ -472,7 +493,7 @@ export default function OnboardingPage() {
                   </div>
                   <div>
                     <label htmlFor="job_title" className="block text-sm font-medium text-gray-700 mb-2">
-                      Job Title *
+                      {data.status === 'internship' ? 'Internship Title *' : 'Job Title *'}
                     </label>
                     <input
                       type="text"
@@ -481,7 +502,7 @@ export default function OnboardingPage() {
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       value={data.job_title}
                       onChange={(e) => updateData('job_title', e.target.value)}
-                      placeholder="Software Engineer"
+                      placeholder={data.status === 'internship' ? 'Software Engineer Intern' : 'Software Engineer'}
                     />
                   </div>
                   <div className="flex items-start">

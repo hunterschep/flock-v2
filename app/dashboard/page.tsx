@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import * as React from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -45,7 +46,18 @@ export default function DashboardPage() {
   const [searchCity, setSearchCity] = useState<string>('');
   const [searchJobTitle, setSearchJobTitle] = useState<string>('');
   const [searchCompany, setSearchCompany] = useState<string>('');
+  const [searchName, setSearchName] = useState<string>('');
   const [filterRoommates, setFilterRoommates] = useState<boolean>(false);
+  
+  // Status filters
+  const [filterEmployed, setFilterEmployed] = useState<boolean>(false);
+  const [filterInternship, setFilterInternship] = useState<boolean>(false);
+  const [filterGradSchool, setFilterGradSchool] = useState<boolean>(false);
+  const [filterLooking, setFilterLooking] = useState<boolean>(false);
+  
+  // Graduation year filter
+  const [minGradYear, setMinGradYear] = useState<string>('');
+  const [maxGradYear, setMaxGradYear] = useState<string>('');
 
   useEffect(() => {
     loadData();
@@ -151,11 +163,23 @@ export default function DashboardPage() {
     setSearchCity('');
     setSearchJobTitle('');
     setSearchCompany('');
+    setSearchName('');
     setFilterRoommates(false);
+    setFilterEmployed(false);
+    setFilterInternship(false);
+    setFilterGradSchool(false);
+    setFilterLooking(false);
+    setMinGradYear('');
+    setMaxGradYear('');
   };
 
   // Apply client-side search filters
   const filteredUsers = users.filter(user => {
+    // Name filter
+    if (searchName && !user.full_name?.toLowerCase().includes(searchName.toLowerCase())) {
+      return false;
+    }
+    
     // City filter
     if (searchCity && !user.city?.toLowerCase().includes(searchCity.toLowerCase())) {
       return false;
@@ -171,6 +195,28 @@ export default function DashboardPage() {
       return false;
     }
     
+    // Status filters - if any status filter is active, user must match at least one
+    const hasStatusFilter = filterEmployed || filterInternship || filterGradSchool || filterLooking;
+    if (hasStatusFilter) {
+      const matchesStatus = 
+        (filterEmployed && user.status === 'employed') ||
+        (filterInternship && user.status === 'internship') ||
+        (filterGradSchool && user.status === 'grad_school') ||
+        (filterLooking && user.status === 'looking');
+      
+      if (!matchesStatus) {
+        return false;
+      }
+    }
+    
+    // Graduation year filter
+    if (minGradYear && user.grad_year < parseInt(minGradYear)) {
+      return false;
+    }
+    if (maxGradYear && user.grad_year > parseInt(maxGradYear)) {
+      return false;
+    }
+    
     // Roommate filter
     if (filterRoommates && !user.looking_for_roommate) {
       return false;
@@ -179,7 +225,70 @@ export default function DashboardPage() {
     return true;
   });
 
-  const hasActiveFilters = searchCity || searchJobTitle || searchCompany || filterRoommates;
+  const hasActiveFilters = searchName || searchCity || searchJobTitle || searchCompany || 
+    filterRoommates || filterEmployed || filterInternship || filterGradSchool || 
+    filterLooking || minGradYear || maxGradYear;
+  
+  const activeFilterCount = [
+    searchName, searchCity, searchJobTitle, searchCompany, filterRoommates,
+    filterEmployed, filterInternship, filterGradSchool, filterLooking,
+    minGradYear, maxGradYear
+  ].filter(Boolean).length;
+
+  // Analytics state
+  const [expandedGradSchools, setExpandedGradSchools] = useState(false);
+  const [expandedCities, setExpandedCities] = useState(false);
+  const [expandedCompanies, setExpandedCompanies] = useState(false);
+
+  // Calculate analytics from users data
+  const analytics = React.useMemo(() => {
+    // Only include users from the same institution
+    const sameInstitutionUsers = users.filter(u => 
+      currentUser?.institutions?.name && 
+      u.institutions?.name === currentUser.institutions.name
+    );
+
+    // Top grad schools
+    const gradSchoolCounts: { [key: string]: number } = {};
+    sameInstitutionUsers.forEach(user => {
+      if (user.status === 'grad_school' && user.grad_school) {
+        gradSchoolCounts[user.grad_school] = (gradSchoolCounts[user.grad_school] || 0) + 1;
+      }
+    });
+    const topGradSchools = Object.entries(gradSchoolCounts)
+      .sort(([, a], [, b]) => b - a)
+      .map(([school, count]) => ({ name: school, count }));
+
+    // Top cities
+    const cityCounts: { [key: string]: number } = {};
+    sameInstitutionUsers.forEach(user => {
+      if (user.city && user.state) {
+        const location = `${user.city}, ${user.state}`;
+        cityCounts[location] = (cityCounts[location] || 0) + 1;
+      }
+    });
+    const topCities = Object.entries(cityCounts)
+      .sort(([, a], [, b]) => b - a)
+      .map(([city, count]) => ({ name: city, count }));
+
+    // Top companies
+    const companyCounts: { [key: string]: number } = {};
+    sameInstitutionUsers.forEach(user => {
+      if ((user.status === 'employed' || user.status === 'internship') && user.employer) {
+        companyCounts[user.employer] = (companyCounts[user.employer] || 0) + 1;
+      }
+    });
+    const topCompanies = Object.entries(companyCounts)
+      .sort(([, a], [, b]) => b - a)
+      .map(([company, count]) => ({ name: company, count }));
+
+    return {
+      gradSchools: topGradSchools,
+      cities: topCities,
+      companies: topCompanies,
+      totalClassmates: sameInstitutionUsers.length,
+    };
+  }, [users, currentUser]);
 
   if (loading) {
     return (
@@ -224,91 +333,354 @@ export default function DashboardPage() {
         <FlockMap onLocationSelect={handleLocationSelect} />
       </div>
 
-      {/* List Section - Below Map */}
+      {/* Analytics Section */}
+      {analytics.totalClassmates > 0 && (
+        <div className="bg-white border-b">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <h2 className="text-xl font-bold text-gray-900 mb-1">
+              Network Insights
+            </h2>
+            <p className="text-sm text-gray-500 mb-6">
+              Where your {currentUser?.institutions?.name || 'university'} classmates are heading
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Top Cities */}
+              <div className="bg-gray-50 rounded-lg p-5 border border-gray-200">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-2xl">📍</span>
+                    <h3 className="font-semibold text-gray-900">Top Cities</h3>
+                  </div>
+                  <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium">
+                    {analytics.cities.length}
+                  </span>
+                </div>
+
+                {analytics.cities.length > 0 ? (
+                  <>
+                    <div className="space-y-3">
+                      {analytics.cities.slice(0, expandedCities ? undefined : 5).map((city, idx) => (
+                        <div key={city.name} className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2 flex-1 min-w-0">
+                            <span className="text-xs font-medium text-gray-400 w-4">#{idx + 1}</span>
+                            <span className="text-sm text-gray-900 truncate">{city.name}</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-blue-500 rounded-full"
+                                style={{ width: `${(city.count / analytics.cities[0].count) * 100}%` }}
+                              />
+                            </div>
+                            <span className="text-sm font-semibold text-gray-700 w-6 text-right">
+                              {city.count}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {analytics.cities.length > 5 && (
+                      <button
+                        onClick={() => setExpandedCities(!expandedCities)}
+                        className="mt-4 text-sm text-blue-600 hover:text-blue-800 font-medium"
+                      >
+                        {expandedCities ? '− Show less' : `+ Show ${analytics.cities.length - 5} more`}
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-sm text-gray-500">No location data yet</p>
+                )}
+              </div>
+
+              {/* Top Companies */}
+              <div className="bg-gray-50 rounded-lg p-5 border border-gray-200">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-2xl">💼</span>
+                    <h3 className="font-semibold text-gray-900">Top Companies</h3>
+                  </div>
+                  <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full font-medium">
+                    {analytics.companies.length}
+                  </span>
+                </div>
+
+                {analytics.companies.length > 0 ? (
+                  <>
+                    <div className="space-y-3">
+                      {analytics.companies.slice(0, expandedCompanies ? undefined : 5).map((company, idx) => (
+                        <div key={company.name} className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2 flex-1 min-w-0">
+                            <span className="text-xs font-medium text-gray-400 w-4">#{idx + 1}</span>
+                            <span className="text-sm text-gray-900 truncate">{company.name}</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-green-500 rounded-full"
+                                style={{ width: `${(company.count / analytics.companies[0].count) * 100}%` }}
+                              />
+                            </div>
+                            <span className="text-sm font-semibold text-gray-700 w-6 text-right">
+                              {company.count}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {analytics.companies.length > 5 && (
+                      <button
+                        onClick={() => setExpandedCompanies(!expandedCompanies)}
+                        className="mt-4 text-sm text-blue-600 hover:text-blue-800 font-medium"
+                      >
+                        {expandedCompanies ? '− Show less' : `+ Show ${analytics.companies.length - 5} more`}
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-sm text-gray-500">No company data yet</p>
+                )}
+              </div>
+
+              {/* Top Grad Schools */}
+              <div className="bg-gray-50 rounded-lg p-5 border border-gray-200">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-2xl">🎓</span>
+                    <h3 className="font-semibold text-gray-900">Top Grad Schools</h3>
+                  </div>
+                  <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full font-medium">
+                    {analytics.gradSchools.length}
+                  </span>
+                </div>
+
+                {analytics.gradSchools.length > 0 ? (
+                  <>
+                    <div className="space-y-3">
+                      {analytics.gradSchools.slice(0, expandedGradSchools ? undefined : 5).map((school, idx) => (
+                        <div key={school.name} className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2 flex-1 min-w-0">
+                            <span className="text-xs font-medium text-gray-400 w-4">#{idx + 1}</span>
+                            <span className="text-sm text-gray-900 truncate">{school.name}</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-purple-500 rounded-full"
+                                style={{ width: `${(school.count / analytics.gradSchools[0].count) * 100}%` }}
+                              />
+                            </div>
+                            <span className="text-sm font-semibold text-gray-700 w-6 text-right">
+                              {school.count}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {analytics.gradSchools.length > 5 && (
+                      <button
+                        onClick={() => setExpandedGradSchools(!expandedGradSchools)}
+                        className="mt-4 text-sm text-blue-600 hover:text-blue-800 font-medium"
+                      >
+                        {expandedGradSchools ? '− Show less' : `+ Show ${analytics.gradSchools.length - 5} more`}
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-sm text-gray-500">No grad school data yet</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* List Section - Below Analytics */}
       <div className="flex-1 bg-gray-50 overflow-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Search & Filters */}
           <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Search & Filter</h3>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Search & Filter</h3>
+                {hasActiveFilters && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    {activeFilterCount} active filter{activeFilterCount !== 1 ? 's' : ''} • Showing {filteredUsers.length} of {users.length} people
+                  </p>
+                )}
+              </div>
               {hasActiveFilters && (
                 <button
                   onClick={handleClearSearch}
-                  className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                  className="px-3 py-1.5 text-sm text-blue-600 hover:text-blue-800 font-medium border border-blue-300 rounded-md hover:bg-blue-50"
                 >
-                  Clear all filters
+                  Clear all
                 </button>
               )}
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* City Search */}
-              <div>
-                <label htmlFor="search-city" className="block text-sm font-medium text-gray-700 mb-1">
-                  City
-                </label>
-                <input
-                  type="text"
-                  id="search-city"
-                  value={searchCity}
-                  onChange={(e) => setSearchCity(e.target.value)}
-                  placeholder="e.g. San Francisco"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                />
-              </div>
-
-              {/* Job Title Search */}
-              <div>
-                <label htmlFor="search-job" className="block text-sm font-medium text-gray-700 mb-1">
-                  Job Title
-                </label>
-                <input
-                  type="text"
-                  id="search-job"
-                  value={searchJobTitle}
-                  onChange={(e) => setSearchJobTitle(e.target.value)}
-                  placeholder="e.g. Software Engineer"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                />
-              </div>
-
-              {/* Company Search */}
-              <div>
-                <label htmlFor="search-company" className="block text-sm font-medium text-gray-700 mb-1">
-                  Company
-                </label>
-                <input
-                  type="text"
-                  id="search-company"
-                  value={searchCompany}
-                  onChange={(e) => setSearchCompany(e.target.value)}
-                  placeholder="e.g. Google"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                />
-              </div>
-
-              {/* Roommate Filter */}
-              <div className="flex items-end">
-                <label className="flex items-center space-x-2 cursor-pointer pb-2">
+            {/* Search Inputs */}
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                {/* Name Search */}
+                <div>
+                  <label htmlFor="search-name" className="block text-sm font-medium text-gray-700 mb-1">
+                    Name
+                  </label>
                   <input
-                    type="checkbox"
-                    checked={filterRoommates}
-                    onChange={(e) => setFilterRoommates(e.target.checked)}
-                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                    type="text"
+                    id="search-name"
+                    value={searchName}
+                    onChange={(e) => setSearchName(e.target.value)}
+                    placeholder="Search by name"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                   />
-                  <span className="text-sm font-medium text-gray-700">
-                    Looking for roommates only
-                  </span>
+                </div>
+
+                {/* City Search */}
+                <div>
+                  <label htmlFor="search-city" className="block text-sm font-medium text-gray-700 mb-1">
+                    City
+                  </label>
+                  <input
+                    type="text"
+                    id="search-city"
+                    value={searchCity}
+                    onChange={(e) => setSearchCity(e.target.value)}
+                    placeholder="e.g. San Francisco"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  />
+                </div>
+
+                {/* Job Title Search */}
+                <div>
+                  <label htmlFor="search-job" className="block text-sm font-medium text-gray-700 mb-1">
+                    Job Title
+                  </label>
+                  <input
+                    type="text"
+                    id="search-job"
+                    value={searchJobTitle}
+                    onChange={(e) => setSearchJobTitle(e.target.value)}
+                    placeholder="e.g. Software Engineer"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  />
+                </div>
+
+                {/* Company Search */}
+                <div>
+                  <label htmlFor="search-company" className="block text-sm font-medium text-gray-700 mb-1">
+                    Company
+                  </label>
+                  <input
+                    type="text"
+                    id="search-company"
+                    value={searchCompany}
+                    onChange={(e) => setSearchCompany(e.target.value)}
+                    placeholder="e.g. Google"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  />
+                </div>
+              </div>
+
+              {/* Status Filters */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Status
                 </label>
+                <div className="flex flex-wrap gap-3">
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={filterEmployed}
+                      onChange={(e) => setFilterEmployed(e.target.checked)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-700">💼 Employed</span>
+                  </label>
+                  
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={filterInternship}
+                      onChange={(e) => setFilterInternship(e.target.checked)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-700">🎓 Internship</span>
+                  </label>
+                  
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={filterGradSchool}
+                      onChange={(e) => setFilterGradSchool(e.target.checked)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-700">📚 Grad School</span>
+                  </label>
+                  
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={filterLooking}
+                      onChange={(e) => setFilterLooking(e.target.checked)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-700">🔍 Looking</span>
+                  </label>
+                  
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={filterRoommates}
+                      onChange={(e) => setFilterRoommates(e.target.checked)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-700">🏠 Seeking Roommates</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Graduation Year Range */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Graduation Year
+                </label>
+                <div className="flex items-center space-x-3">
+                  <input
+                    type="number"
+                    value={minGradYear}
+                    onChange={(e) => setMinGradYear(e.target.value)}
+                    placeholder="From"
+                    min="2000"
+                    max="2030"
+                    className="w-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  />
+                  <span className="text-gray-500">-</span>
+                  <input
+                    type="number"
+                    value={maxGradYear}
+                    onChange={(e) => setMaxGradYear(e.target.value)}
+                    placeholder="To"
+                    min="2000"
+                    max="2030"
+                    className="w-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  />
+                  {(minGradYear || maxGradYear) && (
+                    <button
+                      onClick={() => {
+                        setMinGradYear('');
+                        setMaxGradYear('');
+                      }}
+                      className="text-xs text-gray-500 hover:text-gray-700"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
-
-            {/* Active filters count */}
-            {hasActiveFilters && (
-              <div className="mt-4 text-sm text-gray-600">
-                Showing {filteredUsers.length} of {users.length} people
-              </div>
-            )}
           </div>
 
           {/* Current User Card */}
@@ -320,11 +692,12 @@ export default function DashboardPage() {
                   {currentUser?.institutions?.name || 'No institution'} • Class of {currentUser?.grad_year}
                 </p>
                 <div className="mt-2">
-                  {currentUser?.status === 'employed' && (
+                  {(currentUser?.status === 'employed' || currentUser?.status === 'internship') && (
                     <p className="text-sm text-gray-700">
                       {currentUser.job_title && `${currentUser.job_title}`}
                       {currentUser.show_employer !== false && currentUser.employer && ` at ${currentUser.employer}`}
                       {!currentUser.job_title && currentUser.show_employer !== false && currentUser.employer}
+                      {currentUser.status === 'internship' && ' (Internship)'}
                     </p>
                   )}
                   {currentUser?.status === 'grad_school' && currentUser.program && (
@@ -393,9 +766,11 @@ export default function DashboardPage() {
 
             {filteredUsers.length === 0 ? (
               <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-                <p className="text-gray-500">
+                <div className="text-4xl mb-4">🔍</div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">No results found</h3>
+                <p className="text-gray-500 mb-4 max-w-md mx-auto">
                   {hasActiveFilters 
-                    ? 'No people match your search criteria. Try adjusting your filters.'
+                    ? 'No people match your search criteria. Try adjusting or clearing your filters.'
                     : selectedCity || selectedState 
                       ? 'No people found in this area. Try selecting a different location on the map.'
                       : 'No one in your network yet. The map shows where your classmates are located!'
@@ -404,9 +779,9 @@ export default function DashboardPage() {
                 {hasActiveFilters && (
                   <button
                     onClick={handleClearSearch}
-                    className="mt-4 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+                    className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
                   >
-                    Clear filters
+                    Clear all filters
                   </button>
                 )}
               </div>
@@ -427,11 +802,12 @@ export default function DashboardPage() {
                     </div>
                     
                     <div className="mt-3">
-                      {person.status === 'employed' && (
+                      {(person.status === 'employed' || person.status === 'internship') && (
                         <p className="text-sm text-gray-700">
                           {person.job_title && `${person.job_title}`}
                           {person.show_employer !== false && person.employer && ` at ${person.employer}`}
                           {!person.job_title && person.show_employer !== false && person.employer}
+                          {person.status === 'internship' && ' (Internship)'}
                         </p>
                       )}
                       {person.status === 'grad_school' && person.program && (
