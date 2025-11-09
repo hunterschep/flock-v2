@@ -356,62 +356,68 @@ export default function EditProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-gray-600">Loading...</p>
+      <div className="min-h-screen gradient-mesh flex items-center justify-center">
+        <div className="glass-strong rounded-2xl px-8 py-6">
+          <p className="text-white text-lg drop-shadow">Loading...</p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto">
-        <div className="mb-6">
-          <Link href="/dashboard" className="text-blue-600 hover:text-blue-800">
+    <div className="min-h-screen gradient-mesh py-8 sm:py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Floating orbs - Ultra Dark */}
+      <div className="absolute top-1/4 left-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-indigo-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-purple-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse animation-delay-2000"></div>
+      
+      <div className="max-w-3xl mx-auto relative z-10">
+        <div className="mb-4 sm:mb-6">
+          <Link href="/dashboard" className="glass-light px-4 py-2 rounded-lg text-white hover:bg-white/20 inline-block transition-all text-sm sm:text-base font-medium">
             ← Back to Dashboard
           </Link>
         </div>
 
-        <div className="bg-white rounded-lg shadow px-8 py-10">
-          <h1 className="text-2xl font-bold text-gray-900 mb-8">Edit Profile</h1>
+        <div className="glass-strong rounded-2xl sm:rounded-3xl px-6 sm:px-8 md:px-10 py-8 sm:py-10">
+          <h1 className="text-xl sm:text-2xl font-bold text-white mb-6 sm:mb-8 drop-shadow-lg">Edit Profile</h1>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
-              <p className="text-sm text-red-800">{error}</p>
+            <div className="mb-6 p-3 sm:p-4 glass-card bg-red-500/20 border-red-300/30 rounded-xl">
+              <p className="text-xs sm:text-sm text-white drop-shadow">{error}</p>
             </div>
           )}
 
           {success && (
-            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-md">
-              <p className="text-sm text-green-800">Profile updated successfully! Redirecting...</p>
+            <div className="mb-6 p-3 sm:p-4 glass-card bg-green-500/20 border-green-300/30 rounded-xl">
+              <p className="text-xs sm:text-sm text-white drop-shadow">Profile updated successfully! Redirecting...</p>
             </div>
           )}
 
           <form onSubmit={handleSave} className="space-y-6">
             {/* Basic Info */}
             <div className="space-y-4">
-              <h2 className="text-lg font-semibold text-gray-900">Basic Information</h2>
+              <h2 className="text-base sm:text-lg font-semibold text-white drop-shadow">Basic Information</h2>
               
               <div>
-                <label htmlFor="full_name" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="full_name" className="block text-xs sm:text-sm font-medium text-white/90 mb-2 drop-shadow">
                   Full Name
                 </label>
                 <input
                   type="text"
                   id="full_name"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="glass-input w-full px-4 py-3 rounded-xl focus:outline-none text-white placeholder-white/50 text-sm sm:text-base"
                   value={data.full_name}
                   onChange={(e) => setData({ ...data, full_name: e.target.value })}
                 />
               </div>
 
               <div>
-                <label htmlFor="grad_year" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="grad_year" className="block text-xs sm:text-sm font-medium text-white/90 mb-2 drop-shadow">
                   Graduation Year (4-digit year)
                 </label>
                 <input
                   type="number"
                   id="grad_year"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="glass-input w-full px-4 py-3 rounded-xl focus:outline-none text-white placeholder-white/50 text-sm sm:text-base"
                   value={data.grad_year}
                   onChange={(e) => {
                     const value = e.target.value
@@ -429,44 +435,94 @@ export default function EditProfilePage() {
               </div>
 
               <div>
-                <label htmlFor="personal_email" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="personal_email" className="block text-xs sm:text-sm font-medium text-white/90 mb-2 drop-shadow">
                   Personal Email (optional)
                 </label>
                 <input
                   type="email"
                   id="personal_email"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="glass-input w-full px-4 py-3 rounded-xl focus:outline-none text-white placeholder-white/50 text-sm sm:text-base"
                   value={data.personal_email}
                   onChange={(e) => setData({ ...data, personal_email: e.target.value })}
                   placeholder="your.name@gmail.com"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-white/70 mt-1 drop-shadow">
                   Keep your personal email updated so classmates can reach you after graduation
                 </p>
               </div>
             </div>
 
-            {/* Status */}
-            <div className="space-y-4 pt-6 border-t">
-              <h2 className="text-lg font-semibold text-gray-900">Current Status</h2>
+            {/* Status - Enhanced */}
+            <div className="space-y-4 pt-6 border-t border-white/10">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center">
+                  <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                  </svg>
+                </div>
+                <h2 className="text-lg font-bold text-white drop-shadow">Current Status</h2>
+              </div>
               
               <div className="space-y-3">
                 {[
-                  { value: 'employed', label: 'Employed' },
-                  { value: 'internship', label: 'Internship' },
-                  { value: 'grad_school', label: 'Grad School' },
-                  { value: 'looking', label: 'Looking' },
+                  { 
+                    value: 'employed', 
+                    label: 'Employed',
+                    icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>,
+                    gradient: 'from-emerald-500/20 to-teal-500/20',
+                    iconColor: 'text-emerald-400'
+                  },
+                  { 
+                    value: 'internship', 
+                    label: 'Internship',
+                    icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>,
+                    gradient: 'from-blue-500/20 to-cyan-500/20',
+                    iconColor: 'text-blue-400'
+                  },
+                  { 
+                    value: 'grad_school', 
+                    label: 'Grad School',
+                    icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" /></svg>,
+                    gradient: 'from-purple-500/20 to-pink-500/20',
+                    iconColor: 'text-purple-400'
+                  },
+                  { 
+                    value: 'looking', 
+                    label: 'Looking',
+                    icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>,
+                    gradient: 'from-orange-500/20 to-red-500/20',
+                    iconColor: 'text-orange-400'
+                  },
                 ].map((option) => (
-                  <label key={option.value} className="flex items-center">
+                  <label 
+                    key={option.value}
+                    className={`group flex items-center gap-3 p-4 glass-card rounded-xl cursor-pointer transition-all duration-300 ${
+                      data.status === option.value
+                        ? 'bg-gradient-to-br from-purple-500/20 to-blue-500/20 border-purple-400/40 scale-[1.02]'
+                        : 'hover:bg-white/5'
+                    }`}
+                  >
                     <input
                       type="radio"
                       name="status"
                       value={option.value}
                       checked={data.status === option.value}
                       onChange={(e) => setData({ ...data, status: e.target.value as any })}
-                      className="mr-2"
+                      className="sr-only"
                     />
-                    {option.label}
+                    <div className={`flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br ${option.gradient} flex items-center justify-center ${option.iconColor} transition-transform ${
+                      data.status === option.value ? 'scale-110' : 'group-hover:scale-105'
+                    }`}>
+                      {option.icon}
+                    </div>
+                    <span className={`font-medium drop-shadow ${data.status === option.value ? 'text-white' : 'text-white/90'}`}>
+                      {option.label}
+                    </span>
+                    {data.status === option.value && (
+                      <svg className="w-5 h-5 text-purple-400 ml-auto" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    )}
                   </label>
                 ))}
               </div>
@@ -476,14 +532,14 @@ export default function EditProfilePage() {
                   <input
                     type="text"
                     placeholder="Employer"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="glass-input w-full px-4 py-3 rounded-xl focus:outline-none text-white placeholder-white/50 text-sm sm:text-base"
                     value={data.employer}
                     onChange={(e) => setData({ ...data, employer: e.target.value })}
                   />
                   <input
                     type="text"
                     placeholder={data.status === 'internship' ? 'Internship Title (e.g. Software Engineer Intern)' : 'Job Title'}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="glass-input w-full px-4 py-3 rounded-xl focus:outline-none text-white placeholder-white/50 text-sm sm:text-base"
                     value={data.job_title}
                     onChange={(e) => setData({ ...data, job_title: e.target.value })}
                   />
@@ -496,7 +552,7 @@ export default function EditProfilePage() {
                       onChange={(e) => setData({ ...data, show_employer: !e.target.checked })}
                       className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700">Hide my employer name ({data.status === 'internship' ? 'internship' : 'job'} title will still show)</span>
+                    <span className="text-sm text-white/90 drop-shadow">Hide my employer name ({data.status === 'internship' ? 'internship' : 'job'} title will still show)</span>
                   </label>
                 </div>
               )}
@@ -508,7 +564,7 @@ export default function EditProfilePage() {
                     <input
                       type="text"
                       placeholder="School (e.g., Stanford University)"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="glass-input w-full px-4 py-3 rounded-xl focus:outline-none text-white placeholder-white/50 text-sm sm:text-base"
                       value={universitySearch || data.grad_school}
                       onChange={(e) => {
                         setUniversitySearch(e.target.value)
@@ -520,7 +576,7 @@ export default function EditProfilePage() {
                       autoComplete="off"
                     />
                     {showUniversitySuggestions && universitySuggestions.length > 0 && (
-                      <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                      <div className="absolute z-50 w-full mt-1 glass-strong rounded-lg max-h-60 overflow-auto">
                         {universitySuggestions.map((uni, idx) => (
                           <div
                             key={idx}
@@ -529,7 +585,7 @@ export default function EditProfilePage() {
                               setUniversitySearch(uni)
                               setShowUniversitySuggestions(false)
                             }}
-                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                            className="px-4 py-2 hover:bg-white/10 cursor-pointer text-sm text-white"
                           >
                             {uni}
                           </div>
@@ -543,7 +599,7 @@ export default function EditProfilePage() {
                     <input
                       type="text"
                       placeholder="Program (e.g., Computer Science)"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="glass-input w-full px-4 py-3 rounded-xl focus:outline-none text-white placeholder-white/50 text-sm sm:text-base"
                       value={programSearch || data.program}
                       onChange={(e) => {
                         setProgramSearch(e.target.value)
@@ -555,7 +611,7 @@ export default function EditProfilePage() {
                       autoComplete="off"
                     />
                     {showProgramSuggestions && programSuggestions.length > 0 && (
-                      <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                      <div className="absolute z-50 w-full mt-1 glass-strong rounded-lg max-h-60 overflow-auto">
                         {programSuggestions.map((prog, idx) => (
                           <div
                             key={idx}
@@ -564,7 +620,7 @@ export default function EditProfilePage() {
                               setProgramSearch(prog)
                               setShowProgramSuggestions(false)
                             }}
-                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                            className="px-4 py-2 hover:bg-white/10 cursor-pointer text-sm text-white"
                           >
                             {prog}
                           </div>
@@ -578,7 +634,7 @@ export default function EditProfilePage() {
                     <input
                       type="text"
                       placeholder="Degree (e.g., PhD, MS, MBA)"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="glass-input w-full px-4 py-3 rounded-xl focus:outline-none text-white placeholder-white/50 text-sm sm:text-base"
                       value={degreeSearch || data.degree}
                       onChange={(e) => {
                         setDegreeSearch(e.target.value)
@@ -590,7 +646,7 @@ export default function EditProfilePage() {
                       autoComplete="off"
                     />
                     {showDegreeSuggestions && degreeSuggestions.length > 0 && (
-                      <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                      <div className="absolute z-50 w-full mt-1 glass-strong rounded-lg max-h-60 overflow-auto">
                         {degreeSuggestions.map((deg, idx) => (
                           <div
                             key={idx}
@@ -599,7 +655,7 @@ export default function EditProfilePage() {
                               setDegreeSearch(deg)
                               setShowDegreeSuggestions(false)
                             }}
-                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                            className="px-4 py-2 hover:bg-white/10 cursor-pointer text-sm text-white"
                           >
                             {deg}
                           </div>
@@ -616,40 +672,51 @@ export default function EditProfilePage() {
                       onChange={(e) => setData({ ...data, show_school: !e.target.checked })}
                       className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700">Hide my school name (program and degree will still show)</span>
+                    <span className="text-sm text-white/90 drop-shadow">Hide my school name (program and degree will still show)</span>
                   </label>
                 </div>
               )}
             </div>
 
-            {/* Location */}
-            <div className="space-y-4 pt-6 border-t">
+            {/* Location - Enhanced */}
+            <div className="space-y-4 pt-6 border-t border-white/10">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900">Location</h2>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
+                    <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <h2 className="text-lg font-bold text-white drop-shadow">Location</h2>
+                </div>
                 {!canUpdateLocation && (
-                  <span className="text-xs text-orange-600 font-medium">
-                    🔒 Locked for {daysUntilLocationUpdate} more day{daysUntilLocationUpdate !== 1 ? 's' : ''}
+                  <span className="text-xs glass-light text-white/90 px-2.5 py-1 rounded-full font-medium flex items-center gap-1.5">
+                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                    </svg>
+                    Locked for {daysUntilLocationUpdate} more day{daysUntilLocationUpdate !== 1 ? 's' : ''}
                   </span>
                 )}
               </div>
               
               {!canUpdateLocation && (
-                <div className="p-3 bg-orange-50 border border-orange-200 rounded-md">
-                  <p className="text-sm text-orange-800">
-                    You can only update your location once every 30 days to prevent location hopping. You'll be able to update in {daysUntilLocationUpdate} day{daysUntilLocationUpdate !== 1 ? 's' : ''}.
+                <div className="glass-card bg-orange-500/10 border-orange-400/20 p-3 rounded-lg">
+                  <p className="text-sm text-white/90">
+                    Location updates are limited to once every 30 days to prevent location hopping. You'll be able to update in {daysUntilLocationUpdate} day{daysUntilLocationUpdate !== 1 ? 's' : ''}.
                   </p>
                 </div>
               )}
               
               <div className="relative">
-                <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="location" className="block text-sm font-medium text-white/90 drop-shadow mb-2">
                   Search for your city
                 </label>
                 <input
                   type="text"
                   id="location"
                   disabled={!canUpdateLocation}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  className="glass-input w-full px-4 py-3 rounded-xl focus:outline-none text-white placeholder-white/50 text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                   value={locationSearch}
                   onChange={(e) => {
                     setLocationSearch(e.target.value)
@@ -666,7 +733,7 @@ export default function EditProfilePage() {
                 )}
                 {locationSuggestions.length > 0 && canUpdateLocation && (
                   <div 
-                    className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto"
+                    className="absolute z-50 w-full mt-1 glass-strong rounded-lg max-h-60 overflow-auto"
                     onMouseDown={(e) => e.preventDefault()}
                   >
                     {locationSuggestions.map((location, idx) => (
@@ -677,9 +744,9 @@ export default function EditProfilePage() {
                           e.stopPropagation()
                           selectLocation(location)
                         }}
-                        className="w-full px-4 py-2 text-left hover:bg-gray-100 cursor-pointer"
+                        className="w-full px-4 py-2 text-left hover:bg-white/10 cursor-pointer text-white"
                       >
-                        <div className="font-medium text-gray-900">
+                        <div className="font-medium">
                           {location.display_name}
                         </div>
                       </div>
@@ -688,47 +755,66 @@ export default function EditProfilePage() {
                 )}
               </div>
               {data.city && data.state && (
-                <div className="p-3 bg-green-50 border border-green-200 rounded-md">
-                  <p className="text-sm text-green-800">
-                    ✓ Location set: {data.city}, {data.state}
+                <div className="glass-card bg-emerald-500/10 border-emerald-400/20 p-3 rounded-lg flex items-center gap-2">
+                  <div className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                    <svg className="w-3 h-3 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <p className="text-sm text-white">
+                    Location set: {data.city}, {data.state}
                   </p>
                 </div>
               )}
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-white/80 drop-shadow">
                 Your exact location will not be shared. We use this to connect you with grads nearby (within 50 miles) or from your institution.
               </p>
             </div>
 
-            {/* Social Links */}
-            <div className="space-y-4 pt-6 border-t">
-              <h2 className="text-lg font-semibold text-gray-900">Social Links</h2>
+            {/* Social Links - Enhanced */}
+            <div className="space-y-4 pt-6 border-t border-white/10">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center">
+                  <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                  </svg>
+                </div>
+                <h2 className="text-lg font-bold text-white drop-shadow">Social Links</h2>
+              </div>
               
               <input
                 type="url"
                 placeholder="LinkedIn URL"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="glass-input w-full px-4 py-3 rounded-xl focus:outline-none text-white placeholder-white/50 text-sm sm:text-base"
                 value={data.linkedin_url}
                 onChange={(e) => setData({ ...data, linkedin_url: e.target.value })}
               />
               <input
                 type="url"
                 placeholder="Twitter/X URL"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="glass-input w-full px-4 py-3 rounded-xl focus:outline-none text-white placeholder-white/50 text-sm sm:text-base"
                 value={data.twitter_url}
                 onChange={(e) => setData({ ...data, twitter_url: e.target.value })}
               />
               <input
                 type="url"
                 placeholder="Personal Website"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="glass-input w-full px-4 py-3 rounded-xl focus:outline-none text-white placeholder-white/50 text-sm sm:text-base"
                 value={data.personal_website}
                 onChange={(e) => setData({ ...data, personal_website: e.target.value })}
               />
             </div>
 
-            {/* Preferences */}
-            <div className="space-y-4 pt-6 border-t">
-              <h2 className="text-lg font-semibold text-gray-900">Preferences</h2>
+            {/* Preferences - Enhanced */}
+            <div className="space-y-4 pt-6 border-t border-white/10">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500/20 to-rose-500/20 flex items-center justify-center">
+                  <svg className="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                  </svg>
+                </div>
+                <h2 className="text-lg font-bold text-white drop-shadow">Preferences</h2>
+              </div>
               
               <label className="flex items-center space-x-3">
                 <input
@@ -737,22 +823,22 @@ export default function EditProfilePage() {
                   onChange={(e) => setData({ ...data, looking_for_roommate: e.target.checked })}
                   className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
                 />
-                <span className="text-sm text-gray-700">I'm looking for roommates</span>
+                <span className="text-sm text-white/90 drop-shadow">I'm looking for roommates</span>
               </label>
             </div>
 
             {/* Submit */}
-            <div className="pt-6 flex space-x-4">
+            <div className="pt-6 flex flex-col sm:flex-row gap-3 sm:space-x-4">
               <button
                 type="submit"
                 disabled={saving}
-                className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="glass-button flex-1 px-4 sm:px-6 py-2.5 sm:py-3 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base font-semibold"
               >
                 {saving ? 'Saving...' : 'Save Changes'}
               </button>
               <Link
                 href="/dashboard"
-                className="px-6 py-3 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-center"
+                className="glass-light px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-white hover:bg-white/20 text-center text-sm sm:text-base font-medium transition-all"
               >
                 Cancel
               </Link>
@@ -760,9 +846,9 @@ export default function EditProfilePage() {
           </form>
 
           {/* Delete Account Section */}
-          <div className="mt-12 pt-8 border-t border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Danger Zone</h2>
-            <p className="text-sm text-gray-600 mb-4">
+          <div className="mt-12 pt-8 border-t border-white/20">
+            <h2 className="text-base sm:text-lg font-semibold text-white mb-4 drop-shadow">Danger Zone</h2>
+            <p className="text-xs sm:text-sm text-white/80 mb-4 drop-shadow">
               Once you delete your account, there is no going back. Please be certain.
             </p>
             
@@ -770,21 +856,21 @@ export default function EditProfilePage() {
               <button
                 type="button"
                 onClick={() => setShowDeleteConfirm(true)}
-                className="px-4 py-2 border border-red-300 text-red-700 rounded-md hover:bg-red-50"
+                className="glass-card px-4 py-2 bg-red-500/20 border-red-300/30 text-white rounded-lg hover:bg-red-500/30 text-sm font-medium transition-all"
               >
                 Delete Account
               </button>
             ) : (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-md">
-                <p className="text-sm text-red-800 mb-4 font-semibold">
+              <div className="p-3 sm:p-4 glass-card bg-red-500/20 border-red-300/30 rounded-xl">
+                <p className="text-xs sm:text-sm text-white mb-4 font-semibold drop-shadow">
                   Are you absolutely sure? This action cannot be undone.
                 </p>
-                <div className="flex space-x-3">
+                <div className="flex flex-col sm:flex-row gap-3">
                   <button
                     type="button"
                     onClick={handleDeleteAccount}
                     disabled={deleting}
-                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="glass-button bg-red-500/30 px-4 py-2 text-white rounded-lg hover:bg-red-500/40 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                   >
                     {deleting ? 'Deleting...' : 'Yes, delete my account'}
                   </button>
@@ -792,7 +878,7 @@ export default function EditProfilePage() {
                     type="button"
                     onClick={() => setShowDeleteConfirm(false)}
                     disabled={deleting}
-                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 disabled:opacity-50"
+                    className="glass-light px-4 py-2 text-white rounded-lg hover:bg-white/20 disabled:opacity-50 text-sm font-medium transition-all"
                   >
                     Cancel
                   </button>

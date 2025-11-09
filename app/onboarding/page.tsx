@@ -343,33 +343,77 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl w-full space-y-8">
-        {/* Progress bar */}
-        <div className="w-full bg-gray-200 rounded-full h-2">
-          <div
-            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-            style={{ width: `${(step / 5) * 100}%` }}
-          />
+    <div className="min-h-screen gradient-mesh flex flex-col items-center justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Floating orbs - Ultra Dark */}
+      <div className="absolute top-1/4 left-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-indigo-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-purple-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse animation-delay-2000"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 sm:w-[600px] sm:h-[600px] bg-blue-500/15 rounded-full mix-blend-lighten filter blur-3xl animate-pulse animation-delay-4000"></div>
+      
+      <div className="max-w-2xl w-full space-y-6 sm:space-y-8 relative z-10">
+        {/* Epic Progress Indicator */}
+        <div className="glass-strong rounded-2xl p-6 sm:p-8 space-y-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium text-white/90 drop-shadow">Step {step} of 5</span>
+            <span className="text-sm font-bold text-white drop-shadow">{Math.round((step / 5) * 100)}%</span>
+          </div>
+          
+          {/* Progress bar with glow */}
+          <div className="relative w-full glass-light rounded-full h-3 overflow-hidden">
+            <div
+              className="absolute inset-0 bg-gradient-to-r from-purple-500 via-blue-500 to-indigo-500 h-3 rounded-full transition-all duration-500 ease-out"
+              style={{ 
+                width: `${(step / 5) * 100}%`,
+                boxShadow: '0 0 20px rgba(139, 92, 246, 0.6), 0 0 40px rgba(99, 102, 241, 0.4)'
+              }}
+            />
+          </div>
+          
+          {/* Step indicators */}
+          <div className="flex justify-between items-center pt-2">
+            {[1, 2, 3, 4, 5].map((num) => (
+              <div key={num} className="flex flex-col items-center gap-2">
+                <div 
+                  className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm transition-all duration-300 ${
+                    num < step 
+                      ? 'glass-button scale-100' 
+                      : num === step
+                        ? 'glass-button scale-110 animate-pulse'
+                        : 'glass-light text-white/40'
+                  }`}
+                  style={num === step ? { 
+                    boxShadow: '0 0 20px rgba(139, 92, 246, 0.8), 0 0 30px rgba(99, 102, 241, 0.5)'
+                  } : {}}
+                >
+                  {num < step ? (
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  ) : (
+                    num
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow px-8 py-10">
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+        <div className="glass-strong rounded-2xl sm:rounded-3xl px-6 sm:px-8 md:px-10 py-8 sm:py-10">
+          <div className="mb-6 sm:mb-8">
+            <h2 className="text-xl sm:text-2xl font-bold text-white mb-2 drop-shadow-lg">
               {step === 1 && 'Welcome! Let\'s set up your profile'}
               {step === 2 && 'What are you up to?'}
               {step === 3 && 'Tell us more'}
               {step === 4 && 'Where are you located?'}
               {step === 5 && 'Connect & preferences'}
             </h2>
-            <p className="text-gray-600">
+            <p className="text-sm sm:text-base text-white/80 drop-shadow">
               Step {step} of 5
             </p>
           </div>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
-              <p className="text-sm text-red-800">{error}</p>
+            <div className="mb-6 p-3 sm:p-4 glass-card bg-red-500/20 border-red-300/30 rounded-xl">
+              <p className="text-xs sm:text-sm text-white drop-shadow">{error}</p>
             </div>
           )}
 
@@ -377,26 +421,26 @@ export default function OnboardingPage() {
           {step === 1 && (
             <div className="space-y-6">
               <div>
-                <label htmlFor="full_name" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="full_name" className="block text-xs sm:text-sm font-medium text-white/90 mb-2 drop-shadow">
                   Full Name *
                 </label>
                 <input
                   type="text"
                   id="full_name"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="glass-input w-full px-3 py-2 rounded-xl focus:outline-none text-white placeholder-white/50 text-sm sm:text-base"
                   value={data.full_name}
                   onChange={(e) => updateData('full_name', e.target.value)}
                   placeholder="John Doe"
                 />
               </div>
               <div>
-                <label htmlFor="grad_year" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="grad_year" className="block text-xs sm:text-sm font-medium text-white/90 mb-2 drop-shadow">
                   Graduation Year * (4-digit year)
                 </label>
                 <input
                   type="number"
                   id="grad_year"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="glass-input w-full px-3 py-2 rounded-xl focus:outline-none text-white placeholder-white/50 text-sm sm:text-base"
                   value={data.grad_year || ''}
                   onChange={(e) => {
                     const value = e.target.value
@@ -413,18 +457,18 @@ export default function OnboardingPage() {
                 />
               </div>
               <div>
-                <label htmlFor="personal_email" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="personal_email" className="block text-xs sm:text-sm font-medium text-white/90 mb-2 drop-shadow">
                   Personal Email (optional)
                 </label>
                 <input
                   type="email"
                   id="personal_email"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="glass-input w-full px-3 py-2 rounded-xl focus:outline-none text-white placeholder-white/50 text-sm sm:text-base"
                   value={data.personal_email}
                   onChange={(e) => updateData('personal_email', e.target.value)}
                   placeholder="your.name@gmail.com"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-white/70 mt-1 drop-shadow">
                   Recommended: Add a personal email so classmates can reach you after you lose access to your .edu email
                 </p>
               </div>
@@ -435,23 +479,72 @@ export default function OnboardingPage() {
           {step === 2 && (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-4">
+                <label className="block text-xs sm:text-sm font-medium text-white/90 mb-4 drop-shadow">
                   Current Status *
                 </label>
                 <div className="space-y-3">
                   {[
-                    { value: 'employed', label: 'Employed', desc: 'Working full-time or part-time' },
-                    { value: 'internship', label: 'Internship', desc: 'Summer or part-time internship' },
-                    { value: 'grad_school', label: 'Grad School', desc: 'Pursuing further education' },
-                    { value: 'looking', label: 'Looking', desc: 'Seeking opportunities' },
+                    { 
+                      value: 'employed', 
+                      label: 'Employed', 
+                      desc: 'Working full-time or part-time',
+                      icon: (
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                      ),
+                      gradient: 'from-emerald-500/20 to-teal-500/20',
+                      iconColor: 'text-emerald-400'
+                    },
+                    { 
+                      value: 'internship', 
+                      label: 'Internship', 
+                      desc: 'Summer or part-time internship',
+                      icon: (
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                      ),
+                      gradient: 'from-blue-500/20 to-cyan-500/20',
+                      iconColor: 'text-blue-400'
+                    },
+                    { 
+                      value: 'grad_school', 
+                      label: 'Grad School', 
+                      desc: 'Pursuing further education',
+                      icon: (
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
+                        </svg>
+                      ),
+                      gradient: 'from-purple-500/20 to-pink-500/20',
+                      iconColor: 'text-purple-400'
+                    },
+                    { 
+                      value: 'looking', 
+                      label: 'Looking', 
+                      desc: 'Seeking opportunities',
+                      icon: (
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                      ),
+                      gradient: 'from-orange-500/20 to-red-500/20',
+                      iconColor: 'text-orange-400'
+                    },
                   ].map((option) => (
                     <label
                       key={option.value}
-                      className={`flex items-start p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                      className={`group flex items-start p-4 sm:p-5 glass-card rounded-xl cursor-pointer transition-all duration-300 ${
                         data.status === option.value
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? 'bg-gradient-to-br from-purple-500/30 to-blue-500/30 border-purple-400/50 scale-[1.02] shadow-lg'
+                          : 'hover:bg-white/10 hover:scale-[1.01]'
                       }`}
+                      style={data.status === option.value ? {
+                        boxShadow: '0 8px 32px rgba(139, 92, 246, 0.3), 0 0 20px rgba(99, 102, 241, 0.2)'
+                      } : {}}
                     >
                       <input
                         type="radio"
@@ -459,11 +552,23 @@ export default function OnboardingPage() {
                         value={option.value}
                         checked={data.status === option.value}
                         onChange={(e) => updateData('status', e.target.value)}
-                        className="mt-1 mr-3"
+                        className="sr-only"
                       />
-                      <div>
-                        <div className="font-medium text-gray-900">{option.label}</div>
-                        <div className="text-sm text-gray-500">{option.desc}</div>
+                      <div className={`flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br ${option.gradient} flex items-center justify-center ${option.iconColor} mr-4 transition-transform duration-300 ${
+                        data.status === option.value ? 'scale-110' : 'group-hover:scale-105'
+                      }`}>
+                        {option.icon}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className="font-semibold text-white drop-shadow text-sm sm:text-base">{option.label}</div>
+                          {data.status === option.value && (
+                            <svg className="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </div>
+                        <div className="text-xs sm:text-sm text-white/70 drop-shadow">{option.desc}</div>
                       </div>
                     </label>
                   ))}
@@ -478,44 +583,46 @@ export default function OnboardingPage() {
               {(data.status === 'employed' || data.status === 'internship') && (
                 <>
                   <div>
-                    <label htmlFor="employer" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="employer" className="block text-xs sm:text-sm font-medium text-white/90 mb-2 drop-shadow">
                       Employer *
                     </label>
                     <input
                       type="text"
                       id="employer"
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="glass-input w-full px-4 py-3 rounded-xl focus:outline-none text-white placeholder-white/50 text-sm sm:text-base"
                       value={data.employer}
                       onChange={(e) => updateData('employer', e.target.value)}
-                      placeholder="Google"
+                      placeholder="e.g., Google, Microsoft, Tesla"
                     />
                   </div>
                   <div>
-                    <label htmlFor="job_title" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="job_title" className="block text-xs sm:text-sm font-medium text-white/90 mb-2 drop-shadow">
                       {data.status === 'internship' ? 'Internship Title *' : 'Job Title *'}
                     </label>
                     <input
                       type="text"
                       id="job_title"
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="glass-input w-full px-4 py-3 rounded-xl focus:outline-none text-white placeholder-white/50 text-sm sm:text-base"
                       value={data.job_title}
                       onChange={(e) => updateData('job_title', e.target.value)}
-                      placeholder={data.status === 'internship' ? 'Software Engineer Intern' : 'Software Engineer'}
+                      placeholder={data.status === 'internship' ? 'e.g., Software Engineer Intern' : 'e.g., Software Engineer, Product Manager'}
                     />
                   </div>
-                  <div className="flex items-start">
-                    <input
-                      type="checkbox"
-                      id="hide_employer"
-                      className="mt-1 mr-3 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                      checked={!data.show_employer}
-                      onChange={(e) => updateData('show_employer', !e.target.checked)}
-                    />
-                    <label htmlFor="hide_employer" className="text-sm text-gray-700">
-                      <span className="font-medium">Hide my employer name</span>
-                      <p className="text-gray-500 mt-1">Your job title will still be visible, but not your employer.</p>
+                  <div className="glass-card p-4 rounded-xl">
+                    <label htmlFor="hide_employer" className="flex items-start cursor-pointer group">
+                      <input
+                        type="checkbox"
+                        id="hide_employer"
+                        className="mt-1 mr-3 h-5 w-5 rounded border-white/20 bg-white/10 text-purple-500 focus:ring-2 focus:ring-purple-400"
+                        checked={!data.show_employer}
+                        onChange={(e) => updateData('show_employer', !e.target.checked)}
+                      />
+                      <div className="flex-1">
+                        <span className="font-medium text-white drop-shadow text-sm">Hide my employer name</span>
+                        <p className="text-white/70 mt-1 text-xs drop-shadow">Your job title will still be visible, but your employer name will be hidden from your profile.</p>
+                      </div>
                     </label>
                   </div>
                 </>
@@ -524,14 +631,14 @@ export default function OnboardingPage() {
                 <>
                   {/* University Autocomplete */}
                   <div className="relative">
-                    <label htmlFor="grad_school" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="grad_school" className="block text-xs sm:text-sm font-medium text-white/90 mb-2 drop-shadow">
                       School *
                     </label>
                     <input
                       type="text"
                       id="grad_school"
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="glass-input w-full px-4 py-3 rounded-xl focus:outline-none text-white placeholder-white/50 text-sm sm:text-base"
                       value={universitySearch || data.grad_school}
                       onChange={(e) => {
                         setUniversitySearch(e.target.value)
@@ -540,11 +647,11 @@ export default function OnboardingPage() {
                       }}
                       onFocus={() => setShowUniversitySuggestions(true)}
                       onBlur={() => setTimeout(() => setShowUniversitySuggestions(false), 200)}
-                      placeholder="Start typing university name..."
+                      placeholder="e.g., Stanford University, MIT"
                       autoComplete="off"
                     />
                     {showUniversitySuggestions && universitySuggestions.length > 0 && (
-                      <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                      <div className="absolute z-50 w-full mt-1 glass-strong rounded-lg max-h-60 overflow-auto border border-white/10">
                         {universitySuggestions.map((uni, idx) => (
                           <div
                             key={idx}
@@ -553,7 +660,7 @@ export default function OnboardingPage() {
                               setUniversitySearch(uni)
                               setShowUniversitySuggestions(false)
                             }}
-                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                            className="px-4 py-2.5 hover:bg-white/10 cursor-pointer text-sm text-white transition-colors"
                           >
                             {uni}
                           </div>
@@ -564,14 +671,14 @@ export default function OnboardingPage() {
 
                   {/* Program Autocomplete */}
                   <div className="relative">
-                    <label htmlFor="program" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="program" className="block text-xs sm:text-sm font-medium text-white/90 mb-2 drop-shadow">
                       Program *
                     </label>
                     <input
                       type="text"
                       id="program"
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="glass-input w-full px-4 py-3 rounded-xl focus:outline-none text-white placeholder-white/50 text-sm sm:text-base"
                       value={programSearch || data.program}
                       onChange={(e) => {
                         setProgramSearch(e.target.value)
@@ -580,11 +687,11 @@ export default function OnboardingPage() {
                       }}
                       onFocus={() => setShowProgramSuggestions(true)}
                       onBlur={() => setTimeout(() => setShowProgramSuggestions(false), 200)}
-                      placeholder="Start typing program name..."
+                      placeholder="e.g., Computer Science, MBA"
                       autoComplete="off"
                     />
                     {showProgramSuggestions && programSuggestions.length > 0 && (
-                      <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                      <div className="absolute z-50 w-full mt-1 glass-strong rounded-lg max-h-60 overflow-auto border border-white/10">
                         {programSuggestions.map((prog, idx) => (
                           <div
                             key={idx}
@@ -593,7 +700,7 @@ export default function OnboardingPage() {
                               setProgramSearch(prog)
                               setShowProgramSuggestions(false)
                             }}
-                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                            className="px-4 py-2.5 hover:bg-white/10 cursor-pointer text-sm text-white transition-colors"
                           >
                             {prog}
                           </div>
@@ -604,14 +711,14 @@ export default function OnboardingPage() {
 
                   {/* Degree Autocomplete */}
                   <div className="relative">
-                    <label htmlFor="degree" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="degree" className="block text-xs sm:text-sm font-medium text-white/90 mb-2 drop-shadow">
                       Degree *
                     </label>
                     <input
                       type="text"
                       id="degree"
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="glass-input w-full px-4 py-3 rounded-xl focus:outline-none text-white placeholder-white/50 text-sm sm:text-base"
                       value={degreeSearch || data.degree}
                       onChange={(e) => {
                         setDegreeSearch(e.target.value)
@@ -620,11 +727,11 @@ export default function OnboardingPage() {
                       }}
                       onFocus={() => setShowDegreeSuggestions(true)}
                       onBlur={() => setTimeout(() => setShowDegreeSuggestions(false), 200)}
-                      placeholder="Start typing degree..."
+                      placeholder="e.g., PhD, MS, MBA"
                       autoComplete="off"
                     />
                     {showDegreeSuggestions && degreeSuggestions.length > 0 && (
-                      <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                      <div className="absolute z-50 w-full mt-1 glass-strong rounded-lg max-h-60 overflow-auto border border-white/10">
                         {degreeSuggestions.map((deg, idx) => (
                           <div
                             key={idx}
@@ -633,7 +740,7 @@ export default function OnboardingPage() {
                               setDegreeSearch(deg)
                               setShowDegreeSuggestions(false)
                             }}
-                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                            className="px-4 py-2.5 hover:bg-white/10 cursor-pointer text-sm text-white transition-colors"
                           >
                             {deg}
                           </div>
@@ -642,25 +749,35 @@ export default function OnboardingPage() {
                     )}
                   </div>
 
-                  <div className="flex items-start">
-                    <input
-                      type="checkbox"
-                      id="hide_school"
-                      className="mt-1 mr-3 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                      checked={!data.show_school}
-                      onChange={(e) => updateData('show_school', !e.target.checked)}
-                    />
-                    <label htmlFor="hide_school" className="text-sm text-gray-700">
-                      <span className="font-medium">Hide my school name</span>
-                      <p className="text-gray-500 mt-1">Your program and degree will still be visible, but not your school.</p>
+                  <div className="glass-card p-4 rounded-xl">
+                    <label htmlFor="hide_school" className="flex items-start cursor-pointer group">
+                      <input
+                        type="checkbox"
+                        id="hide_school"
+                        className="mt-1 mr-3 h-5 w-5 rounded border-white/20 bg-white/10 text-purple-500 focus:ring-2 focus:ring-purple-400"
+                        checked={!data.show_school}
+                        onChange={(e) => updateData('show_school', !e.target.checked)}
+                      />
+                      <div className="flex-1">
+                        <span className="font-medium text-white drop-shadow text-sm">Hide my school name</span>
+                        <p className="text-white/70 mt-1 text-xs drop-shadow">Your program and degree will still be visible, but your school name will be hidden from your profile.</p>
+                      </div>
                     </label>
                   </div>
                 </>
               )}
               {data.status === 'looking' && (
-                <div>
-                  <p className="text-gray-600">
-                    You're all set for this step! Continue to add your location.
+                <div className="glass-card p-6 rounded-xl text-center">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500/20 to-red-500/20 mb-4">
+                    <svg className="w-8 h-8 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </div>
+                  <p className="text-white/90 font-medium mb-2 drop-shadow">
+                    Ready to explore opportunities!
+                  </p>
+                  <p className="text-white/70 text-sm drop-shadow">
+                    You're all set for this step. Continue to add your location so classmates can connect with you.
                   </p>
                 </div>
               )}
@@ -671,31 +788,35 @@ export default function OnboardingPage() {
           {step === 4 && (
             <div className="space-y-6">
               <div className="relative">
-                <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="location" className="block text-xs sm:text-sm font-medium text-white/90 mb-2 drop-shadow">
                   Location *
                 </label>
-                <input
-                  type="text"
-                  id="location"
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  value={locationSearch}
-                  onChange={(e) => {
-                    setLocationSearch(e.target.value)
-                    // Allow searching again when user manually types
-                    setIsLocationSelected(false)
-                  }}
-                  placeholder="Search for a city..."
-                  autoComplete="off"
-                />
-                {searchingLocation && (
-                  <div className="absolute right-3 top-10 text-gray-400">
-                    Searching...
-                  </div>
-                )}
+                <div className="relative">
+                  <input
+                    type="text"
+                    id="location"
+                    required
+                    className="glass-input w-full px-4 py-3 pr-10 rounded-xl focus:outline-none text-white placeholder-white/50 text-sm sm:text-base"
+                    value={locationSearch}
+                    onChange={(e) => {
+                      setLocationSearch(e.target.value)
+                      setIsLocationSelected(false)
+                    }}
+                    placeholder="Type to search... e.g., San Francisco, CA"
+                    autoComplete="off"
+                  />
+                  {searchingLocation && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <svg className="animate-spin h-5 w-5 text-white/60" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                    </div>
+                  )}
+                </div>
                 {locationSuggestions.length > 0 && (
                   <div 
-                    className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto"
+                    className="absolute z-50 w-full mt-1 glass-strong rounded-lg max-h-60 overflow-auto border border-white/10 shadow-2xl"
                     onMouseDown={(e) => e.preventDefault()}
                   >
                     {locationSuggestions.map((location, idx) => (
@@ -704,12 +825,15 @@ export default function OnboardingPage() {
                         onClick={(e) => {
                           e.preventDefault()
                           e.stopPropagation()
-                          console.log('Clicking location item')
                           selectLocation(location)
                         }}
-                        className="w-full px-4 py-2 text-left hover:bg-gray-100 cursor-pointer"
+                        className="w-full px-4 py-3 text-left hover:bg-white/10 cursor-pointer transition-colors flex items-center gap-3 group"
                       >
-                        <div className="font-medium text-gray-900">
+                        <svg className="w-5 h-5 text-blue-400 flex-shrink-0 group-hover:text-blue-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <div className="font-medium text-white text-sm">
                           {location.display_name}
                         </div>
                       </div>
@@ -718,86 +842,133 @@ export default function OnboardingPage() {
                 )}
               </div>
               {data.city && data.state && (
-                <div className="p-3 bg-green-50 border border-green-200 rounded-md">
-                  <p className="text-sm text-green-800">
-                    ✓ Location set: {data.city}, {data.state}
-                  </p>
+                <div className="glass-card bg-emerald-500/10 border-emerald-400/30 p-4 rounded-xl flex items-center gap-3 animate-fade-in">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center">
+                    <svg className="w-5 h-5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-white drop-shadow">
+                      Location confirmed
+                    </p>
+                    <p className="text-xs text-white/70 drop-shadow mt-0.5">
+                      {data.city}, {data.state}
+                    </p>
+                  </div>
                 </div>
               )}
-              <p className="text-sm text-gray-500">
-                * Required field. Your exact location will not be shared. We use this to connect you with grads nearby (within 50 miles) or from your institution.
-              </p>
+              <div className="glass-card p-4 rounded-xl">
+                <div className="flex gap-3">
+                  <svg className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  <div>
+                    <p className="text-sm font-medium text-white/90 drop-shadow mb-1">Privacy Protected</p>
+                    <p className="text-xs text-white/70 drop-shadow leading-relaxed">
+                      Your exact location will not be shared. We use this to connect you with classmates from your university and alumni within 50 miles.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
           {/* Step 5: Social & Preferences */}
           {step === 5 && (
             <div className="space-y-6">
-              <p className="text-sm text-gray-600 mb-4">
-                All fields on this page are optional. Add social links to help classmates connect with you.
-              </p>
+              <div className="glass-card p-4 rounded-xl text-center mb-6">
+                <p className="text-sm text-white/80 drop-shadow">
+                  All fields on this page are <span className="font-semibold text-white">optional</span>. Add social links to help classmates connect with you.
+                </p>
+              </div>
+              
               <div>
-                <label htmlFor="linkedin_url" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="linkedin_url" className="block text-xs sm:text-sm font-medium text-white/90 mb-2 drop-shadow flex items-center gap-2">
+                  <svg className="w-4 h-4 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20.5 2h-17A1.5 1.5 0 002 3.5v17A1.5 1.5 0 003.5 22h17a1.5 1.5 0 001.5-1.5v-17A1.5 1.5 0 0020.5 2zM8 19H5v-9h3zM6.5 8.25A1.75 1.75 0 118.3 6.5a1.78 1.78 0 01-1.8 1.75zM19 19h-3v-4.74c0-1.42-.6-1.93-1.38-1.93A1.74 1.74 0 0013 14.19a.66.66 0 000 .14V19h-3v-9h2.9v1.3a3.11 3.11 0 012.7-1.4c1.55 0 3.36.86 3.36 3.66z"/>
+                  </svg>
                   LinkedIn URL (optional)
                 </label>
                 <input
                   type="url"
                   id="linkedin_url"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="glass-input w-full px-4 py-3 rounded-xl focus:outline-none text-white placeholder-white/50 text-sm sm:text-base"
                   value={data.linkedin_url}
                   onChange={(e) => updateData('linkedin_url', e.target.value)}
                   placeholder="https://linkedin.com/in/yourprofile"
                 />
               </div>
+              
               <div>
-                <label htmlFor="twitter_url" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="twitter_url" className="block text-xs sm:text-sm font-medium text-white/90 mb-2 drop-shadow flex items-center gap-2">
+                  <svg className="w-4 h-4 text-sky-400" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                  </svg>
                   Twitter/X URL (optional)
                 </label>
                 <input
                   type="url"
                   id="twitter_url"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="glass-input w-full px-4 py-3 rounded-xl focus:outline-none text-white placeholder-white/50 text-sm sm:text-base"
                   value={data.twitter_url}
                   onChange={(e) => updateData('twitter_url', e.target.value)}
                   placeholder="https://twitter.com/yourhandle"
                 />
               </div>
+              
               <div>
-                <label htmlFor="personal_website" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="personal_website" className="block text-xs sm:text-sm font-medium text-white/90 mb-2 drop-shadow flex items-center gap-2">
+                  <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                  </svg>
                   Personal Website (optional)
                 </label>
                 <input
                   type="url"
                   id="personal_website"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="glass-input w-full px-4 py-3 rounded-xl focus:outline-none text-white placeholder-white/50 text-sm sm:text-base"
                   value={data.personal_website}
                   onChange={(e) => updateData('personal_website', e.target.value)}
-                  placeholder="https://yourwebsite.com"
+                  placeholder="https://yourportfolio.com"
                 />
               </div>
-              <div className="pt-4 border-t">
-                <label className="flex items-center space-x-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={data.looking_for_roommate}
-                    onChange={(e) => updateData('looking_for_roommate', e.target.checked)}
-                    className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-                  />
-                  <span className="text-sm font-medium text-gray-700">
-                    I'm looking for roommates
-                  </span>
-                </label>
+              
+              <div className="pt-4">
+                <div className="glass-card p-5 rounded-xl hover:bg-white/5 transition-colors cursor-pointer" onClick={() => updateData('looking_for_roommate', !data.looking_for_roommate)}>
+                  <label className="flex items-start gap-4 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={data.looking_for_roommate}
+                      onChange={(e) => updateData('looking_for_roommate', e.target.checked)}
+                      className="mt-1 h-5 w-5 rounded border-white/20 bg-white/10 text-purple-500 focus:ring-2 focus:ring-purple-400"
+                    />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <svg className="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        <span className="text-sm font-semibold text-white drop-shadow">
+                          I'm looking for roommates
+                        </span>
+                      </div>
+                      <p className="text-xs text-white/70 drop-shadow">
+                        Let classmates know you're searching for housing. This will make you easier to find for others looking for roommates.
+                      </p>
+                    </div>
+                  </label>
+                </div>
               </div>
             </div>
           )}
 
           {/* Navigation buttons */}
-          <div className="mt-8 flex justify-between">
+          <div className="mt-6 sm:mt-8 flex justify-between gap-3">
             {step > 1 && (
               <button
                 onClick={handleBack}
                 disabled={loading}
-                className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                className="glass-light px-4 sm:px-6 py-2 sm:py-3 rounded-xl text-white hover:bg-white/20 disabled:opacity-50 text-sm sm:text-base font-medium transition-all"
               >
                 Back
               </button>
@@ -807,7 +978,7 @@ export default function OnboardingPage() {
                 <button
                   onClick={handleNext}
                   disabled={loading}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                  className="glass-button px-4 sm:px-6 py-2 sm:py-3 text-white rounded-xl disabled:opacity-50 text-sm sm:text-base font-semibold"
                 >
                   Next
                 </button>
@@ -815,7 +986,7 @@ export default function OnboardingPage() {
                 <button
                   onClick={handleSubmit}
                   disabled={loading}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                  className="glass-button px-4 sm:px-6 py-2 sm:py-3 text-white rounded-xl disabled:opacity-50 text-sm sm:text-base font-semibold"
                 >
                   {loading ? 'Completing...' : 'Complete Setup'}
                 </button>

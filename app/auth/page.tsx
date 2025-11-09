@@ -44,21 +44,31 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Welcome to Flock
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Sign in or create an account with your .edu email
-          </p>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleAuth}>
-          <div className="rounded-md shadow-sm -space-y-px">
+    <div className="min-h-screen gradient-mesh flex items-center justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8 overflow-hidden relative">
+      {/* Floating orbs - Ultra Dark */}
+      <div className="absolute top-1/4 left-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-indigo-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-purple-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse animation-delay-2000"></div>
+      
+      <div className="max-w-md w-full space-y-6 relative z-10">
+        <div className="glass-strong rounded-2xl p-8 sm:p-10">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 mb-6">
+              <svg className="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            </div>
+            <h2 className="text-3xl font-bold text-white drop-shadow-lg tracking-tight">
+              Welcome back
+            </h2>
+            <p className="mt-3 text-sm text-white/70">
+              Sign in to access your alumni network
+            </p>
+          </div>
+          
+          <form className="space-y-6" onSubmit={handleAuth}>
             <div>
-              <label htmlFor="email-address" className="sr-only">
-                Email address
+              <label htmlFor="email-address" className="block text-sm font-medium text-white/90 mb-2.5">
+                University Email
               </label>
               <input
                 id="email-address"
@@ -66,51 +76,87 @@ export default function AuthPage() {
                 type="email"
                 autoComplete="email"
                 required
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="your.name@university.edu"
+                className="glass-input appearance-none rounded-xl block w-full px-4 py-3.5 placeholder-white/40 text-white focus:outline-none text-base"
+                placeholder="name@university.edu"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}
               />
             </div>
-          </div>
 
-          {message && (
-            <div
-              className={`rounded-md p-4 ${
-                message.type === 'error'
-                  ? 'bg-red-50 text-red-800'
-                  : 'bg-green-50 text-green-800'
-              }`}
-            >
-              <p className="text-sm">{message.text}</p>
-            </div>
-          )}
+            {message && (
+              <div className={`rounded-xl p-4 flex items-start gap-3 ${
+                  message.type === 'error'
+                    ? 'glass-card bg-red-500/10 border-red-400/20'
+                    : 'glass-card bg-emerald-500/10 border-emerald-400/20'
+                }`}
+              >
+                <div className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center ${
+                  message.type === 'error' ? 'bg-red-500/20' : 'bg-emerald-500/20'
+                }`}>
+                  {message.type === 'error' ? (
+                    <svg className="w-3 h-3 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  ) : (
+                    <svg className="w-3 h-3 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  )}
+                </div>
+                <p className="text-sm text-white flex-1">{message.text}</p>
+              </div>
+            )}
 
-          <div>
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="glass-button w-full flex items-center justify-center gap-2 py-3.5 px-4 text-base font-semibold rounded-xl text-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Sending magic link...' : 'Continue with email'}
+              {loading ? (
+                <>
+                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Sending magic link...
+                </>
+              ) : (
+                <>
+                  Continue
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </>
+              )}
             </button>
+          </form>
+
+          <div className="mt-8 space-y-4">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-white/10"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-4 glass-light text-white/60 text-xs rounded-full">
+                  Magic link authentication
+                </span>
+              </div>
+            </div>
+            
+            <p className="text-xs text-center text-white/60 leading-relaxed">
+              We'll send a secure sign-in link to your email. No password required.
+            </p>
           </div>
-        </form>
 
-        <div className="mt-6 space-y-2">
-          <p className="text-xs text-center text-gray-500">
-            We'll send you a magic link to sign in or create your account
-          </p>
-          <p className="text-xs text-center text-gray-500">
-            * You must have a .edu email address to use Flock
-          </p>
-        </div>
-
-        <div className="mt-6 pt-6 border-t border-gray-200">
-          <Link href="/" className="text-sm text-center block text-blue-600 hover:text-blue-500">
-            ← Back to home
-          </Link>
+          <div className="mt-6 pt-6 border-t border-white/10">
+            <Link href="/" className="text-sm text-center block text-white/70 hover:text-white transition-colors font-medium flex items-center justify-center gap-2">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Back to home
+            </Link>
+          </div>
         </div>
       </div>
     </div>

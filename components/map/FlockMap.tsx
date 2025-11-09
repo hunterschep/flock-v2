@@ -47,8 +47,8 @@ const layerStyle = (colorExpression: PropertyValueSpecification<string>): LayerP
   type: 'fill',
   paint: {
     'fill-color': colorExpression,
-    'fill-opacity': 0.4,
-    'fill-outline-color': '#333333',
+    'fill-opacity': 0.6,
+    'fill-outline-color': '#334155',
   },
 });
 
@@ -192,8 +192,8 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
         .fill(0)
         .map((_, index) => (
           <div key={index} className="flex items-center gap-2.5">
-            <div className="w-4 h-4 rounded border border-gray-100 bg-gray-200 animate-pulse" />
-            <div className="h-4 w-12 bg-gray-200 rounded animate-pulse" />
+            <div className="w-4 h-4 rounded border border-white/20 bg-white/10 animate-pulse" />
+            <div className="h-4 w-12 bg-white/10 rounded animate-pulse" />
           </div>
         ))}
     </div>
@@ -335,7 +335,7 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
         {...viewState}
         ref={mapRef}
         style={{ width: '100%', height: '100%' }}
-        mapStyle="https://tiles.stadiamaps.com/styles/outdoors.json"
+        mapStyle="https://tiles.stadiamaps.com/styles/alidade_smooth.json"
         cursor={hoveredStateId !== null ? 'pointer' : 'grab'}
         onMove={(evt) => {
           setViewState((prev) => ({
@@ -437,63 +437,72 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
         {/* Tooltips */}
         {hoverInfo && !selectedState && (
           <div
-            className="fixed bg-white px-3 py-2 rounded-lg shadow-md border border-gray-100 pointer-events-none z-50 text-xs"
+            className="fixed glass-strong px-3 py-2 rounded-lg pointer-events-none z-50 text-xs"
             style={{
               left: hoverInfo.x,
               top: hoverInfo.y,
               transform: 'translate(0px, -100%)',
             }}
           >
-            <div className="font-medium text-gray-900">{hoverInfo.name}</div>
-            <div className="text-gray-500">
+            <div className="font-medium text-white drop-shadow">{hoverInfo.name}</div>
+            <div className="text-white/80 drop-shadow">
               {hoverInfo.value} {hoverInfo.value === 1 ? 'person' : 'people'}
             </div>
           </div>
         )}
         {hoveredCity && (
           <div
-            className="fixed bg-white px-3 py-2 rounded-lg shadow-md border border-gray-100 text-xs z-50 pointer-events-none"
+            className="fixed glass-strong px-3 py-2 rounded-lg text-xs z-50 pointer-events-none"
             style={{
               left: hoveredCity.x,
               top: hoveredCity.y,
               transform: 'translate(-50%, -100%)',
             }}
           >
-            <div className="font-medium text-gray-900">{hoveredCity.city}</div>
-            <div className="text-gray-500">{hoveredCity.value} people</div>
+            <div className="font-medium text-white drop-shadow">{hoveredCity.city}</div>
+            <div className="text-white/80 drop-shadow">{hoveredCity.value} people</div>
           </div>
         )}
       </MapGL>
 
-      {/* Zoom Controls */}
-      <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-10">
+      {/* Zoom Controls - Enhanced */}
+      <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-10">
         <button
           onClick={() => setViewState((s) => ({ ...s, zoom: Math.min(8, s.zoom * 1.2) }))}
-          className="p-2 cursor-pointer bg-white rounded-lg shadow-md border transition transform hover:scale-110 hover:bg-gray-100 hover:shadow-lg"
+          className="p-3 cursor-pointer glass-light rounded-xl transition-all duration-300 transform hover:scale-110 hover:bg-white/20 group shadow-lg"
+          title="Zoom In"
         >
-          <Plus className="w-4 h-4 text-gray-900" />
+          <Plus className="w-5 h-5 text-white drop-shadow group-hover:text-purple-300 transition-colors" />
         </button>
         <button
           onClick={() => setViewState((s) => ({ ...s, zoom: Math.max(1, s.zoom / 1.2) }))}
-          className="p-2 cursor-pointer bg-white rounded-lg shadow-md border transition transform hover:scale-110 hover:bg-gray-100 hover:shadow-lg"
+          className="p-3 cursor-pointer glass-light rounded-xl transition-all duration-300 transform hover:scale-110 hover:bg-white/20 group shadow-lg"
+          title="Zoom Out"
         >
-          <Minus className="w-4 h-4 text-gray-900" />
+          <Minus className="w-5 h-5 text-white drop-shadow group-hover:text-purple-300 transition-colors" />
         </button>
       </div>
 
-      {/* Legend */}
-      <div className="absolute top-4 left-4 bg-white rounded-lg shadow-md border border-gray-100 p-3 z-10 max-w-xs">
-        <div className="text-sm font-semibold text-gray-900 mb-1">
-          {selectedState 
-            ? `${selectedState} Cities` 
-            : selectedCountry && selectedCountry !== 'United States'
-              ? `${selectedCountry} Cities`
-              : selectedCountry === 'United States'
-                ? 'USA States'
-                : 'Classmates by Country'
-          }
+      {/* Legend - Enhanced */}
+      <div className="absolute top-4 left-4 glass-strong rounded-2xl p-4 z-10 max-w-xs shadow-2xl">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center">
+            <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+            </svg>
+          </div>
+          <div className="text-sm font-bold text-white drop-shadow">
+            {selectedState 
+              ? `${selectedState} Cities` 
+              : selectedCountry && selectedCountry !== 'United States'
+                ? `${selectedCountry} Cities`
+                : selectedCountry === 'United States'
+                  ? 'USA States'
+                  : 'Classmates by Country'
+            }
+          </div>
         </div>
-        <div className="text-xs text-gray-600 mb-3">
+        <div className="text-xs text-white/80 drop-shadow mb-4 ml-10">
           {selectedState || (selectedCountry && selectedCountry !== 'United States')
             ? 'Institution + 50mi radius' 
             : 'From your institution'
@@ -502,7 +511,7 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
         {showSkeleton ? renderLegendSkeleton() : <Legend colorScale={colorScale} />}
       </div>
 
-      {/* Back Button */}
+      {/* Back Button - Enhanced */}
       {(selectedState || selectedCountry) && (
         <button
           onClick={() => {
@@ -541,17 +550,24 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
               }
             }
           }}
-          className="absolute top-4 right-16 px-4 py-2 bg-white rounded-lg shadow-md border hover:bg-gray-50 transition z-10 text-gray-900 cursor-pointer text-sm font-medium"
+          className="absolute top-4 right-16 px-5 py-2.5 glass-light rounded-xl transition-all duration-300 z-10 text-white cursor-pointer text-sm font-semibold drop-shadow hover:bg-white/20 hover:scale-105 flex items-center gap-2 shadow-lg"
         >
-          ← Back to {selectedState ? 'USA' : 'World'}
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to {selectedState ? 'USA' : 'World'}
         </button>
       )}
 
       <button
         onClick={toggleFullscreen}
-        className="absolute top-4 p-2 bg-white rounded-lg shadow-md border hover:bg-gray-50 transition z-10 text-gray-900 right-4 cursor-pointer"
+        className="absolute top-4 p-3 glass-light rounded-xl transition-all duration-300 z-10 text-white right-4 cursor-pointer hover:bg-white/20 hover:scale-105 shadow-lg group"
+        title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
       >
-        {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+        {isFullscreen ? 
+          <Minimize2 className="w-5 h-5 drop-shadow group-hover:text-purple-300 transition-colors" /> : 
+          <Maximize2 className="w-5 h-5 drop-shadow group-hover:text-purple-300 transition-colors" />
+        }
       </button>
     </div>
   );

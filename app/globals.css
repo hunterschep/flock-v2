@@ -8,7 +8,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
 }
 
@@ -22,5 +22,396 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+  font-weight: 500;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+strong, b {
+  font-weight: 700;
+}
+
+/* Dark Mode Glassmorphism - Ultra Dark Premium */
+.glass {
+  background: linear-gradient(135deg, rgba(20, 20, 25, 0.85), rgba(10, 10, 15, 0.8));
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6),
+              inset 0 1px 0 0 rgba(255, 255, 255, 0.03);
+}
+
+.glass-card {
+  background: linear-gradient(135deg, rgba(20, 20, 25, 0.75), rgba(10, 10, 15, 0.7));
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.7),
+              inset 0 1px 0 0 rgba(255, 255, 255, 0.05),
+              0 0 0 1px rgba(139, 92, 246, 0.03);
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  background: linear-gradient(135deg, rgba(25, 25, 30, 0.85), rgba(15, 15, 20, 0.8));
+  box-shadow: 0 16px 48px 0 rgba(0, 0, 0, 0.8),
+              inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
+              0 0 0 1px rgba(139, 92, 246, 0.1);
+  transform: translateY(-2px);
+}
+
+.glass-strong {
+  background: linear-gradient(135deg, rgba(25, 25, 30, 0.9), rgba(15, 15, 20, 0.85));
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 16px 48px 0 rgba(0, 0, 0, 0.8),
+              inset 0 2px 0 0 rgba(255, 255, 255, 0.06),
+              0 0 0 1px rgba(139, 92, 246, 0.05);
+}
+
+.glass-light {
+  background: rgba(20, 20, 25, 0.6);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.5),
+              inset 0 1px 0 0 rgba(255, 255, 255, 0.04);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-light:hover {
+  background: rgba(25, 25, 30, 0.75);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.glass-header {
+  background: linear-gradient(135deg, rgba(20, 20, 25, 0.85), rgba(10, 10, 15, 0.8));
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.6),
+              inset 0 1px 0 0 rgba(255, 255, 255, 0.04);
+}
+
+.glass-input {
+  background: linear-gradient(135deg, rgba(20, 20, 25, 0.7), rgba(10, 10, 15, 0.6));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  color: #f1f5f9;
+  box-shadow: inset 0 2px 8px 0 rgba(0, 0, 0, 0.4),
+              0 2px 8px 0 rgba(0, 0, 0, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-input::placeholder {
+  color: rgba(148, 163, 184, 0.5);
+}
+
+.glass-input:focus {
+  background: linear-gradient(135deg, rgba(25, 25, 30, 0.8), rgba(15, 15, 20, 0.7)) !important;
+  border-color: rgba(139, 92, 246, 0.6);
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15),
+              inset 0 2px 8px 0 rgba(0, 0, 0, 0.4),
+              0 4px 12px 0 rgba(139, 92, 246, 0.2);
+  outline: none;
+}
+
+/* Prevent browser autocomplete from changing background */
+.glass-input:-webkit-autofill,
+.glass-input:-webkit-autofill:hover,
+.glass-input:-webkit-autofill:focus,
+.glass-input:-webkit-autofill:active {
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: #f1f5f9;
+  transition: background-color 5000s ease-in-out 0s;
+  box-shadow: inset 0 0 20px 20px rgba(20, 20, 25, 0.9) !important;
+}
+
+/* Keep dark background when input has value */
+.glass-input:not(:placeholder-shown) {
+  background: linear-gradient(135deg, rgba(20, 20, 25, 0.7), rgba(10, 10, 15, 0.6)) !important;
+}
+
+.glass-button {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.8), rgba(99, 102, 241, 0.7));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(139, 92, 246, 0.4);
+  box-shadow: 0 4px 16px 0 rgba(139, 92, 246, 0.5),
+              inset 0 1px 0 0 rgba(255, 255, 255, 0.2),
+              0 0 0 1px rgba(139, 92, 246, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-button:hover {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 1), rgba(99, 102, 241, 0.9));
+  box-shadow: 0 8px 24px 0 rgba(139, 92, 246, 0.6),
+              inset 0 1px 0 0 rgba(255, 255, 255, 0.3),
+              0 0 0 1px rgba(139, 92, 246, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Dark Mode Premium Gradient Backgrounds - Ultra Dark */
+.gradient-animated {
+  background: linear-gradient(-45deg, #0a0a0f, #0f1419, #0c1220, #0a1628);
+  background-size: 400% 400%;
+  animation: gradient 20s ease infinite;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.gradient-ocean {
+  background: 
+    radial-gradient(at 0% 0%, hsla(240, 30%, 15%, 0.2) 0px, transparent 50%),
+    radial-gradient(at 50% 0%, hsla(220, 30%, 12%, 0.2) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, hsla(200, 30%, 12%, 0.15) 0px, transparent 50%);
+  background-color: #000000;
+}
+
+.gradient-mesh {
+  background: 
+    radial-gradient(at 0% 0%, hsla(240, 25%, 15%, 0.15) 0px, transparent 50%),
+    radial-gradient(at 50% 0%, hsla(220, 25%, 12%, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, hsla(200, 25%, 12%, 0.12) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, hsla(240, 25%, 10%, 0.1) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, hsla(200, 25%, 10%, 0.1) 0px, transparent 50%),
+    linear-gradient(135deg, #000000 0%, #0a0a0f 100%);
+}
+
+.gradient-premium {
+  background: radial-gradient(ellipse at top, #0a0a0f 0%, #000000 100%);
+  background-attachment: fixed;
+}
+
+/* Premium text gradients */
+.text-gradient {
+  background: linear-gradient(135deg, #8B5CF6 0%, #3B82F6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-premium {
+  background: linear-gradient(135deg, #a78bfa 0%, #60a5fa 50%, #34d399 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Subtle Premium Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Delay utilities for staggered animations */
+.animation-delay-100 {
+  animation-delay: 0.1s;
+}
+
+.animation-delay-200 {
+  animation-delay: 0.2s;
+}
+
+.animation-delay-300 {
+  animation-delay: 0.3s;
+}
+
+.animation-delay-400 {
+  animation-delay: 0.4s;
+}
+
+.animation-delay-500 {
+  animation-delay: 0.5s;
+}
+
+.animation-delay-1000 {
+  animation-delay: 1s;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+/* Pulse animation with glow */
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+  }
+  50% {
+    opacity: 0.8;
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.6);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(10, 10, 15, 0.5);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.5), rgba(99, 102, 241, 0.5));
+  border-radius: 10px;
+  border: 2px solid rgba(10, 10, 15, 0.5);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.7), rgba(99, 102, 241, 0.7));
+}
+
+/* Selection styling */
+::selection {
+  background-color: rgba(139, 92, 246, 0.4);
+  color: white;
+}
+
+::-moz-selection {
+  background-color: rgba(139, 92, 246, 0.4);
+  color: white;
+}
+
+/* Focus visible styling for accessibility */
+*:focus-visible {
+  outline: 2px solid rgba(139, 92, 246, 0.6);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Skeleton loading animation */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Backdrop blur support check */
+@supports not (backdrop-filter: blur(10px)) {
+  .glass,
+  .glass-card,
+  .glass-strong,
+  .glass-light,
+  .glass-header,
+  .glass-input,
+  .glass-button {
+    background: rgba(20, 20, 25, 0.95);
+  }
+}
+
+/* Feature card hover effects - CSS only */
+.feature-card-purple:hover {
+  box-shadow: 0 20px 60px rgba(139, 92, 246, 0.4), 0 0 40px rgba(99, 102, 241, 0.2);
+}
+
+.feature-card-blue:hover {
+  box-shadow: 0 20px 60px rgba(59, 130, 246, 0.4), 0 0 40px rgba(14, 165, 233, 0.2);
+}
+
+.feature-card-pink:hover {
+  box-shadow: 0 20px 60px rgba(236, 72, 153, 0.4), 0 0 40px rgba(219, 39, 119, 0.2);
 }

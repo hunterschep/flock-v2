@@ -40,14 +40,22 @@ export const Legend: React.FC<LegendProps> = ({ colorScale }) => {
   }, [domain, range]);
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2.5">
       {items.map((item, index) => (
-        <div key={index} className="flex items-center gap-2.5">
+        <div 
+          key={index} 
+          className="flex items-center gap-3 group hover:scale-105 transition-all duration-300 cursor-default"
+        >
           <div
-            className="w-4 h-4 rounded border border-gray-300"
-            style={{ backgroundColor: item.color }}
+            className="w-5 h-5 rounded-lg border-2 border-white/40 group-hover:border-white/60 shadow-lg transition-all duration-300"
+            style={{ 
+              backgroundColor: item.color,
+              boxShadow: `0 0 10px ${item.color}40`
+            }}
           />
-          <div className="text-xs text-gray-700">{item.label}</div>
+          <div className="text-xs text-white drop-shadow font-semibold tracking-wide group-hover:text-white/90 transition-colors">
+            {item.label} {item.label.includes('+') ? 'people' : ''}
+          </div>
         </div>
       ))}
     </div>
