@@ -58,10 +58,10 @@ export default function AuthPage() {
               </svg>
             </div>
             <h2 className="text-3xl font-bold text-white drop-shadow-lg tracking-tight">
-              Welcome back
+              Welcome to Flock
             </h2>
             <p className="mt-3 text-sm text-white/70">
-              Sign in to access your alumni network
+              Access your alumni network
             </p>
           </div>
           
@@ -144,9 +144,13 @@ export default function AuthPage() {
               </div>
             </div>
             
-            <p className="text-xs text-center text-white/60 leading-relaxed">
-              We'll send a secure sign-in link to your email. No password required.
-            </p>
+            <div className="glass-card bg-blue-500/10 border-blue-400/20 p-4 rounded-xl">
+              <p className="text-xs text-center text-white/80 leading-relaxed">
+                <span className="font-semibold text-white">New or returning?</span> We'll send a secure link to your email.
+                <br />
+                No password required – the same link works for both sign in and sign up!
+              </p>
+            </div>
           </div>
 
           <div className="mt-6 pt-6 border-t border-white/10">
