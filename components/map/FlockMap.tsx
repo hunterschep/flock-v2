@@ -465,33 +465,33 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
         )}
       </MapGL>
 
-      {/* Zoom Controls - Enhanced */}
-      <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-10">
+      {/* Zoom Controls - Enhanced & Mobile Responsive */}
+      <div className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 flex flex-col gap-1.5 sm:gap-3 z-10">
         <button
           onClick={() => setViewState((s) => ({ ...s, zoom: Math.min(8, s.zoom * 1.2) }))}
-          className="p-3 cursor-pointer glass-light rounded-xl transition-all duration-300 transform hover:scale-110 hover:bg-white/20 group shadow-lg"
+          className="p-2 sm:p-3 cursor-pointer glass-light rounded-lg sm:rounded-xl transition-all duration-300 transform hover:scale-110 hover:bg-white/20 group shadow-lg"
           title="Zoom In"
         >
-          <Plus className="w-5 h-5 text-white drop-shadow group-hover:text-purple-300 transition-colors" />
+          <Plus className="w-4 h-4 sm:w-5 sm:h-5 text-white drop-shadow group-hover:text-purple-300 transition-colors" />
         </button>
         <button
           onClick={() => setViewState((s) => ({ ...s, zoom: Math.max(1, s.zoom / 1.2) }))}
-          className="p-3 cursor-pointer glass-light rounded-xl transition-all duration-300 transform hover:scale-110 hover:bg-white/20 group shadow-lg"
+          className="p-2 sm:p-3 cursor-pointer glass-light rounded-lg sm:rounded-xl transition-all duration-300 transform hover:scale-110 hover:bg-white/20 group shadow-lg"
           title="Zoom Out"
         >
-          <Minus className="w-5 h-5 text-white drop-shadow group-hover:text-purple-300 transition-colors" />
+          <Minus className="w-4 h-4 sm:w-5 sm:h-5 text-white drop-shadow group-hover:text-purple-300 transition-colors" />
         </button>
       </div>
 
-      {/* Legend - Enhanced */}
-      <div className="absolute top-4 left-4 glass-strong rounded-2xl p-4 z-10 max-w-xs shadow-2xl">
-        <div className="flex items-center gap-2 mb-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center">
-            <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      {/* Legend - Enhanced & Mobile Responsive */}
+      <div className="absolute top-2 sm:top-4 left-2 sm:left-4 glass-strong rounded-xl sm:rounded-2xl p-3 sm:p-4 z-10 max-w-[200px] sm:max-w-xs shadow-2xl">
+        <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center flex-shrink-0">
+            <svg className="w-3 h-3 sm:w-4 sm:h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
             </svg>
           </div>
-          <div className="text-sm font-bold text-white drop-shadow">
+          <div className="text-xs sm:text-sm font-bold text-white drop-shadow leading-tight">
             {selectedState 
               ? `${selectedState} Cities` 
               : selectedCountry && selectedCountry !== 'United States'
@@ -502,7 +502,7 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
             }
           </div>
         </div>
-        <div className="text-xs text-white/80 drop-shadow mb-4 ml-10">
+        <div className="text-[10px] sm:text-xs text-white/80 drop-shadow mb-2 sm:mb-4 ml-7 sm:ml-10">
           {selectedState || (selectedCountry && selectedCountry !== 'United States')
             ? 'Institution + 50mi radius' 
             : 'From your institution'
@@ -511,7 +511,7 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
         {showSkeleton ? renderLegendSkeleton() : <Legend colorScale={colorScale} />}
       </div>
 
-      {/* Back Button - Enhanced */}
+      {/* Back Button - Enhanced & Mobile Responsive */}
       {(selectedState || selectedCountry) && (
         <button
           onClick={() => {
@@ -550,23 +550,23 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
               }
             }
           }}
-          className="absolute top-4 right-16 px-5 py-2.5 glass-light rounded-xl transition-all duration-300 z-10 text-white cursor-pointer text-sm font-semibold drop-shadow hover:bg-white/20 hover:scale-105 flex items-center gap-2 shadow-lg"
+          className="absolute top-2 sm:top-4 right-12 sm:right-16 px-3 sm:px-5 py-2 sm:py-2.5 glass-light rounded-lg sm:rounded-xl transition-all duration-300 z-10 text-white cursor-pointer text-xs sm:text-sm font-semibold drop-shadow hover:bg-white/20 hover:scale-105 flex items-center gap-1.5 sm:gap-2 shadow-lg"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
-          Back to {selectedState ? 'USA' : 'World'}
+          <span className="hidden sm:inline">Back to </span>{selectedState ? 'USA' : 'World'}
         </button>
       )}
 
       <button
         onClick={toggleFullscreen}
-        className="absolute top-4 p-3 glass-light rounded-xl transition-all duration-300 z-10 text-white right-4 cursor-pointer hover:bg-white/20 hover:scale-105 shadow-lg group"
+        className="absolute top-2 sm:top-4 p-2 sm:p-3 glass-light rounded-lg sm:rounded-xl transition-all duration-300 z-10 text-white right-2 sm:right-4 cursor-pointer hover:bg-white/20 hover:scale-105 shadow-lg group"
         title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
       >
         {isFullscreen ? 
-          <Minimize2 className="w-5 h-5 drop-shadow group-hover:text-purple-300 transition-colors" /> : 
-          <Maximize2 className="w-5 h-5 drop-shadow group-hover:text-purple-300 transition-colors" />
+          <Minimize2 className="w-4 h-4 sm:w-5 sm:h-5 drop-shadow group-hover:text-purple-300 transition-colors" /> : 
+          <Maximize2 className="w-4 h-4 sm:w-5 sm:h-5 drop-shadow group-hover:text-purple-300 transition-colors" />
         }
       </button>
     </div>

@@ -118,8 +118,8 @@ export default function Home() {
         {/* Locked Map Preview - EPIC Interactive Element */}
         <div className="max-w-6xl mx-auto animate-fade-in-up" style={{animationDelay: '500ms'}}>
           <div className="relative group">
-            {/* Map Container with blur */}
-            <div className="glass-strong rounded-3xl overflow-hidden relative" style={{ height: '500px' }}>
+            {/* Map Container with blur - responsive height */}
+            <div className="glass-strong rounded-3xl overflow-hidden relative h-[350px] sm:h-[450px] md:h-[500px]">
               <div className="absolute inset-0 pointer-events-none z-10">
                 <FlockMap />
               </div>
@@ -128,48 +128,48 @@ export default function Home() {
               <div className="absolute inset-0 backdrop-blur-sm bg-black/30 z-20"></div>
               
               {/* Lock UI */}
-              <div className="absolute inset-0 z-30 flex flex-col items-center justify-center p-8 text-center">
+              <div className="absolute inset-0 z-30 flex flex-col items-center justify-center p-4 sm:p-8 text-center">
                 {/* Animated Lock Icon */}
-                <div className="relative mb-6">
+                <div className="relative mb-4 sm:mb-6">
                   <div className="absolute inset-0 bg-purple-500/30 rounded-full blur-2xl animate-pulse"></div>
-                  <div className="relative glass-strong p-6 rounded-3xl">
-                    <Lock className="w-12 h-12 text-purple-400 animate-pulse" />
+                  <div className="relative glass-strong p-4 sm:p-6 rounded-2xl sm:rounded-3xl">
+                    <Lock className="w-8 h-8 sm:w-12 sm:h-12 text-purple-400 animate-pulse" />
                   </div>
                 </div>
                 
-                <h3 className="text-3xl sm:text-4xl font-bold text-white mb-4 drop-shadow-lg">
+                <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4 drop-shadow-lg px-4">
                   Your Network Awaits
                 </h3>
-                <p className="text-lg text-white/80 mb-8 max-w-md">
+                <p className="text-sm sm:text-base md:text-lg text-white/80 mb-6 sm:mb-8 max-w-md px-4">
                   Sign in to explore the interactive alumni map and connect with your network
                 </p>
                 
                 <Link
                   href="/auth"
-                  className="group relative px-8 py-4 glass-button rounded-2xl font-bold text-base flex items-center gap-3 hover:scale-105 transition-all duration-300 overflow-hidden"
+                  className="group relative px-6 sm:px-8 py-3 sm:py-4 glass-button rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base flex items-center gap-2 sm:gap-3 hover:scale-105 transition-all duration-300 overflow-hidden"
                   style={{
                     boxShadow: '0 15px 40px rgba(139, 92, 246, 0.4)'
                   }}
                 >
-                  <Lock className="w-5 h-5 relative z-10" />
+                  <Lock className="w-4 h-4 sm:w-5 sm:h-5 relative z-10" />
                   <span className="relative z-10">Unlock Full Access</span>
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform relative z-10" />
+                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-2 transition-transform relative z-10" />
                   <div className="absolute inset-0 bg-gradient-to-r from-purple-600/0 via-purple-600/50 to-purple-600/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
                 </Link>
 
                 {/* Feature Pills */}
-                <div className="flex flex-wrap justify-center gap-3 mt-8">
-                  <div className="glass-light px-4 py-2 rounded-full flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-blue-400" />
-                    <span className="text-sm text-white/90">Live Map</span>
+                <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mt-6 sm:mt-8 px-4">
+                  <div className="glass-light px-3 sm:px-4 py-1.5 sm:py-2 rounded-full flex items-center gap-1.5 sm:gap-2">
+                    <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400" />
+                    <span className="text-xs sm:text-sm text-white/90">Live Map</span>
                   </div>
-                  <div className="glass-light px-4 py-2 rounded-full flex items-center gap-2">
-                    <Users className="w-4 h-4 text-purple-400" />
-                    <span className="text-sm text-white/90">Alumni Directory</span>
+                  <div className="glass-light px-3 sm:px-4 py-1.5 sm:py-2 rounded-full flex items-center gap-1.5 sm:gap-2">
+                    <Users className="w-3 h-3 sm:w-4 sm:h-4 text-purple-400" />
+                    <span className="text-xs sm:text-sm text-white/90">Alumni Directory</span>
                   </div>
-                  <div className="glass-light px-4 py-2 rounded-full flex items-center gap-2">
-                    <HomeIcon className="w-4 h-4 text-pink-400" />
-                    <span className="text-sm text-white/90">Roommate Finder</span>
+                  <div className="glass-light px-3 sm:px-4 py-1.5 sm:py-2 rounded-full flex items-center gap-1.5 sm:gap-2">
+                    <HomeIcon className="w-3 h-3 sm:w-4 sm:h-4 text-pink-400" />
+                    <span className="text-xs sm:text-sm text-white/90">Roommate Finder</span>
                   </div>
                 </div>
               </div>
@@ -181,10 +181,10 @@ export default function Home() {
         </div>
 
         {/* University Carousel - EPIC */}
-        <div className="max-w-6xl mx-auto mt-24 overflow-hidden">
-          <div className="text-center mb-12">
-            <p className="text-sm uppercase tracking-wider text-white/50 font-semibold mb-4">Trusted By Students At</p>
-            <h3 className="text-2xl sm:text-3xl font-bold text-white drop-shadow-lg">
+        <div className="max-w-6xl mx-auto mt-16 sm:mt-24 overflow-hidden pb-12 sm:pb-16">
+          <div className="text-center mb-8 sm:mb-12">
+            <p className="text-xs sm:text-sm uppercase tracking-wider text-white/50 font-semibold mb-3 sm:mb-4">Trusted By Students At</p>
+            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white drop-shadow-lg">
               Top Universities Nationwide
             </h3>
           </div>
@@ -197,7 +197,7 @@ export default function Home() {
             
             <div className="flex animate-carousel">
               {/* First set of universities */}
-              <div className="flex gap-6 shrink-0">
+              <div className="flex gap-4 sm:gap-6 shrink-0">
                 {[
                   { emoji: '🌲', name: 'Stanford', color: 'from-red-500/20 to-red-600/20' },
                   { emoji: '🐻', name: 'UC Berkeley', color: 'from-blue-500/20 to-yellow-500/20' },
@@ -210,18 +210,18 @@ export default function Home() {
                 ].map((uni, idx) => (
                   <div
                     key={`set1-${idx}`}
-                    className="glass-card p-6 rounded-2xl flex flex-col items-center gap-3 min-w-[140px] hover:scale-105 transition-all duration-300 group cursor-pointer"
+                    className="glass-card p-4 sm:p-6 rounded-xl sm:rounded-2xl flex flex-col items-center gap-2 sm:gap-3 min-w-[110px] sm:min-w-[140px] hover:scale-105 transition-all duration-300 group cursor-pointer"
                   >
-                    <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${uni.color} flex items-center justify-center text-4xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
+                    <div className={`w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br ${uni.color} flex items-center justify-center text-3xl sm:text-4xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
                       {uni.emoji}
                     </div>
-                    <span className="text-sm font-semibold text-white/90 text-center">{uni.name}</span>
+                    <span className="text-xs sm:text-sm font-semibold text-white/90 text-center">{uni.name}</span>
                   </div>
                 ))}
               </div>
               
               {/* Duplicate set for seamless loop */}
-              <div className="flex gap-6 shrink-0 ml-6">
+              <div className="flex gap-4 sm:gap-6 shrink-0 ml-4 sm:ml-6">
                 {[
                   { emoji: '🌲', name: 'Stanford', color: 'from-red-500/20 to-red-600/20' },
                   { emoji: '🐻', name: 'UC Berkeley', color: 'from-blue-500/20 to-yellow-500/20' },
@@ -234,12 +234,12 @@ export default function Home() {
                 ].map((uni, idx) => (
                   <div
                     key={`set2-${idx}`}
-                    className="glass-card p-6 rounded-2xl flex flex-col items-center gap-3 min-w-[140px] hover:scale-105 transition-all duration-300 group cursor-pointer"
+                    className="glass-card p-4 sm:p-6 rounded-xl sm:rounded-2xl flex flex-col items-center gap-2 sm:gap-3 min-w-[110px] sm:min-w-[140px] hover:scale-105 transition-all duration-300 group cursor-pointer"
                   >
-                    <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${uni.color} flex items-center justify-center text-4xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
+                    <div className={`w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br ${uni.color} flex items-center justify-center text-3xl sm:text-4xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
                       {uni.emoji}
                     </div>
-                    <span className="text-sm font-semibold text-white/90 text-center">{uni.name}</span>
+                    <span className="text-xs sm:text-sm font-semibold text-white/90 text-center">{uni.name}</span>
                   </div>
                 ))}
               </div>

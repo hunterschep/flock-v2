@@ -1,219 +1,111 @@
-# Flock
+# Flock v2
 
-A platform to connect with new grads from your university or in your city.
+Improved Flock application that connects alumni using Supabase authentication, geospatial queries, and a map-based discovery UI.
 
-## Features
+## Architecture
 
-- **University Network**: Connect with grads from your institution
-- **Location-Based Discovery**: Find alumni in your city
-- **Profile Management**: Share your current status (employed, grad school, or looking)
-- **Roommate Matching**: Connect with potential roommates
-- **Social Integration**: Link your LinkedIn, Twitter, and personal website
+- Frontend: Next.js 16 (App Router), React 19, TypeScript
+- Styling: Tailwind CSS v4 utilities + custom glassmorphism styles in `app/globals.css`
+- State: React Query provider at `components/providers/QueryProvider.tsx`
+- Map: MapLibre via `react-map-gl`, turf.js for centroids, D3 for color scales
+- Backend: Supabase Postgres with PostGIS, Supabase Auth (magic links)
+- API: Next.js route handlers in `app/api`
 
-## Tech Stack
+## Key Features
 
-- **Framework**: Next.js 14+ (App Router) with TypeScript
-- **Styling**: Tailwind CSS + shadcn/ui
-- **Database & Auth**: Supabase (Postgres + Auth)
-- **Deployment**: Vercel (recommended)
+- OTP sign-in restricted to `.edu` addresses (`app/auth`)
+- Auth callback exchanges Supabase session and routes users to onboarding or dashboard
+- Five-step onboarding wizard collecting profile, status, location, and social data
+- Dashboard with classmates list, client-side filters, and contact links
+- Map drill-down (world, country, state) with institution and proximity filtering
+- Profile editor with privacy controls and location update throttling
 
-## Getting Started
+## Directory Layout
 
-### Prerequisites
+```
+app/
+  layout.tsx            // global font config, QueryProvider
+  page.tsx              // landing page, redirects signed-in users
+  auth/                 // magic link entry and callback handler
+  onboarding/           // multi-step onboarding workflow
+  dashboard/            // map view + classmates feed
+  profile/edit/         // profile management page
+  api/locations/        // geospatial aggregation endpoint
+components/
+  InteractiveStarfield.tsx
+  map/FlockMap.tsx      // MapLibre rendering logic
+  map/Legend.tsx
+  providers/QueryProvider.tsx
+lib/
+  supabase/             // browser/server clients, middleware helpers
+  constants/            // university and location metadata
+  types/database.ts     // generated Supabase types
+  utils.ts              // shared helpers (color bucket logic)
+supabase/
+  schema_v3_optimized.sql
+  seed_bc_users.sql
+  seed_v3_test_users.sql
+```
 
-- Node.js 20.9.0 or higher
-- A Supabase account (free tier works great)
-- A Vercel account for deployment (optional)
+## Prerequisites
 
-### 1. Clone and Install
+- Node.js 20.9 or newer
+- Supabase project with PostGIS enabled
+- MapLibre access relies on public Stadia tiles (no extra key required)
+
+## Initial Setup
 
 ```bash
-git clone <your-repo-url>
+git clone <repo>
 cd flock-v2
 npm install
 ```
 
-### 2. Set up Supabase
+1. Create `.env.local` and set:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=https://<project>.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key>
+   ```
+2. In Supabase SQL editor, run `supabase/schema_v3_optimized.sql`
+3. Optional: load sample data from `supabase/seed_*.sql`
+4. In Supabase Auth settings, enable Email provider and configure redirect to `http://localhost:3000/auth/callback`
 
-1. Go to [https://supabase.com](https://supabase.com) and create a new project
-2. Wait for the database to be provisioned (~2 minutes)
-3. Go to **Project Settings > API** and copy:
-   - Project URL
-   - Anon/Public Key
-
-### 3. Configure Environment Variables
-
-```bash
-cp .env.local.example .env.local
-```
-
-Edit `.env.local` with your Supabase credentials:
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=your-project-url.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-```
-
-### 4. Set up the Database Schema
-
-1. In your Supabase dashboard, go to **SQL Editor**
-2. Open `supabase/schema.sql` in this repo
-3. Copy the entire contents and paste into the SQL Editor
-4. Click **Run** to execute
-
-This will create:
-- Tables: `institutions`, `users`, `profiles`
-- Row Level Security (RLS) policies
-- Helper views
-- Sample institutions (Stanford, MIT, Berkeley, etc.)
-
-### 5. Configure Email Authentication
-
-1. In Supabase dashboard, go to **Authentication > Providers**
-2. Enable **Email** provider
-3. For development, you can disable email confirmation:
-   - Go to **Authentication > Settings**
-   - Uncheck "Enable email confirmations" (dev only!)
-   - Set "Site URL" to `http://localhost:3000`
-   - Add `http://localhost:3000/**` to "Redirect URLs"
-
-### 6. Run the Development Server
+## Development
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+The dev server runs on `http://localhost:3000`. Supabase OTP links redirect back to `/auth/callback`, which checks onboarding status before routing to `/dashboard`.
 
-## Usage
+## Supabase Schema Notes
 
-### Sign Up Flow
+- Central table `public.users` stores identity, status, geospatial data, and preferences
+- `location` column uses `geography(Point, 4326)` with a GiST index for 50-mile proximity searches
+- Row Level Security policies grant access to authenticated users only
+- `get_current_user_data()` helper exposes institution and location for policies without breaking RLS
 
-1. Go to `/sign-up`
-2. Enter a `.edu` email address
-3. Check your email for the magic link
-4. Click the link to authenticate
-5. Complete the onboarding flow:
-   - Basic info (name, graduation year)
-   - Current status (employed/grad school/looking)
-   - Additional details (employer/program)
-   - Location (city, state)
-   - Social links & roommate preference
+## Map Data Flow
 
-### Dashboard
+1. `FlockMap` queries `/api/locations`
+2. Route handler validates the caller, loads classmates, and aggregates results by geo level
+3. Color buckets computed via `getCustomBuckets`, legend rendered by `Legend`
+4. City markers display counts and allow quick filtering in the dashboard
 
-After onboarding, you'll see:
-- Your profile card
-- List of classmates from your university
-- Ability to edit your profile
-- Social links for each classmate
+## Available Scripts
 
-## Project Structure
+- `npm run dev` – Next.js dev server
+- `npm run build` – production build
+- `npm run start` – production server
+- `npm run lint` – ESLint (Next.js config)
 
-```
-flock-v2/
-├── app/
-│   ├── (routes)
-│   │   ├── page.tsx              # Landing page
-│   │   ├── sign-in/              # Sign in page
-│   │   ├── sign-up/              # Sign up page
-│   │   ├── onboarding/           # Multi-step onboarding
-│   │   ├── dashboard/            # Main dashboard
-│   │   └── profile/edit/         # Edit profile
-│   ├── auth/callback/            # Auth callback handler
-│   └── globals.css               # Global styles
-├── components/
-│   └── ui/                       # shadcn/ui components (add as needed)
-├── lib/
-│   ├── supabase/
-│   │   ├── client.ts             # Browser client
-│   │   ├── server.ts             # Server client
-│   │   └── middleware.ts         # Auth middleware
-│   ├── types/
-│   │   └── database.ts           # TypeScript types
-│   └── utils.ts                  # Utility functions
-├── supabase/
-│   └── schema.sql                # Database schema
-├── middleware.ts                 # Next.js middleware
-└── SETUP.md                      # Detailed setup guide
-```
+## Deployment Checklist
 
-## Development Notes
-
-### .edu Email Restriction
-
-Currently enforced client-side during sign-up. For production:
-- Add server-side validation
-- Maintain an allowlist of approved institutions
-- Implement email verification
-- Consider manual approval for new institutions
-
-### Database
-
-- Uses Supabase Postgres with PostGIS enabled
-- Row Level Security (RLS) ensures users only see appropriate data
-- `user_profiles` view joins users + institutions + profiles for easy querying
-
-### Authentication
-
-- Uses Supabase Auth with magic links (OTP)
-- Middleware handles route protection
-- Users must complete onboarding before accessing dashboard
-
-### Location Privacy
-
-- Currently stores city/state as text
-- Future: Use H3 hexagonal indexing for privacy-preserving location
-- Never expose exact coordinates
-
-## Deployment
-
-### Deploy to Vercel
-
-1. Push your code to GitHub
-2. Go to [vercel.com](https://vercel.com)
-3. Import your repository
-4. Add environment variables:
+1. Set environment variables on the hosting platform:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-5. Deploy!
-
-### Update Supabase Settings
-
-After deploying to Vercel:
-1. Go to Supabase dashboard > Authentication > Settings
-2. Update "Site URL" to your Vercel domain
-3. Add `https://your-app.vercel.app/**` to "Redirect URLs"
-
-## Roadmap
-
-Phase 1 (Current):
-- ✅ Authentication with .edu emails
-- ✅ User onboarding
-- ✅ Profile management
-- ✅ Same-school classmate list
-
-Phase 2 (Next):
-- [ ] Search functionality
-- [ ] Filter by status, location, roommate preference
-- [ ] Better institution management
-
-Phase 3 (Future):
-- [ ] Map view with pins
-- [ ] Heatmap of grads by city
-- [ ] 50-mile radius for cross-school discovery
-- [ ] H3 geospatial indexing
-
-Phase 4 (Later):
-- [ ] Wave/connection system
-- [ ] Direct messaging
-- [ ] Roommate board with detailed listings
-- [ ] Admin dashboard
-- [ ] Analytics API for institutions
-
-## Contributing
-
-This is a personal project, but feedback and suggestions are welcome!
+2. Update Supabase Auth redirect URLs for the deployed domain
+3. Migrate database changes through Supabase SQL editor or migrations tooling
 
 ## License
 
