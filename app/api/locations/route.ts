@@ -175,6 +175,7 @@ export async function GET(request: NextRequest) {
       if (!currentUser.institution_id) {
         return NextResponse.json({ 
           locations: {},
+          coordinates: {},
           error: 'No institution found. Please complete onboarding.'
         });
       }
@@ -190,7 +191,7 @@ export async function GET(request: NextRequest) {
         .not('state', 'is', null);
 
       if (!institutionUsers || institutionUsers.length === 0) {
-        return NextResponse.json({ locations: {} });
+        return NextResponse.json({ locations: {}, coordinates: {} });
       }
 
       // Aggregate by state (convert abbreviations to full names for GeoJSON matching)
@@ -203,13 +204,17 @@ export async function GET(request: NextRequest) {
         }
       });
 
-      return NextResponse.json({ locations: locationData });
+      return NextResponse.json({ 
+        locations: locationData,
+        coordinates: {} // Empty coordinates for state-level view
+      });
     }
 
     // Otherwise (no params), return country-level data for users from the same institution
     if (!currentUser.institution_id) {
       return NextResponse.json({ 
         locations: {},
+        coordinates: {},
         error: 'No institution found. Please complete onboarding.'
       });
     }
@@ -224,7 +229,7 @@ export async function GET(request: NextRequest) {
       .not('country', 'is', null);
 
     if (!institutionUsers || institutionUsers.length === 0) {
-      return NextResponse.json({ locations: {} });
+      return NextResponse.json({ locations: {}, coordinates: {} });
     }
 
     // Aggregate by country (normalize country names for GeoJSON matching)
@@ -243,7 +248,10 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    return NextResponse.json({ locations: locationData });
+    return NextResponse.json({ 
+      locations: locationData,
+      coordinates: {} // Empty coordinates for country-level view
+    });
   } catch (error) {
     console.error('Error in /api/locations:', error);
     return NextResponse.json(

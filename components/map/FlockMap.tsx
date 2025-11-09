@@ -47,8 +47,8 @@ const layerStyle = (colorExpression: PropertyValueSpecification<string>): LayerP
   type: 'fill',
   paint: {
     'fill-color': colorExpression,
-    'fill-opacity': 0.6,
-    'fill-outline-color': '#334155',
+    'fill-opacity': 0.7,
+    'fill-outline-color': '#475569', // Slightly lighter outline for better visibility
   },
 });
 
@@ -56,7 +56,7 @@ const hoverLayerStyle: LayerProps = {
   id: 'states-hover',
   type: 'line' as const,
   paint: {
-    'line-color': '#333333',
+    'line-color': '#a78bfa', // Purple hover to match theme
     'line-width': 2,
   },
 };
@@ -148,12 +148,12 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
 
   const thresholds = getCustomBuckets(maxValue);
 
-  // Match colors to number of bins
+  // Match colors to number of bins - Purple/Blue gradient matching site theme
   const colorSchemes: { [key: number]: string[] } = {
-    2: ['#fb6a4a', '#de2d26'],
-    3: ['#fc9272', '#fb6a4a', '#de2d26'],
-    4: ['#fc9272', '#fb6a4a', '#de2d26', '#a50f15'],
-    5: ['#fc9272', '#fb6a4a', '#de2d26', '#a50f15', '#701013'],
+    2: ['#a78bfa', '#7c3aed'],       // Light purple -> Purple
+    3: ['#c4b5fd', '#a78bfa', '#7c3aed'],  // Very light -> Light -> Purple
+    4: ['#c4b5fd', '#a78bfa', '#8b5cf6', '#6d28d9'],  // Very light -> Purple -> Dark purple
+    5: ['#ddd6fe', '#c4b5fd', '#a78bfa', '#8b5cf6', '#6d28d9'],  // Lightest -> Darkest purple
   };
 
   const colorRange = colorSchemes[thresholds.length] || colorSchemes[5];
@@ -165,8 +165,8 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
 
   const fillColorExpression = React.useMemo(() => {
     if (!locationData || Object.keys(locationData).length === 0 || selectedState || (selectedCountry && viewLevel === 'state')) {
-      // Return a simple color when no data
-      return '#cccccc' as PropertyValueSpecification<string>;
+      // Return a dark gray for no data that matches dark theme
+      return '#1e293b' as PropertyValueSpecification<string>;
     }
 
     const pairs = Object.entries(locationData)
@@ -175,14 +175,14 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
 
     // Only return match expression if we have data
     if (pairs.length === 0) {
-      return '#cccccc' as PropertyValueSpecification<string>;
+      return '#1e293b' as PropertyValueSpecification<string>;
     }
 
     return [
       'match',
       ['get', 'name'],
       ...pairs,
-      '#cccccc', // fallback for "no data"
+      '#1e293b', // fallback for "no data" - dark gray matching theme
     ] as unknown as PropertyValueSpecification<string>;
   }, [locationData, selectedState, selectedCountry, viewLevel, colorScale]);
 
