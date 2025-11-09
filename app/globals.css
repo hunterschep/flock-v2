@@ -179,6 +179,28 @@ strong, b {
   }
 }
 
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient 8s ease infinite;
+}
+
+@keyframes carousel {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-carousel {
+  animation: carousel 40s linear infinite;
+}
+
+.animate-carousel:hover {
+  animation-play-state: paused;
+}
+
 .gradient-ocean {
   background: 
     radial-gradient(at 0% 0%, hsla(240, 30%, 15%, 0.2) 0px, transparent 50%),
