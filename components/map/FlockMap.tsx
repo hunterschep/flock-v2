@@ -130,8 +130,8 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
     return apiResponse as LocationData;
   }, [apiResponse]);
 
-  const [geoJson, setGeoJson] = React.useState<any>(null);
-  const [countriesGeoJson, setCountriesGeoJson] = React.useState<any>(null);
+  const [geoJson, setGeoJson] = React.useState<unknown>(null);
+  const [countriesGeoJson, setCountriesGeoJson] = React.useState<unknown>(null);
 
   React.useEffect(() => {
     fetch(stateGeoUrl)
@@ -184,6 +184,7 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
       ...pairs,
       '#1e293b', // fallback for "no data" - dark gray matching theme
     ] as unknown as PropertyValueSpecification<string>;
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   }, [locationData, selectedState, selectedCountry, viewLevel, colorScale]);
 
   const renderLegendSkeleton = () => (
@@ -199,7 +200,7 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
     </div>
   );
 
-  const handleCountryClick = (feature: any) => {
+  const handleCountryClick = (feature: { properties?: { name?: string }; geometry: { coordinates: [number, number] } }) => {
     const clickedCountry = feature.properties?.name;
     if (!clickedCountry) return;
 
@@ -219,7 +220,7 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
           pitch: 0,
           speed: 1.2,
           curve: 1.5,
-          easing: (t: any) => t,
+          easing: (t: number) => t,
           essential: true,
         });
       }
@@ -236,7 +237,7 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
           pitch: 0,
           speed: 1.2,
           curve: 1.5,
-          easing: (t: any) => t,
+          easing: (t: number) => t,
           essential: true,
         });
       }
@@ -246,7 +247,7 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
     }
   };
 
-  const handleStateClick = (feature: any) => {
+  const handleStateClick = (feature: { properties?: { name?: string }; geometry: { coordinates: [number, number] } }) => {
     const clickedState = feature.properties?.name;
     if (!clickedState) return;
 
@@ -267,7 +268,7 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
         pitch: 30,
         speed: 1.2,
         curve: 1.5,
-        easing: (t: any) => t,
+        easing: (t: number) => t,
         essential: true,
       });
     }
@@ -279,7 +280,7 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
   const showSkeleton = !mapLoaded || isLoading;
 
   const handleMouseMove = React.useCallback(
-    (event: any) => {
+    (event: { features?: Array<{ id?: number; properties?: { name?: string } }>; point: { x: number; y: number } }) => {
       const feature = event.features?.[0];
       if (feature && mapRef.current) {
         const name = feature.properties?.name || 'Unknown';
@@ -527,7 +528,7 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
                   speed: 1.2,
                   pitch: 0,
                   curve: 1.5,
-                  easing: (t: any) => t,
+                  easing: (t: number) => t,
                   essential: true,
                 });
               }
@@ -544,7 +545,7 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
                   speed: 1.2,
                   pitch: 0,
                   curve: 1.5,
-                  easing: (t: any) => t,
+                  easing: (t: number) => t,
                   essential: true,
                 });
               }

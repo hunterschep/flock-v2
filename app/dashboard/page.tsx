@@ -11,19 +11,13 @@ import {
   Briefcase, 
   GraduationCap, 
   Search, 
-  Filter,
   Mail,
   Linkedin,
   Twitter,
   Globe,
   Home as HomeIcon,
-  Building2,
-  TrendingUp,
   Users,
-  LogOut,
   Settings,
-  ChevronDown,
-  ChevronUp,
   X
 } from 'lucide-react';
 
@@ -81,6 +75,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     loadData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -90,6 +85,7 @@ export default function DashboardPage() {
       // Load default classmates view
       loadFilteredUsers();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCity, selectedState, currentUser]);
 
   const loadData = async () => {

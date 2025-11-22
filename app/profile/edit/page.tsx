@@ -50,7 +50,12 @@ export default function EditProfilePage() {
 
   // Location search state
   const [locationSearch, setLocationSearch] = useState('')
-  const [locationSuggestions, setLocationSuggestions] = useState<any[]>([])
+  const [locationSuggestions, setLocationSuggestions] = useState<Array<{
+    name: string;
+    display_name: string;
+    lat: string;
+    lon: string;
+  }>>([])
   const [searchingLocation, setSearchingLocation] = useState(false)
   const [isLocationSelected, setIsLocationSelected] = useState(false)
   const [canUpdateLocation, setCanUpdateLocation] = useState(true)
@@ -71,6 +76,7 @@ export default function EditProfilePage() {
 
   useEffect(() => {
     loadProfile()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Filter universities as user types
@@ -136,9 +142,7 @@ export default function EditProfilePage() {
     return () => clearTimeout(timeoutId)
   }, [locationSearch, isLocationSelected])
 
-  const selectLocation = (location: any) => {
-    console.log('Selected location:', location)
-    
+  const selectLocation = (location: { name: string; display_name: string; lat: string; lon: string }) => {
     // Extract city name from name field or first part of display_name
     const cityName = location.name || location.display_name.split(',')[0].trim()
     
@@ -146,8 +150,6 @@ export default function EditProfilePage() {
     const displayParts = location.display_name.split(',').map((s: string) => s.trim())
     // State is usually the second-to-last item (before "United States")
     const stateName = displayParts.length >= 2 ? displayParts[displayParts.length - 2] : ''
-    
-    console.log('Extracted:', { cityName, stateName, lat: location.lat, lon: location.lon })
     
     // Update the data
     setData(prev => ({
@@ -233,9 +235,9 @@ export default function EditProfilePage() {
         setLocationSearch(`${profile.city}, ${profile.state}`)
         setIsLocationSelected(true)
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error loading profile:', err)
-      setError(err.message)
+      setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
       setLoading(false)
     }
@@ -275,7 +277,7 @@ export default function EditProfilePage() {
       }
 
       // Build update object
-      const updateData: any = {
+      const updateData: Record<string, unknown> = {
         full_name: data.full_name,
         grad_year: data.grad_year,
         personal_email: data.personal_email || null,
@@ -316,9 +318,9 @@ export default function EditProfilePage() {
       setTimeout(() => {
         window.location.href = '/dashboard'
       }, 1000)
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error saving profile:', err)
-      setError(err.message)
+      setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
       setSaving(false)
     }
@@ -346,9 +348,9 @@ export default function EditProfilePage() {
       
       // Redirect to home page
       router.push('/')
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error deleting account:', err)
-      setError(err.message)
+      setError(err instanceof Error ? err.message : 'An error occurred')
       setDeleting(false)
       setShowDeleteConfirm(false)
     }
@@ -507,7 +509,7 @@ export default function EditProfilePage() {
                       name="status"
                       value={option.value}
                       checked={data.status === option.value}
-                      onChange={(e) => setData({ ...data, status: e.target.value as any })}
+                      onChange={(e) => setData({ ...data, status: e.target.value as 'employed' | 'grad_school' | 'looking' | 'internship' })}
                       className="sr-only"
                     />
                     <div className={`flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br ${option.gradient} flex items-center justify-center ${option.iconColor} transition-transform ${
@@ -703,7 +705,7 @@ export default function EditProfilePage() {
               {!canUpdateLocation && (
                 <div className="glass-card bg-orange-500/10 border-orange-400/20 p-3 rounded-lg">
                   <p className="text-sm text-white/90">
-                    Location updates are limited to once every 30 days to prevent location hopping. You'll be able to update in {daysUntilLocationUpdate} day{daysUntilLocationUpdate !== 1 ? 's' : ''}.
+                    Location updates are limited to once every 30 days to prevent location hopping. You&apos;ll be able to update in {daysUntilLocationUpdate} day{daysUntilLocationUpdate !== 1 ? 's' : ''}.
                   </p>
                 </div>
               )}
@@ -823,7 +825,7 @@ export default function EditProfilePage() {
                   onChange={(e) => setData({ ...data, looking_for_roommate: e.target.checked })}
                   className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
                 />
-                <span className="text-sm text-white/90 drop-shadow">I'm looking for roommates</span>
+                <span className="text-sm text-white/90 drop-shadow">I&apos;m looking for roommates</span>
               </label>
             </div>
 

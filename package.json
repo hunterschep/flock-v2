@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint . --ext .ts,.tsx --max-warnings 0",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "lint:report": "eslint . --ext .ts,.tsx --format json --output-file eslint-report.json",
+    "prepare": "husky"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",
@@ -32,8 +35,16 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "supabase": "^2.53.6",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "eslint"
+    ]
   }
 }

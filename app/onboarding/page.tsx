@@ -61,7 +61,12 @@ export default function OnboardingPage() {
   })
 
   const [locationSearch, setLocationSearch] = useState('')
-  const [locationSuggestions, setLocationSuggestions] = useState<any[]>([])
+  const [locationSuggestions, setLocationSuggestions] = useState<Array<{
+    name: string;
+    display_name: string;
+    lat: string;
+    lon: string;
+  }>>([])
   const [searchingLocation, setSearchingLocation] = useState(false)
   const [isLocationSelected, setIsLocationSelected] = useState(false)
 
@@ -78,7 +83,7 @@ export default function OnboardingPage() {
   const [degreeSuggestions, setDegreeSuggestions] = useState<string[]>([])
   const [showDegreeSuggestions, setShowDegreeSuggestions] = useState(false)
 
-  const updateData = (field: keyof OnboardingData, value: any) => {
+  const updateData = <K extends keyof OnboardingData>(field: K, value: OnboardingData[K]) => {
     setData(prev => ({ ...prev, [field]: value }))
   }
 
@@ -145,9 +150,7 @@ export default function OnboardingPage() {
     return () => clearTimeout(timeoutId)
   }, [locationSearch, isLocationSelected])
 
-  const selectLocation = (location: any) => {
-    console.log('Selected location:', location)
-    
+  const selectLocation = (location: { name: string; display_name: string; lat: string; lon: string }) => {
     // Extract city name from name field or first part of display_name
     const cityName = location.name || location.display_name.split(',')[0].trim()
     
@@ -155,8 +158,6 @@ export default function OnboardingPage() {
     const displayParts = location.display_name.split(',').map((s: string) => s.trim())
     // State is usually the second-to-last item (before "United States")
     const stateName = displayParts.length >= 2 ? displayParts[displayParts.length - 2] : ''
-    
-    console.log('Extracted:', { cityName, stateName, lat: location.lat, lon: location.lon })
     
     // Update the data
     setData(prev => ({
@@ -334,9 +335,9 @@ export default function OnboardingPage() {
 
       // Redirect to dashboard
       router.push('/dashboard')
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Onboarding error:', err)
-      setError(err.message || 'Something went wrong')
+      setError(err instanceof Error ? err.message : 'Something went wrong')
     } finally {
       setLoading(false)
     }
@@ -400,7 +401,7 @@ export default function OnboardingPage() {
         <div className="glass-strong rounded-2xl sm:rounded-3xl px-6 sm:px-8 md:px-10 py-8 sm:py-10">
           <div className="mb-6 sm:mb-8">
             <h2 className="text-xl sm:text-2xl font-bold text-white mb-2 drop-shadow-lg">
-              {step === 1 && 'Welcome! Let\'s set up your profile'}
+              {step === 1 && 'Welcome! Let&apos;s set up your profile'}
               {step === 2 && 'What are you up to?'}
               {step === 3 && 'Tell us more'}
               {step === 4 && 'Where are you located?'}
@@ -777,7 +778,7 @@ export default function OnboardingPage() {
                     Ready to explore opportunities!
                   </p>
                   <p className="text-white/70 text-sm drop-shadow">
-                    You're all set for this step. Continue to add your location so classmates can connect with you.
+                    You&apos;re all set for this step. Continue to add your location so classmates can connect with you.
                   </p>
                 </div>
               )}
@@ -949,11 +950,11 @@ export default function OnboardingPage() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                         </svg>
                         <span className="text-sm font-semibold text-white drop-shadow">
-                          I'm looking for roommates
+                          I&apos;m looking for roommates
                         </span>
                       </div>
                       <p className="text-xs text-white/70 drop-shadow">
-                        Let classmates know you're searching for housing. This will make you easier to find for others looking for roommates.
+                        Let classmates know you&apos;re searching for housing. This will make you easier to find for others looking for roommates.
                       </p>
                     </div>
                   </label>

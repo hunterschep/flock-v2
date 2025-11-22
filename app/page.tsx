@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Users, MapPin, Home as HomeIcon, ArrowRight, Lock, Sparkles, TrendingUp } from 'lucide-react'
+import { Users, MapPin, Home as HomeIcon, ArrowRight, Lock } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import InteractiveStarfield from '@/components/InteractiveStarfield'
 
@@ -20,7 +20,6 @@ const FlockMap = dynamic(() => import('@/components/map/FlockMap').then(mod => m
 
 export default function Home() {
   const router = useRouter()
-  const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -54,13 +53,6 @@ export default function Home() {
       
       {/* Hero Section */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-20 pb-16 sm:pb-24">
-        {/* Badge */}
-        <div className="flex justify-center mb-8 animate-fade-in-up">
-          <div className="inline-flex items-center gap-2 glass-light px-4 py-2 rounded-full">
-            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
-            <span className="text-sm text-white/90 font-medium">Alumni Network Platform</span>
-          </div>
-        </div>
 
         {/* Hero Text */}
         <div className="text-center max-w-4xl mx-auto mb-12 animate-fade-in-up" style={{animationDelay: '100ms'}}>
@@ -94,7 +86,7 @@ export default function Home() {
               <svg className="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
-              <span className="text-sm text-white/90">Free with .edu email</span>
+              <span className="text-sm text-white/90">.edu email required</span>
             </div>
           </div>
 
