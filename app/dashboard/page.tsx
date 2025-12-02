@@ -11,15 +11,15 @@ import {
   Briefcase, 
   GraduationCap, 
   Search, 
-  Mail,
-  Linkedin,
+  MessageCircle,
   Twitter,
   Globe,
   Home as HomeIcon,
   Users,
-  Settings,
   X
 } from 'lucide-react';
+import { UnreadBadge } from '@/components/messaging/UnreadBadge';
+import { getOrCreateConversation } from '@/lib/messaging/utils';
 
 interface UserProfile {
   id: string;
@@ -165,6 +165,13 @@ export default function DashboardPage() {
     router.push('/auth');
   };
 
+  const handleSendMessage = async (userId: string) => {
+    const conversationId = await getOrCreateConversation(userId);
+    if (conversationId) {
+      router.push(`/messages?conversation=${conversationId}`);
+    }
+  };
+
   const handleLocationSelect = (city: string, state: string) => {
     setSelectedCity(city);
     setSelectedState(state);
@@ -250,11 +257,6 @@ export default function DashboardPage() {
     filterEmployed, filterInternship, filterGradSchool, filterLooking,
     minGradYear, maxGradYear
   ].filter(Boolean).length;
-
-  // Analytics state
-  const [expandedGradSchools, setExpandedGradSchools] = useState(false);
-  const [expandedCities, setExpandedCities] = useState(false);
-  const [expandedCompanies, setExpandedCompanies] = useState(false);
 
   // Calculate analytics from users data
   const analytics = React.useMemo(() => {
@@ -343,6 +345,14 @@ export default function DashboardPage() {
           </div>
           <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
             <Link 
+              href="/messages"
+              className="glass-light text-white hover:bg-white/20 text-xs sm:text-sm font-medium px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-lg transition-all whitespace-nowrap relative"
+            >
+              <span className="hidden sm:inline">Messages</span>
+              <MessageCircle className="w-4 h-4 sm:hidden" />
+              <UnreadBadge />
+            </Link>
+            <Link 
               href="/profile/edit"
               className="glass-light text-white hover:bg-white/20 text-xs sm:text-sm font-medium px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-lg transition-all whitespace-nowrap"
             >
@@ -369,176 +379,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Analytics Section */}
-      {analytics.totalClassmates > 0 && (
-        <div className="relative z-10">
-          <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8">
-            <h2 className="text-xl sm:text-2xl font-bold text-white mb-2 drop-shadow-lg">
-              Network Insights
-            </h2>
-            <p className="text-xs sm:text-sm text-white/80 mb-4 sm:mb-6 drop-shadow">
-              Where your {currentUser?.institutions?.name || 'university'} classmates are heading
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {/* Top Cities */}
-              <div className="glass-card p-5 sm:p-6 group hover:scale-105 transition-all duration-300">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <MapPin className="w-5 h-5 text-blue-400" />
-                    </div>
-                    <h3 className="font-semibold text-white text-base">Top Cities</h3>
-                  </div>
-                  <span className="text-xs glass-light text-white/90 px-2.5 py-1 rounded-full font-medium">
-                    {analytics.cities.length}
-                  </span>
-                </div>
-
-                {analytics.cities.length > 0 ? (
-                  <>
-                    <div className="space-y-3">
-                      {analytics.cities.slice(0, expandedCities ? undefined : 5).map((city, idx) => (
-                        <div key={city.name} className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2 flex-1 min-w-0">
-                            <span className="text-xs font-medium text-white/50 w-4 drop-shadow">#{idx + 1}</span>
-                            <span className="text-sm text-white truncate drop-shadow">{city.name}</span>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <div className="w-16 h-2 bg-white/10 rounded-full overflow-hidden">
-                              <div 
-                                className="h-full bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full"
-                                style={{ width: `${(city.count / analytics.cities[0].count) * 100}%` }}
-                              />
-                            </div>
-                            <span className="text-sm font-semibold text-white w-6 text-right drop-shadow">
-                              {city.count}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    {analytics.cities.length > 5 && (
-                      <button
-                        onClick={() => setExpandedCities(!expandedCities)}
-                        className="mt-4 text-sm text-white hover:text-white/80 font-medium drop-shadow"
-                      >
-                        {expandedCities ? '− Show less' : `+ Show ${analytics.cities.length - 5} more`}
-                      </button>
-                    )}
-                  </>
-                ) : (
-                  <p className="text-sm text-white/70 drop-shadow">No location data yet</p>
-                )}
-              </div>
-
-              {/* Top Companies */}
-              <div className="glass-card p-5 sm:p-6 group hover:scale-105 transition-all duration-300">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <Briefcase className="w-5 h-5 text-emerald-400" />
-                    </div>
-                    <h3 className="font-semibold text-white text-base">Top Companies</h3>
-                  </div>
-                  <span className="text-xs glass-light text-white/90 px-2.5 py-1 rounded-full font-medium">
-                    {analytics.companies.length}
-                  </span>
-                </div>
-
-                {analytics.companies.length > 0 ? (
-                  <>
-                    <div className="space-y-3">
-                      {analytics.companies.slice(0, expandedCompanies ? undefined : 5).map((company, idx) => (
-                        <div key={company.name} className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2 flex-1 min-w-0">
-                            <span className="text-xs font-medium text-white/50 w-4 drop-shadow">#{idx + 1}</span>
-                            <span className="text-sm text-white truncate drop-shadow">{company.name}</span>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <div className="w-16 h-2 bg-white/10 rounded-full overflow-hidden">
-                              <div 
-                                className="h-full bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full"
-                                style={{ width: `${(company.count / analytics.companies[0].count) * 100}%` }}
-                              />
-                            </div>
-                            <span className="text-sm font-semibold text-white w-6 text-right drop-shadow">
-                              {company.count}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    {analytics.companies.length > 5 && (
-                      <button
-                        onClick={() => setExpandedCompanies(!expandedCompanies)}
-                        className="mt-4 text-sm text-white hover:text-white/80 font-medium drop-shadow"
-                      >
-                        {expandedCompanies ? '− Show less' : `+ Show ${analytics.companies.length - 5} more`}
-                      </button>
-                    )}
-                  </>
-                ) : (
-                  <p className="text-sm text-white/70 drop-shadow">No company data yet</p>
-                )}
-              </div>
-
-              {/* Top Grad Schools */}
-              <div className="glass-card p-5 sm:p-6 group hover:scale-105 transition-all duration-300 sm:col-span-2 lg:col-span-1">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <GraduationCap className="w-5 h-5 text-purple-400" />
-                    </div>
-                    <h3 className="font-semibold text-white text-base">Top Grad Schools</h3>
-                  </div>
-                  <span className="text-xs glass-light text-white/90 px-2.5 py-1 rounded-full font-medium">
-                    {analytics.gradSchools.length}
-                  </span>
-                </div>
-
-                {analytics.gradSchools.length > 0 ? (
-                  <>
-                    <div className="space-y-3">
-                      {analytics.gradSchools.slice(0, expandedGradSchools ? undefined : 5).map((school, idx) => (
-                        <div key={school.name} className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2 flex-1 min-w-0">
-                            <span className="text-xs font-medium text-white/50 w-4 drop-shadow">#{idx + 1}</span>
-                            <span className="text-sm text-white truncate drop-shadow">{school.name}</span>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <div className="w-16 h-2 bg-white/10 rounded-full overflow-hidden">
-                              <div 
-                                className="h-full bg-gradient-to-r from-purple-400 to-pink-400 rounded-full"
-                                style={{ width: `${(school.count / analytics.gradSchools[0].count) * 100}%` }}
-                              />
-                            </div>
-                            <span className="text-sm font-semibold text-white w-6 text-right drop-shadow">
-                              {school.count}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    {analytics.gradSchools.length > 5 && (
-                      <button
-                        onClick={() => setExpandedGradSchools(!expandedGradSchools)}
-                        className="mt-4 text-sm text-white hover:text-white/80 font-medium drop-shadow"
-                      >
-                        {expandedGradSchools ? '− Show less' : `+ Show ${analytics.gradSchools.length - 5} more`}
-                      </button>
-                    )}
-                  </>
-                ) : (
-                  <p className="text-sm text-white/70 drop-shadow">No grad school data yet</p>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* List Section - Below Analytics */}
+      {/* List Section */}
       <div className="flex-1 overflow-auto relative z-10">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8">
           {/* Search & Filters - Enhanced */}
@@ -751,67 +592,6 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Current User Card - Enhanced */}
-          <div className="glass-card p-6 sm:p-7 md:p-8 mb-6 sm:mb-8 hover:shadow-2xl transition-all duration-300 relative overflow-hidden group">
-            {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/0 to-blue-500/0 group-hover:from-purple-500/10 group-hover:to-blue-500/10 transition-all duration-500 pointer-events-none" />
-            
-            <div className="flex flex-col sm:flex-row items-start sm:justify-between gap-4 relative z-10">
-              <div className="flex-1 min-w-0 pr-32 sm:pr-0">
-                {/* Profile badge - moved inside content area */}
-                <div className="inline-flex items-center gap-1.5 glass-light px-3 py-1.5 rounded-full mb-3">
-                  <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
-                  <span className="text-xs font-medium text-white/90 drop-shadow">Your Profile</span>
-                </div>
-                
-                <h2 className="text-xl sm:text-2xl font-bold text-white drop-shadow mb-2">{currentUser?.full_name}</h2>
-                <div className="flex flex-col gap-2 text-sm sm:text-base text-white/80">
-                  <p className="flex items-center gap-2 drop-shadow">
-                    <svg className="w-4 h-4 text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0v6" />
-                    </svg>
-                    <span>{currentUser?.institutions?.name || 'No institution'} • Class of {currentUser?.grad_year}</span>
-                  </p>
-                <div className="mt-2">
-                  {(currentUser?.status === 'employed' || currentUser?.status === 'internship') && (
-                    <p className="text-sm text-white/90 drop-shadow">
-                      {currentUser.job_title && `${currentUser.job_title}`}
-                      {currentUser.show_employer !== false && currentUser.employer && ` at ${currentUser.employer}`}
-                      {!currentUser.job_title && currentUser.show_employer !== false && currentUser.employer}
-                      {currentUser.status === 'internship' && ' (Internship)'}
-                    </p>
-                  )}
-                  {currentUser?.status === 'grad_school' && currentUser.program && (
-                    <p className="text-sm text-white/90 drop-shadow">
-                      {currentUser.degree} in {currentUser.program}
-                      {currentUser.show_school !== false && currentUser.grad_school && ` at ${currentUser.grad_school}`}
-                    </p>
-                  )}
-                  {currentUser?.status === 'looking' && (
-                    <p className="text-sm text-white/90 drop-shadow">
-                      Looking for opportunities
-                    </p>
-                  )}
-                </div>
-                  {currentUser?.city && currentUser?.state && (
-                    <p className="text-sm text-white/80 mt-2 drop-shadow flex items-center gap-1.5">
-                      <MapPin className="w-4 h-4 text-purple-400" />
-                      {currentUser.city}, {currentUser.state}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <Link
-                href="/profile/edit"
-                className="glass-button px-5 sm:px-6 py-2.5 text-xs sm:text-sm text-white rounded-xl font-semibold transition-all whitespace-nowrap self-start sm:self-auto flex items-center gap-2 group"
-              >
-                <Settings className="w-4 h-4 group-hover:rotate-45 transition-transform" />
-                Edit Profile
-              </Link>
-            </div>
-          </div>
-
           {/* Filter Info */}
           {(selectedCity || selectedState) && (
             <div className="glass-card p-3 sm:p-4 mb-4 sm:mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:justify-between">
@@ -877,111 +657,151 @@ export default function DashboardPage() {
                 {filteredUsers.map((person) => (
                   <div
                     key={person.id}
-                    className="group glass-card p-5 sm:p-6 hover:scale-[1.03] transition-all duration-500 relative overflow-hidden"
-                    style={{
-                      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.boxShadow = '0 20px 60px rgba(139, 92, 246, 0.4), 0 0 40px rgba(99, 102, 241, 0.2)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.4)';
-                    }}
+                    className="group glass-card p-6 hover:scale-[1.02] transition-all duration-300 relative overflow-hidden border border-white/5 hover:border-white/10"
                   >
-                    {/* Gradient overlay on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/0 to-blue-500/0 group-hover:from-purple-500/10 group-hover:to-blue-500/10 transition-all duration-500 pointer-events-none" />
+                    {/* Animated gradient background on hover */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/0 via-blue-500/0 to-cyan-500/0 group-hover:from-purple-500/10 group-hover:via-blue-500/5 group-hover:to-cyan-500/10 transition-all duration-500 pointer-events-none" />
+                    
+                    {/* Glow effect on hover */}
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-purple-400/50 to-transparent" />
+                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-blue-400/50 to-transparent" />
+                    </div>
                     
                     <div className="relative z-10">
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-bold text-white drop-shadow text-sm sm:text-base truncate group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-blue-400 transition-all duration-300">
+                      {/* Header with Avatar and Name */}
+                      <div className="flex items-start gap-4 mb-4">
+                        {/* Avatar */}
+                        <div className="relative flex-shrink-0">
+                          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center ring-2 ring-white/10 group-hover:ring-purple-400/30 transition-all duration-300">
+                            <span className="text-xl font-bold text-white">
+                              {person.full_name.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          {/* Status indicator */}
+                          <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-gradient-to-br from-emerald-400 to-green-500 ring-2 ring-[#0f0f23] flex items-center justify-center">
+                            <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                          </div>
+                        </div>
+
+                        {/* Name and School */}
+                        <div className="flex-1 min-w-0 pt-1">
+                          <h4 className="font-bold text-white text-lg mb-1 truncate group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-300 group-hover:via-blue-300 group-hover:to-cyan-300 transition-all duration-300">
                             {person.full_name}
                           </h4>
-                          <p className="text-xs sm:text-sm text-white/80 mt-1 drop-shadow flex items-center gap-1.5">
-                            <svg className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0v6" />
-                            </svg>
+                          <div className="flex items-center gap-1.5 text-xs text-white/70 mb-0.5">
+                            <GraduationCap className="w-3.5 h-3.5 text-blue-400/80" />
                             <span className="truncate">{person.institutions?.name || 'University'}</span>
-                          </p>
-                          <p className="text-xs text-white/70 mt-0.5 drop-shadow flex items-center gap-1.5">
-                            <svg className="w-3 h-3 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
-                            </svg>
+                          </div>
+                          <p className="text-xs text-white/60">
                             Class of {person.grad_year}
                           </p>
                         </div>
                       </div>
-                    
-                    <div className="mt-3">
-                      {(person.status === 'employed' || person.status === 'internship') && (
-                        <p className="text-sm text-white/90 drop-shadow">
-                          {person.job_title && `${person.job_title}`}
-                          {person.show_employer !== false && person.employer && ` at ${person.employer}`}
-                          {!person.job_title && person.show_employer !== false && person.employer}
-                          {person.status === 'internship' && ' (Internship)'}
-                        </p>
-                      )}
-                      {person.status === 'grad_school' && person.program && (
-                        <p className="text-sm text-white/90 drop-shadow">
-                          {person.degree && `${person.degree} in `}
-                          {person.program}
-                          {person.show_school !== false && person.grad_school && ` at ${person.grad_school}`}
-                        </p>
-                      )}
-                      {person.status === 'looking' && (
-                        <p className="text-sm text-white/90 drop-shadow">
-                          Looking for opportunities
-                        </p>
-                      )}
-                    </div>
 
-                    {person.city && person.state && (
-                      <p className="text-sm text-white/70 mt-2 drop-shadow flex items-center gap-1.5">
-                        <MapPin className="w-3.5 h-3.5" />
-                        {person.city}, {person.state}
-                      </p>
-                    )}
+                      {/* Divider */}
+                      <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mb-4" />
 
-                    {person.looking_for_roommate && (
-                      <span className="inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 text-xs glass-light text-white/90 rounded-lg font-medium">
-                        <HomeIcon className="w-3.5 h-3.5" />
-                        Looking for roommate
-                      </span>
-                    )}
+                      {/* Status/Work Info - Fixed Height */}
+                      <div className="mb-4 h-[72px] flex items-start">
+                        {(person.status === 'employed' || person.status === 'internship') && (
+                          <div className="flex items-start gap-2 w-full">
+                            <Briefcase className="w-4 h-4 text-purple-400/80 mt-0.5 flex-shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm text-white/90 font-medium leading-snug line-clamp-2">
+                                {person.job_title || 'Working'}
+                              </p>
+                              {person.show_employer !== false && person.employer && (
+                                <p className="text-xs text-white/70 mt-0.5 line-clamp-1">
+                                  at {person.employer}
+                                </p>
+                              )}
+                              {person.status === 'internship' && (
+                                <span className="inline-block mt-1 px-2 py-0.5 text-xs bg-blue-500/20 text-blue-300 rounded-md">
+                                  Internship
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                        {person.status === 'grad_school' && (
+                          <div className="flex items-start gap-2 w-full">
+                            <GraduationCap className="w-4 h-4 text-purple-400/80 mt-0.5 flex-shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm text-white/90 font-medium leading-snug line-clamp-2">
+                                {person.degree && `${person.degree} `}
+                                {person.program || 'Graduate Student'}
+                              </p>
+                              {person.show_school !== false && person.grad_school && (
+                                <p className="text-xs text-white/70 mt-0.5 line-clamp-1">
+                                  at {person.grad_school}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                        {person.status === 'looking' && (
+                          <div className="flex items-start gap-2 w-full">
+                            <Search className="w-4 h-4 text-yellow-400/80 mt-0.5 flex-shrink-0" />
+                            <p className="text-sm text-white/90 font-medium">
+                              Looking for opportunities
+                            </p>
+                          </div>
+                        )}
+                        {!person.status && (
+                          <div className="flex items-center justify-center w-full h-full text-white/40 text-xs">
+                            No status set
+                          </div>
+                        )}
+                      </div>
 
-                      {/* Contact Button */}
-                      <a
-                        href={`mailto:${person.email}?subject=Hi from Flock - ${currentUser?.institutions?.name || 'Alumni'}&body=Hi ${person.full_name.split(' ')[0]},%0D%0A%0D%0AI found you on Flock and wanted to reach out!%0D%0A%0D%0A- ${currentUser?.full_name}`}
-                        className="glass-button mt-5 w-full px-4 py-3 text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-2 group-hover:shadow-lg transition-all"
+                      {/* Location - Fixed Height */}
+                      <div className="h-[40px] mb-4 flex items-center">
+                        {person.city && person.state ? (
+                          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 w-full">
+                            <MapPin className="w-3.5 h-3.5 text-cyan-400/80 flex-shrink-0" />
+                            <span className="text-sm text-white/80 truncate">
+                              {person.city}, {person.state}
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="text-xs text-white/30 px-3">
+                            Location not set
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Badges - Fixed Height */}
+                      <div className="h-[32px] mb-4 flex items-center">
+                        {person.looking_for_roommate && (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs glass-light text-white/90 rounded-lg font-medium border border-white/10">
+                            <HomeIcon className="w-3 h-3" />
+                            Looking for roommate
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Contact Buttons */}
+                      <button
+                        onClick={() => handleSendMessage(person.id)}
+                        className="group/btn w-full glass-button px-4 py-2.5 text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 relative overflow-hidden"
                       >
-                        <Mail className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                        Send Email
-                      </a>
+                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/0 via-purple-500/20 to-purple-500/0 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-1000" />
+                        <MessageCircle className="w-4 h-4 group-hover/btn:scale-110 transition-transform relative z-10" />
+                        <span className="relative z-10">Send Message</span>
+                      </button>
 
-                      {/* Social links */}
-                      {(person.linkedin_url || person.twitter_url || person.personal_website) && (
-                        <div className="mt-4 flex gap-2">
-                          {person.linkedin_url && (
-                            <a
-                              href={person.linkedin_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex-1 glass-light p-2.5 rounded-xl text-white/70 hover:text-blue-400 hover:bg-blue-500/10 transition-all hover:scale-105 flex items-center justify-center"
-                              title="LinkedIn"
-                            >
-                              <Linkedin className="w-4 h-4" />
-                            </a>
-                          )}
-                          {person.twitter_url && (
+                      {/* Social Links */}
+                      {(person.twitter_url || person.personal_website) && (
+                        <div className="flex gap-2 mt-3">{person.twitter_url && (
                             <a
                               href={person.twitter_url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex-1 glass-light p-2.5 rounded-xl text-white/70 hover:text-sky-400 hover:bg-sky-500/10 transition-all hover:scale-105 flex items-center justify-center"
+                              className="flex-1 glass-light p-2.5 rounded-lg text-white/60 hover:text-sky-400 hover:bg-sky-500/10 transition-all hover:scale-105 flex items-center justify-center group/social"
                               title="Twitter"
                             >
-                              <Twitter className="w-4 h-4" />
+                              <Twitter className="w-4 h-4 group-hover/social:scale-110 transition-transform" />
                             </a>
                           )}
                           {person.personal_website && (
@@ -989,10 +809,10 @@ export default function DashboardPage() {
                               href={person.personal_website}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex-1 glass-light p-2.5 rounded-xl text-white/70 hover:text-purple-400 hover:bg-purple-500/10 transition-all hover:scale-105 flex items-center justify-center"
+                              className="flex-1 glass-light p-2.5 rounded-lg text-white/60 hover:text-purple-400 hover:bg-purple-500/10 transition-all hover:scale-105 flex items-center justify-center group/social"
                               title="Website"
                             >
-                              <Globe className="w-4 h-4" />
+                              <Globe className="w-4 h-4 group-hover/social:scale-110 transition-transform" />
                             </a>
                           )}
                         </div>
@@ -1003,6 +823,217 @@ export default function DashboardPage() {
               </div>
             )}
           </div>
+
+          {/* Network Insights - Bottom Section */}
+          {analytics.totalClassmates > 0 && (
+            <div className="mt-12 sm:mt-16">
+              {/* Section Header */}
+              <div className="text-center mb-8 sm:mb-12">
+                <div className="inline-flex items-center gap-2 glass-light px-4 py-2 rounded-full mb-4">
+                  <Users className="w-4 h-4 text-purple-400" />
+                  <span className="text-sm font-medium text-white/90">Network Analytics</span>
+                </div>
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3">
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400">
+                    {currentUser?.institutions?.name}
+                  </span>
+                  {' '}Network
+                </h2>
+                <p className="text-sm sm:text-base text-white/70 max-w-2xl mx-auto">
+                  Discover where your {analytics.totalClassmates} classmates are heading and building their careers
+                </p>
+              </div>
+
+              {/* Stats Overview Cards */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                {/* Total Classmates */}
+                <div className="glass-card p-5 text-center group hover:scale-105 transition-all duration-300 border border-white/5">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                    <Users className="w-6 h-6 text-purple-400" />
+                  </div>
+                  <div className="text-3xl font-bold text-white mb-1">{analytics.totalClassmates}</div>
+                  <div className="text-xs text-white/70">Total Network</div>
+                </div>
+
+                {/* Cities */}
+                <div className="glass-card p-5 text-center group hover:scale-105 transition-all duration-300 border border-white/5">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                    <MapPin className="w-6 h-6 text-blue-400" />
+                  </div>
+                  <div className="text-3xl font-bold text-white mb-1">{analytics.cities.length}</div>
+                  <div className="text-xs text-white/70">Cities Worldwide</div>
+                </div>
+
+                {/* Companies */}
+                <div className="glass-card p-5 text-center group hover:scale-105 transition-all duration-300 border border-white/5">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                    <Briefcase className="w-6 h-6 text-emerald-400" />
+                  </div>
+                  <div className="text-3xl font-bold text-white mb-1">{analytics.companies.length}</div>
+                  <div className="text-xs text-white/70">Companies</div>
+                </div>
+
+                {/* Grad Schools */}
+                <div className="glass-card p-5 text-center group hover:scale-105 transition-all duration-300 border border-white/5">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                    <GraduationCap className="w-6 h-6 text-pink-400" />
+                  </div>
+                  <div className="text-3xl font-bold text-white mb-1">{analytics.gradSchools.length}</div>
+                  <div className="text-xs text-white/70">Grad Schools</div>
+                </div>
+              </div>
+
+              {/* Detailed Analytics Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Top Cities */}
+                <div className="glass-card p-6 group hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 border border-white/5">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center ring-2 ring-blue-400/20">
+                      <MapPin className="w-6 h-6 text-blue-400" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-bold text-white text-lg">Popular Cities</h3>
+                      <p className="text-xs text-white/60">Where classmates live</p>
+                    </div>
+                  </div>
+
+                  {analytics.cities.length > 0 ? (
+                    <div className="space-y-4">
+                      {analytics.cities.slice(0, 8).map((city, idx) => (
+                        <div key={city.name} className="group/item">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                              <div className="w-6 h-6 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
+                                <span className="text-xs font-bold text-blue-400">#{idx + 1}</span>
+                              </div>
+                              <span className="text-sm font-medium text-white truncate group-hover/item:text-blue-300 transition-colors">
+                                {city.name}
+                              </span>
+                            </div>
+                            <span className="text-sm font-bold text-white ml-2">{city.count}</span>
+                          </div>
+                          <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full transition-all duration-500"
+                              style={{ width: `${(city.count / analytics.cities[0].count) * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                      {analytics.cities.length > 8 && (
+                        <div className="text-center pt-2">
+                          <span className="text-xs text-white/50">
+                            +{analytics.cities.length - 8} more cities
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-white/50 text-center py-8">No location data yet</p>
+                  )}
+                </div>
+
+                {/* Top Companies */}
+                <div className="glass-card p-6 group hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-300 border border-white/5">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center ring-2 ring-emerald-400/20">
+                      <Briefcase className="w-6 h-6 text-emerald-400" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-bold text-white text-lg">Top Employers</h3>
+                      <p className="text-xs text-white/60">Where classmates work</p>
+                    </div>
+                  </div>
+
+                  {analytics.companies.length > 0 ? (
+                    <div className="space-y-4">
+                      {analytics.companies.slice(0, 8).map((company, idx) => (
+                        <div key={company.name} className="group/item">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                              <div className="w-6 h-6 rounded-lg bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
+                                <span className="text-xs font-bold text-emerald-400">#{idx + 1}</span>
+                              </div>
+                              <span className="text-sm font-medium text-white truncate group-hover/item:text-emerald-300 transition-colors">
+                                {company.name}
+                              </span>
+                            </div>
+                            <span className="text-sm font-bold text-white ml-2">{company.count}</span>
+                          </div>
+                          <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full transition-all duration-500"
+                              style={{ width: `${(company.count / analytics.companies[0].count) * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                      {analytics.companies.length > 8 && (
+                        <div className="text-center pt-2">
+                          <span className="text-xs text-white/50">
+                            +{analytics.companies.length - 8} more companies
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-white/50 text-center py-8">No company data yet</p>
+                  )}
+                </div>
+
+                {/* Top Grad Schools */}
+                <div className="glass-card p-6 group hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 border border-white/5">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center ring-2 ring-purple-400/20">
+                      <GraduationCap className="w-6 h-6 text-purple-400" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-bold text-white text-lg">Grad Schools</h3>
+                      <p className="text-xs text-white/60">Higher education paths</p>
+                    </div>
+                  </div>
+
+                  {analytics.gradSchools.length > 0 ? (
+                    <div className="space-y-4">
+                      {analytics.gradSchools.slice(0, 8).map((school, idx) => (
+                        <div key={school.name} className="group/item">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                              <div className="w-6 h-6 rounded-lg bg-purple-500/10 flex items-center justify-center flex-shrink-0">
+                                <span className="text-xs font-bold text-purple-400">#{idx + 1}</span>
+                              </div>
+                              <span className="text-sm font-medium text-white truncate group-hover/item:text-purple-300 transition-colors">
+                                {school.name}
+                              </span>
+                            </div>
+                            <span className="text-sm font-bold text-white ml-2">{school.count}</span>
+                          </div>
+                          <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-gradient-to-r from-purple-400 to-pink-400 rounded-full transition-all duration-500"
+                              style={{ width: `${(school.count / analytics.gradSchools[0].count) * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                      {analytics.gradSchools.length > 8 && (
+                        <div className="text-center pt-2">
+                          <span className="text-xs text-white/50">
+                            +{analytics.gradSchools.length - 8} more schools
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-white/50 text-center py-8">No grad school data yet</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Bottom Divider */}
+              <div className="mt-12 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+            </div>
+          )}
         </div>
       </div>
     </div>

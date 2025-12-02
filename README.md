@@ -17,6 +17,7 @@ Improved Flock application that connects alumni using Supabase authentication, g
 - Auth callback exchanges Supabase session and routes users to onboarding or dashboard
 - Five-step onboarding wizard collecting profile, status, location, and social data
 - Dashboard with classmates list, client-side filters, and contact links
+- **Real-time messaging system with WebSocket support** (`app/messages`)
 - Map drill-down (world, country, state) with institution and proximity filtering
 - Profile editor with privacy controls and location update throttling
 
@@ -29,20 +30,25 @@ app/
   auth/                 // magic link entry and callback handler
   onboarding/           // multi-step onboarding workflow
   dashboard/            // map view + classmates feed
+  messages/             // real-time messaging interface
   profile/edit/         // profile management page
   api/locations/        // geospatial aggregation endpoint
 components/
   InteractiveStarfield.tsx
   map/FlockMap.tsx      // MapLibre rendering logic
   map/Legend.tsx
+  messaging/            // messaging UI components
   providers/QueryProvider.tsx
 lib/
   supabase/             // browser/server clients, middleware helpers
+  messaging/            // messaging utilities and Realtime subscriptions
   constants/            // university and location metadata
   types/database.ts     // generated Supabase types
+  types/messaging.ts    // messaging type definitions
   utils.ts              // shared helpers (color bucket logic)
 supabase/
   schema_v3_optimized.sql
+  messaging_schema.sql  // messaging system database schema
   seed_bc_users.sql
   seed_v3_test_users.sql
 ```
@@ -67,8 +73,9 @@ npm install
    NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key>
    ```
 2. In Supabase SQL editor, run `supabase/schema_v3_optimized.sql`
-3. Optional: load sample data from `supabase/seed_*.sql`
-4. In Supabase Auth settings, enable Email provider and configure redirect to `http://localhost:3000/auth/callback`
+3. **For messaging system**: Run `supabase/messaging_schema.sql` (see [MESSAGING_SETUP.md](./MESSAGING_SETUP.md))
+4. Optional: load sample data from `supabase/seed_*.sql`
+5. In Supabase Auth settings, enable Email provider and configure redirect to `http://localhost:3000/auth/callback`
 
 ## Development
 
@@ -84,6 +91,7 @@ The dev server runs on `http://localhost:3000`. Supabase OTP links redirect back
 - `location` column uses `geography(Point, 4326)` with a GiST index for 50-mile proximity searches
 - Row Level Security policies grant access to authenticated users only
 - `get_current_user_data()` helper exposes institution and location for policies without breaking RLS
+- **Messaging tables** (`conversations`, `messages`) use Supabase Realtime for live updates
 
 ## Map Data Flow
 
