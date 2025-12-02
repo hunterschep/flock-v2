@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { UNIVERSITIES, DEGREE_TYPES, PROGRAM_NAMES } from '@/lib/constants/universities'
+import { Footer } from '@/components/Footer'
 
 export default function EditProfilePage() {
   const [loading, setLoading] = useState(true)
@@ -367,12 +368,13 @@ export default function EditProfilePage() {
   }
 
   return (
-    <div className="min-h-screen gradient-mesh py-8 sm:py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="min-h-screen gradient-mesh flex flex-col relative overflow-hidden">
       {/* Floating orbs - Ultra Dark */}
       <div className="absolute top-1/4 left-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-pink-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse"></div>
       <div className="absolute bottom-1/4 right-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-rose-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse animation-delay-2000"></div>
       
-      <div className="max-w-3xl mx-auto relative z-10">
+      <div className="flex-1 py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-3xl mx-auto relative z-10">
         <div className="mb-4 sm:mb-6">
           <Link href="/dashboard" className="glass-light px-4 py-2 rounded-lg text-white hover:bg-white/20 inline-block transition-all text-sm sm:text-base font-medium">
             ← Back to Dashboard
@@ -889,7 +891,11 @@ export default function EditProfilePage() {
             )}
           </div>
         </div>
+        </div>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }

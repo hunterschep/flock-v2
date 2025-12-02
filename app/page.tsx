@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { Users, MapPin, Home as HomeIcon, ArrowRight, Lock } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import InteractiveStarfield from '@/components/InteractiveStarfield'
+import { Footer } from '@/components/Footer'
 
 // Dynamically import the map to avoid SSR issues
 const FlockMap = dynamic(() => import('@/components/map/FlockMap').then(mod => mod.FlockMap), { 
@@ -45,7 +46,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen gradient-ocean overflow-hidden relative">
+    <div id="main-content" className="min-h-screen gradient-ocean overflow-hidden relative">
       {/* EPIC Interactive Starfield */}
       <InteractiveStarfield />
       
@@ -244,6 +245,9 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }

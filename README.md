@@ -1,65 +1,130 @@
-# Flock v2
+# Flock
 
-Improved Flock application that connects alumni using Supabase authentication, geospatial queries, and a map-based discovery UI.
+Flock is an alumni networking platform that connects university graduates through geospatial proximity and shared institutions. Users discover other alumni on an interactive map, filter by location or status, and communicate via real-time messaging.
+
+## Tech Stack
+
+- **Frontend**: Next.js 16 (App Router), React 19, TypeScript
+- **Styling**: Tailwind CSS v4
+- **State Management**: TanStack React Query
+- **Map**: MapLibre GL via `react-map-gl`, turf.js for geometry, D3 for color scales
+- **Backend**: Supabase (Postgres + PostGIS, Auth, Realtime)
+- **Hosting**: Vercel (or any Node.js host)
 
 ## Architecture
 
-- Frontend: Next.js 16 (App Router), React 19, TypeScript
-- Styling: Tailwind CSS v4 utilities + custom glassmorphism styles in `app/globals.css`
-- State: React Query provider at `components/providers/QueryProvider.tsx`
-- Map: MapLibre via `react-map-gl`, turf.js for centroids, D3 for color scales
-- Backend: Supabase Postgres with PostGIS, Supabase Auth (magic links)
-- API: Next.js route handlers in `app/api`
+### Authentication
 
-## Key Features
+Supabase Auth with magic link OTP. Only `.edu` email addresses are accepted. The flow:
 
-- OTP sign-in restricted to `.edu` addresses (`app/auth`)
-- Auth callback exchanges Supabase session and routes users to onboarding or dashboard
-- Five-step onboarding wizard collecting profile, status, location, and social data
-- Dashboard with classmates list, client-side filters, and contact links
-- **Real-time messaging system with WebSocket support** (`app/messages`)
-- Map drill-down (world, country, state) with institution and proximity filtering
-- Profile editor with privacy controls and location update throttling
+1. User enters `.edu` email at `/auth`
+2. Supabase sends OTP link
+3. User clicks link, redirected to `/auth/callback`
+4. Callback exchanges code for session, checks `onboarding_completed`
+5. Routes to `/onboarding` (new users) or `/dashboard` (existing users)
 
-## Directory Layout
+Session refresh handled by Next.js middleware (`middleware.ts`) on every request.
+
+### Database
+
+Postgres with PostGIS extension. Core tables:
+
+| Table | Purpose |
+|-------|---------|
+| `institutions` | University registry (name, domain) |
+| `users` | User profiles, location, status, preferences |
+| `user_connections` | Block/hide/favorite relationships |
+| `conversations` | Direct message threads |
+| `messages` | Individual messages with read receipts |
+
+Key design decisions:
+
+- Location stored as `GEOGRAPHY(POINT, 4326)` with GiST index for 50-mile proximity queries via `ST_DWithin`
+- Row Level Security (RLS) restricts access to authenticated users only
+- `get_current_user_data()` SECURITY DEFINER function exposes caller's institution/location to RLS policies without recursion
+- Full-text search via `tsvector` column with weighted fields (name, bio, employer, city)
+- Profile completeness calculated by trigger on insert/update
+
+### Data Access Patterns
+
+Users can view other users if:
+- Same institution, OR
+- Within 50 miles (80,467 meters)
+- AND target has `profile_visible = true` and `onboarding_completed = true`
+- AND target is not blocked/hidden by viewer
+
+### Real-time Messaging
+
+Built on Supabase Realtime (WebSocket). The messaging system:
+
+- Creates a `conversations` row on first message between two users
+- Messages stored in `messages` table with `is_read` and `read_at` tracking
+- Client subscribes to Postgres changes on both tables
+- Unread counts computed client-side from message state
+
+### Map Data Flow
+
+1. `FlockMap` component calls `/api/locations`
+2. Route handler validates auth, queries classmates, aggregates by geo level (country/state/city)
+3. Returns GeoJSON-like structure with counts per region
+4. MapLibre renders choropleth with D3 color buckets
+5. Drill-down on click filters dashboard classmate list
+
+## Directory Structure
 
 ```
 app/
-  layout.tsx            // global font config, QueryProvider
-  page.tsx              // landing page, redirects signed-in users
-  auth/                 // magic link entry and callback handler
-  onboarding/           // multi-step onboarding workflow
-  dashboard/            // map view + classmates feed
-  messages/             // real-time messaging interface
-  profile/edit/         // profile management page
-  api/locations/        // geospatial aggregation endpoint
+  layout.tsx              # Root layout, fonts, QueryProvider
+  page.tsx                # Landing page (redirects auth users to dashboard)
+  auth/                   # Magic link entry (/auth) and callback handler
+  onboarding/             # Multi-step profile setup wizard
+  dashboard/              # Main app: map + classmate list + filters
+  messages/               # Real-time messaging UI
+  profile/edit/           # Profile editor with privacy controls
+  api/locations/          # Geospatial aggregation endpoint
+  privacy/                # Privacy policy
+  terms/                  # Terms of service
+
 components/
-  InteractiveStarfield.tsx
-  map/FlockMap.tsx      // MapLibre rendering logic
-  map/Legend.tsx
-  messaging/            // messaging UI components
-  providers/QueryProvider.tsx
+  map/FlockMap.tsx        # MapLibre map component
+  map/Legend.tsx          # Color scale legend
+  messaging/              # ConversationList, MessageView, UnreadBadge
+  providers/QueryProvider # React Query provider
+  InteractiveStarfield    # Animated background
+  Footer.tsx              # Site footer
+
 lib/
-  supabase/             // browser/server clients, middleware helpers
-  messaging/            // messaging utilities and Realtime subscriptions
-  constants/            // university and location metadata
-  types/database.ts     // generated Supabase types
-  types/messaging.ts    // messaging type definitions
-  utils.ts              // shared helpers (color bucket logic)
+  supabase/client.ts      # Browser Supabase client
+  supabase/server.ts      # Server Supabase client (cookies)
+  supabase/middleware.ts  # Session refresh logic
+  types/database.ts       # Generated Supabase types
+  types/messaging.ts      # Messaging type definitions
+  constants/              # University list, location metadata
+  utils.ts                # Shared helpers
+
 supabase/
-  schema_v3_optimized.sql
-  messaging_schema.sql  // messaging system database schema
-  seed_bc_users.sql
-  seed_v3_test_users.sql
+  schema_v3_optimized.sql # Main database schema
+  messaging_schema.sql    # Messaging tables and RLS
+  seed_*.sql              # Test data
 ```
 
-## Prerequisites
+## User Flow
 
-- Node.js 20.9 or newer
+1. **Landing** (`/`): Shows locked map preview, prompts sign-in
+2. **Auth** (`/auth`): Enter .edu email, receive magic link
+3. **Onboarding** (`/onboarding`): 5-step wizard collecting name, graduation year, location, status, social links
+4. **Dashboard** (`/dashboard`): Interactive map, classmate list with filters (status, location, roommate), search
+5. **Messages** (`/messages`): Conversation list, real-time message view
+6. **Profile** (`/profile/edit`): Update info, toggle privacy settings, 30-day location lock
+
+## Setup
+
+### Prerequisites
+
+- Node.js 20.9+
 - Supabase project with PostGIS enabled
-- MapLibre access relies on public Stadia tiles (no extra key required)
 
-## Initial Setup
+### Installation
 
 ```bash
 git clone <repo>
@@ -67,15 +132,26 @@ cd flock-v2
 npm install
 ```
 
-1. Create `.env.local` and set:
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=https://<project>.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key>
-   ```
-2. In Supabase SQL editor, run `supabase/schema_v3_optimized.sql`
-3. **For messaging system**: Run `supabase/messaging_schema.sql` (see [MESSAGING_SETUP.md](./MESSAGING_SETUP.md))
-4. Optional: load sample data from `supabase/seed_*.sql`
-5. In Supabase Auth settings, enable Email provider and configure redirect to `http://localhost:3000/auth/callback`
+### Environment Variables
+
+Create `.env.local`:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://<project>.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key>
+```
+
+### Database Setup
+
+1. Run `supabase/schema_v3_optimized.sql` in Supabase SQL editor
+2. Run `supabase/messaging_schema.sql` for messaging support
+3. Optionally run `supabase/seed_*.sql` for test data
+
+### Supabase Auth Configuration
+
+1. Enable Email provider in Supabase Auth settings
+2. Set redirect URL to `http://localhost:3000/auth/callback`
+3. For production, add your domain to allowed redirect URLs
 
 ## Development
 
@@ -83,37 +159,23 @@ npm install
 npm run dev
 ```
 
-The dev server runs on `http://localhost:3000`. Supabase OTP links redirect back to `/auth/callback`, which checks onboarding status before routing to `/dashboard`.
+Runs at `http://localhost:3000`.
 
-## Supabase Schema Notes
+## Scripts
 
-- Central table `public.users` stores identity, status, geospatial data, and preferences
-- `location` column uses `geography(Point, 4326)` with a GiST index for 50-mile proximity searches
-- Row Level Security policies grant access to authenticated users only
-- `get_current_user_data()` helper exposes institution and location for policies without breaking RLS
-- **Messaging tables** (`conversations`, `messages`) use Supabase Realtime for live updates
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Development server |
+| `npm run build` | Production build |
+| `npm run start` | Production server |
+| `npm run lint` | ESLint check |
+| `npm run lint:fix` | Auto-fix lint errors |
 
-## Map Data Flow
+## Deployment
 
-1. `FlockMap` queries `/api/locations`
-2. Route handler validates the caller, loads classmates, and aggregates results by geo level
-3. Color buckets computed via `getCustomBuckets`, legend rendered by `Legend`
-4. City markers display counts and allow quick filtering in the dashboard
-
-## Available Scripts
-
-- `npm run dev` – Next.js dev server
-- `npm run build` – production build
-- `npm run start` – production server
-- `npm run lint` – ESLint (Next.js config)
-
-## Deployment Checklist
-
-1. Set environment variables on the hosting platform:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-2. Update Supabase Auth redirect URLs for the deployed domain
-3. Migrate database changes through Supabase SQL editor or migrations tooling
+1. Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` on host
+2. Update Supabase Auth redirect URLs for production domain
+3. Run any pending SQL migrations
 
 ## License
 

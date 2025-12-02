@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { UNIVERSITIES, DEGREE_TYPES, PROGRAM_NAMES } from '@/lib/constants/universities'
+import { Footer } from '@/components/Footer'
 
 type OnboardingStep = 1 | 2 | 3 | 4 | 5
 
@@ -344,13 +345,14 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen gradient-mesh flex flex-col items-center justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="min-h-screen gradient-mesh flex flex-col relative overflow-hidden">
       {/* Floating orbs - Ultra Dark */}
       <div className="absolute top-1/4 left-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-pink-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse"></div>
       <div className="absolute bottom-1/4 right-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-rose-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse animation-delay-2000"></div>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 sm:w-[600px] sm:h-[600px] bg-blue-500/15 rounded-full mix-blend-lighten filter blur-3xl animate-pulse animation-delay-4000"></div>
       
-      <div className="max-w-2xl w-full space-y-6 sm:space-y-8 relative z-10">
+      <div className="flex-1 flex flex-col items-center justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-2xl w-full space-y-6 sm:space-y-8 relative z-10">
         {/* Epic Progress Indicator */}
         <div className="glass-strong rounded-2xl p-6 sm:p-8 space-y-4">
           <div className="flex items-center justify-between mb-2">
@@ -1001,7 +1003,11 @@ export default function OnboardingPage() {
             </div>
           </div>
         </div>
+        </div>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }

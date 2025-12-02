@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0a0f"/>
+      <stop offset="100%" stop-color="#000000"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F28B82"/>
+      <stop offset="50%" stop-color="#EC4899"/>
+      <stop offset="100%" stop-color="#F9C5D1"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="20" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  
+  <!-- Decorative circles -->
+  <circle cx="200" cy="150" r="200" fill="#F28B82" opacity="0.1" filter="url(#glow)"/>
+  <circle cx="1000" cy="500" r="250" fill="#EC4899" opacity="0.1" filter="url(#glow)"/>
+  
+  <!-- Logo/Icon -->
+  <g transform="translate(540, 180)">
+    <rect x="0" y="0" width="120" height="120" rx="24" fill="rgba(242, 139, 130, 0.2)"/>
+    <!-- Bird paths -->
+    <path d="M25 55c15-15 25-20 35-15M20 70c15-15 25-20 35-15" stroke="url(#accent)" stroke-width="6" stroke-linecap="round" fill="none"/>
+    <path d="M50 40c20-20 35-25 50-20M45 60c20-20 35-25 50-20" stroke="url(#accent)" stroke-width="7" stroke-linecap="round" fill="none"/>
+    <path d="M70 75c15-15 25-20 35-15M65 90c15-15 25-20 35-15" stroke="url(#accent)" stroke-width="6" stroke-linecap="round" fill="none"/>
+  </g>
+  
+  <!-- Title -->
+  <text x="600" y="370" font-family="Inter, -apple-system, sans-serif" font-size="72" font-weight="800" fill="white" text-anchor="middle">Flock</text>
+  
+  <!-- Tagline -->
+  <text x="600" y="430" font-family="Inter, -apple-system, sans-serif" font-size="28" font-weight="500" fill="rgba(255,255,255,0.7)" text-anchor="middle">Your network, visualized</text>
+  
+  <!-- Subtitle -->
+  <text x="600" y="490" font-family="Inter, -apple-system, sans-serif" font-size="20" font-weight="400" fill="rgba(255,255,255,0.5)" text-anchor="middle">Connect with alumni from your university</text>
+  
+  <!-- Bottom accent line -->
+  <rect x="400" y="550" width="400" height="4" rx="2" fill="url(#accent)" opacity="0.8"/>
+</svg>
+

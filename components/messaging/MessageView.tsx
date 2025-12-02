@@ -87,13 +87,10 @@ export function MessageView({
 
   if (!conversation) {
     return (
-      <div className="h-full flex items-center justify-center">
+      <div className="h-full flex items-center justify-center bg-black/10">
         <div className="text-center">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center mb-4 mx-auto">
-            <Send className="w-8 h-8 text-rose-400" />
-          </div>
-          <p className="text-white/80 font-medium">Select a conversation</p>
-          <p className="text-white/60 text-sm mt-1">Choose a conversation to start messaging</p>
+          <Send className="w-8 h-8 text-white/30 mx-auto mb-3" />
+          <p className="text-white/60 text-sm">Select a conversation</p>
         </div>
       </div>
     );
@@ -102,29 +99,28 @@ export function MessageView({
   const messageGroups = groupMessagesByDate(messages);
 
   return (
-    <div className="h-full flex flex-col">
-      {/* Header */}
-      <div className="glass-header p-4 border-b border-white/10 flex items-center gap-3">
+    <div className="h-full flex flex-col bg-black/10">
+      {/* Header - Compact */}
+      <div className="px-4 py-3 border-b border-white/5 flex items-center gap-3 bg-black/20">
         <button
           onClick={onBack}
-          className="lg:hidden glass-light p-2 rounded-lg hover:bg-white/20 transition-all"
+          className="lg:hidden p-1.5 rounded-lg hover:bg-white/10 transition-all"
         >
-          <ArrowLeft className="w-5 h-5 text-white" />
+          <ArrowLeft className="w-4 h-4 text-white/70" />
         </button>
 
-        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center">
-          <span className="text-lg font-bold text-white">
+        <div className="shrink-0 w-9 h-9 rounded-xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center">
+          <span className="text-sm font-bold text-white">
             {conversation.other_user.full_name.charAt(0).toUpperCase()}
           </span>
         </div>
 
         <div className="flex-1 min-w-0">
-          <h2 className="font-bold text-white truncate">{conversation.other_user.full_name}</h2>
-          <p className="text-xs text-white/60 truncate">
-            {conversation.other_user.institutions?.name}
-            {conversation.other_user.city && conversation.other_user.state && (
-              <> • {conversation.other_user.city}, {conversation.other_user.state}</>
-            )}
+          <h2 className="font-medium text-white text-sm truncate">{conversation.other_user.full_name}</h2>
+          <p className="text-xs text-white/50 truncate">
+            {conversation.other_user.city && conversation.other_user.state 
+              ? `${conversation.other_user.city}, ${conversation.other_user.state}`
+              : conversation.other_user.institutions?.name || ''}
           </p>
         </div>
       </div>
@@ -163,39 +159,30 @@ export function MessageView({
                 return (
                   <div
                     key={message.id}
-                    className={`flex gap-2 mb-3 ${isOwn ? 'justify-end' : 'justify-start'}`}
+                    className={`flex gap-2 mb-2 ${isOwn ? 'justify-end' : 'justify-start'}`}
                   >
                     {!isOwn && (
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center">
-                        <span className="text-sm font-bold text-white">
+                      <div className="shrink-0 w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center">
+                        <span className="text-xs font-medium text-white/80">
                           {message.sender?.full_name?.charAt(0)?.toUpperCase() || '?'}
                         </span>
                       </div>
                     )}
 
-                    <div className={`flex flex-col ${isOwn ? 'items-end' : 'items-start'} max-w-[70%]`}>
+                    <div className={`flex flex-col ${isOwn ? 'items-end' : 'items-start'} max-w-[75%]`}>
                       <div
-                        className={`rounded-2xl px-4 py-2 ${
+                        className={`rounded-xl px-3 py-2 ${
                           isOwn
-                            ? 'glass-button text-white'
-                            : 'glass-card text-white'
+                            ? 'bg-rose-500/20 border border-rose-500/30 text-white'
+                            : 'bg-white/5 border border-white/10 text-white/90'
                         }`}
                       >
                         <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
                       </div>
-                      <span className="text-xs text-white/40 mt-1 px-1">
+                      <span className="text-xs text-white/30 mt-0.5 px-1">
                         {formatMessageTime(new Date(message.created_at))}
-                        {isOwn && message.is_read && ' • Read'}
                       </span>
                     </div>
-
-                    {isOwn && (
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center">
-                        <span className="text-sm font-bold text-white">
-                          {message.sender?.full_name?.charAt(0)?.toUpperCase() || '?'}
-                        </span>
-                      </div>
-                    )}
                   </div>
                 );
               })}
@@ -205,8 +192,8 @@ export function MessageView({
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
-      <form onSubmit={handleSend} className="p-4 border-t border-white/10">
+      {/* Input - Compact */}
+      <form onSubmit={handleSend} className="p-3 border-t border-white/5 bg-black/20">
         <div className="flex gap-2">
           <textarea
             ref={inputRef}
@@ -215,23 +202,22 @@ export function MessageView({
             onKeyDown={handleKeyDown}
             placeholder="Type a message..."
             rows={1}
-            className="glass-input flex-1 px-4 py-3 rounded-xl resize-none focus:outline-none text-white placeholder-white/40 text-sm"
-            style={{ minHeight: '44px', maxHeight: '120px' }}
+            className="glass-input flex-1 px-3 py-2.5 rounded-xl resize-none focus:outline-none text-white placeholder-white/40 text-sm"
+            style={{ minHeight: '40px', maxHeight: '100px' }}
             disabled={sending}
           />
           <button
             type="submit"
             disabled={!messageInput.trim() || sending}
-            className="glass-button px-4 py-3 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:scale-105"
+            className="glass-button px-3 py-2.5 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-all"
           >
             {sending ? (
-              <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white" />
+              <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-white" />
             ) : (
-              <Send className="w-5 h-5 text-white" />
+              <Send className="w-4 h-4 text-white" />
             )}
           </button>
         </div>
-        <p className="text-xs text-white/40 mt-2">Press Enter to send, Shift+Enter for new line</p>
       </form>
     </div>
   );

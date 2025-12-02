@@ -16,10 +16,13 @@ import {
   Globe,
   Home as HomeIcon,
   Users,
-  X
+  X,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { UnreadBadge } from '@/components/messaging/UnreadBadge';
 import { getOrCreateConversation } from '@/lib/messaging/utils';
+import { Footer } from '@/components/Footer';
 
 interface UserProfile {
   id: string;
@@ -72,6 +75,10 @@ export default function DashboardPage() {
   // Graduation year filter
   const [minGradYear, setMinGradYear] = useState<string>('');
   const [maxGradYear, setMaxGradYear] = useState<string>('');
+  
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 16;
 
   useEffect(() => {
     loadData();
@@ -251,12 +258,19 @@ export default function DashboardPage() {
   const hasActiveFilters = searchName || searchCity || searchJobTitle || searchCompany || 
     filterRoommates || filterEmployed || filterInternship || filterGradSchool || 
     filterLooking || minGradYear || maxGradYear;
-  
-  const activeFilterCount = [
-    searchName, searchCity, searchJobTitle, searchCompany, filterRoommates,
-    filterEmployed, filterInternship, filterGradSchool, filterLooking,
-    minGradYear, maxGradYear
-  ].filter(Boolean).length;
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
+
+  // Reset to page 1 when filters change
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchName, searchCity, searchJobTitle, searchCompany, filterRoommates, 
+      filterEmployed, filterInternship, filterGradSchool, filterLooking, 
+      minGradYear, maxGradYear, selectedCity, selectedState]);
 
   // Calculate analytics from users data
   const analytics = React.useMemo(() => {
@@ -327,7 +341,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col gradient-mesh overflow-hidden relative">
+    <div id="main-content" className="min-h-screen flex flex-col gradient-mesh overflow-hidden relative">
       {/* Floating background orbs - Ultra Dark */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-pink-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse"></div>
       <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-rose-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse animation-delay-2000"></div>
@@ -382,445 +396,371 @@ export default function DashboardPage() {
       {/* List Section */}
       <div className="flex-1 overflow-auto relative z-10">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8">
-          {/* Search & Filters - Enhanced */}
-          <div className="glass-card p-5 sm:p-6 md:p-8 mb-6 sm:mb-8 hover:shadow-2xl transition-shadow duration-300">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-6">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center">
-                    <svg className="w-5 h-5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-base sm:text-lg font-bold text-white drop-shadow">Search & Filter</h3>
-                  {hasActiveFilters && (
-                    <p className="text-xs text-white/70 mt-0.5 drop-shadow flex items-center gap-1.5">
-                      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-rose-500/20 text-xs font-bold text-rose-400">
-                        {activeFilterCount}
-                      </span>
-                      {activeFilterCount} filter{activeFilterCount !== 1 ? 's' : ''} • {filteredUsers.length} of {users.length} people
-                    </p>
-                  )}
-                </div>
+          {/* Search & Filters - Clean Compact Design */}
+          <div className="glass-card p-4 sm:p-5 mb-6 border border-white/5">
+            {/* Single Row: Search + Quick Filters + Clear */}
+            <div className="flex flex-col lg:flex-row gap-3">
+              {/* Search Input with Icon */}
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                <input
+                  type="text"
+                  value={searchName}
+                  onChange={(e) => setSearchName(e.target.value)}
+                  placeholder="Search by name..."
+                  className="glass-input w-full pl-10 pr-4 py-2.5 rounded-xl text-sm text-white placeholder-white/40"
+                />
               </div>
-              {hasActiveFilters && (
+              
+              {/* Quick Filter Pills */}
+              <div className="flex flex-wrap items-center gap-2">
                 <button
-                  onClick={handleClearSearch}
-                  className="glass-button px-4 sm:px-5 py-2 text-xs sm:text-sm text-white font-semibold rounded-xl transition-all self-start sm:self-auto flex items-center gap-2 group"
+                  onClick={() => setFilterEmployed(!filterEmployed)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${
+                    filterEmployed 
+                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' 
+                      : 'glass-light text-white/70 hover:text-white hover:bg-white/10'
+                  }`}
                 >
-                  <X className="w-4 h-4 group-hover:rotate-90 transition-transform" />
-                  Clear all
+                  <Briefcase className="w-3 h-3" />
+                  Employed
                 </button>
+                <button
+                  onClick={() => setFilterGradSchool(!filterGradSchool)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${
+                    filterGradSchool 
+                      ? 'bg-violet-500/20 text-violet-300 border border-violet-500/30' 
+                      : 'glass-light text-white/70 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  <GraduationCap className="w-3 h-3" />
+                  Grad School
+                </button>
+                <button
+                  onClick={() => setFilterLooking(!filterLooking)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${
+                    filterLooking 
+                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' 
+                      : 'glass-light text-white/70 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  <Search className="w-3 h-3" />
+                  Looking
+                </button>
+                <button
+                  onClick={() => setFilterRoommates(!filterRoommates)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${
+                    filterRoommates 
+                      ? 'bg-pink-500/20 text-pink-300 border border-pink-500/30' 
+                      : 'glass-light text-white/70 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  <HomeIcon className="w-3 h-3" />
+                  Roommates
+                </button>
+              </div>
+
+              {/* Clear & Count */}
+              {hasActiveFilters && (
+                <div className="flex items-center gap-3 ml-auto">
+                  <span className="text-xs text-white/50">
+                    {filteredUsers.length} of {users.length}
+                  </span>
+                  <button
+                    onClick={handleClearSearch}
+                    className="text-xs text-rose-400 hover:text-rose-300 font-medium flex items-center gap-1 transition-colors"
+                  >
+                    <X className="w-3 h-3" />
+                    Clear
+                  </button>
+                </div>
               )}
             </div>
-            
-            {/* Search Inputs */}
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-                {/* Name Search */}
-                <div>
-                  <label htmlFor="search-name" className="block text-sm font-medium text-white/90 mb-1 drop-shadow">
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    id="search-name"
-                    value={searchName}
-                    onChange={(e) => setSearchName(e.target.value)}
-                    placeholder="Search by name"
-                    className="glass-input w-full px-3 py-2 rounded-lg focus:outline-none text-sm text-white placeholder-white/50"
-                  />
-                </div>
 
-                {/* City Search */}
-                <div>
-                  <label htmlFor="search-city" className="block text-sm font-medium text-white/90 mb-1 drop-shadow">
-                    City
-                  </label>
-                  <input
-                    type="text"
-                    id="search-city"
-                    value={searchCity}
-                    onChange={(e) => setSearchCity(e.target.value)}
-                    placeholder="e.g. San Francisco"
-                    className="glass-input w-full px-3 py-2 rounded-lg focus:outline-none text-sm text-white placeholder-white/50"
-                  />
-                </div>
-
-                {/* Job Title Search */}
-                <div>
-                  <label htmlFor="search-job" className="block text-sm font-medium text-white/90 mb-1 drop-shadow">
-                    Job Title
-                  </label>
-                  <input
-                    type="text"
-                    id="search-job"
-                    value={searchJobTitle}
-                    onChange={(e) => setSearchJobTitle(e.target.value)}
-                    placeholder="e.g. Software Engineer"
-                    className="glass-input w-full px-3 py-2 rounded-lg focus:outline-none text-sm text-white placeholder-white/50"
-                  />
-                </div>
-
-                {/* Company Search */}
-                <div>
-                  <label htmlFor="search-company" className="block text-sm font-medium text-white/90 mb-1 drop-shadow">
-                    Company
-                  </label>
-                  <input
-                    type="text"
-                    id="search-company"
-                    value={searchCompany}
-                    onChange={(e) => setSearchCompany(e.target.value)}
-                    placeholder="e.g. Google"
-                    className="glass-input w-full px-3 py-2 rounded-lg focus:outline-none text-sm text-white placeholder-white/50"
-                  />
-                </div>
-              </div>
-
-              {/* Status Filters */}
-              <div>
-                <label className="block text-sm font-medium text-white/90 mb-2 drop-shadow">
-                  Status
-                </label>
-                <div className="flex flex-wrap gap-3">
-                  <label className="flex items-center space-x-2 cursor-pointer glass-light px-3 py-2 rounded-lg hover:bg-white/20 transition-all">
-                    <input
-                      type="checkbox"
-                      checked={filterEmployed}
-                      onChange={(e) => setFilterEmployed(e.target.checked)}
-                      className="w-4 h-4 text-blue-600 border-white/30 rounded focus:ring-2 focus:ring-blue-400"
-                    />
-                    <span className="text-sm text-white/90 flex items-center gap-1.5">
-                      <Briefcase className="w-3.5 h-3.5" />
-                      Employed
-                    </span>
-                  </label>
-                  
-                  <label className="flex items-center space-x-2 cursor-pointer glass-light px-3 py-2 rounded-lg hover:bg-white/20 transition-all">
-                    <input
-                      type="checkbox"
-                      checked={filterInternship}
-                      onChange={(e) => setFilterInternship(e.target.checked)}
-                      className="w-4 h-4 text-blue-600 border-white/30 rounded focus:ring-2 focus:ring-blue-400"
-                    />
-                    <span className="text-sm text-white/90 flex items-center gap-1.5">
-                      <Users className="w-3.5 h-3.5" />
-                      Internship
-                    </span>
-                  </label>
-                  
-                  <label className="flex items-center space-x-2 cursor-pointer glass-light px-3 py-2 rounded-lg hover:bg-white/20 transition-all">
-                    <input
-                      type="checkbox"
-                      checked={filterGradSchool}
-                      onChange={(e) => setFilterGradSchool(e.target.checked)}
-                      className="w-4 h-4 text-blue-600 border-white/30 rounded focus:ring-2 focus:ring-blue-400"
-                    />
-                    <span className="text-sm text-white/90 flex items-center gap-1.5">
-                      <GraduationCap className="w-3.5 h-3.5" />
-                      Grad School
-                    </span>
-                  </label>
-                  
-                  <label className="flex items-center space-x-2 cursor-pointer glass-light px-3 py-2 rounded-lg hover:bg-white/20 transition-all">
-                    <input
-                      type="checkbox"
-                      checked={filterLooking}
-                      onChange={(e) => setFilterLooking(e.target.checked)}
-                      className="w-4 h-4 text-blue-600 border-white/30 rounded focus:ring-2 focus:ring-blue-400"
-                    />
-                    <span className="text-sm text-white/90 flex items-center gap-1.5">
-                      <Search className="w-3.5 h-3.5" />
-                      Looking
-                    </span>
-                  </label>
-                  
-                  <label className="flex items-center space-x-2 cursor-pointer glass-light px-3 py-2 rounded-lg hover:bg-white/20 transition-all">
-                    <input
-                      type="checkbox"
-                      checked={filterRoommates}
-                      onChange={(e) => setFilterRoommates(e.target.checked)}
-                      className="w-4 h-4 text-blue-600 border-white/30 rounded focus:ring-2 focus:ring-blue-400"
-                    />
-                    <span className="text-sm text-white/90 flex items-center gap-1.5">
-                      <HomeIcon className="w-3.5 h-3.5" />
-                      Roommates
-                    </span>
-                  </label>
-                </div>
-              </div>
-
-              {/* Graduation Year Range */}
-              <div>
-                <label className="block text-sm font-medium text-white/90 mb-2 drop-shadow">
-                  Graduation Year
-                </label>
-                <div className="flex items-center space-x-3">
+            {/* Expandable Advanced Filters */}
+            <details className="mt-3 group">
+              <summary className="text-xs text-white/50 hover:text-white/70 cursor-pointer list-none flex items-center gap-1 transition-colors">
+                <ChevronRight className="w-3 h-3 group-open:rotate-90 transition-transform" />
+                More filters
+              </summary>
+              <div className="mt-3 pt-3 border-t border-white/5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <input
+                  type="text"
+                  value={searchCity}
+                  onChange={(e) => setSearchCity(e.target.value)}
+                  placeholder="City"
+                  className="glass-input px-3 py-2 rounded-lg text-sm text-white placeholder-white/40"
+                />
+                <input
+                  type="text"
+                  value={searchJobTitle}
+                  onChange={(e) => setSearchJobTitle(e.target.value)}
+                  placeholder="Job Title"
+                  className="glass-input px-3 py-2 rounded-lg text-sm text-white placeholder-white/40"
+                />
+                <input
+                  type="text"
+                  value={searchCompany}
+                  onChange={(e) => setSearchCompany(e.target.value)}
+                  placeholder="Company"
+                  className="glass-input px-3 py-2 rounded-lg text-sm text-white placeholder-white/40"
+                />
+                <div className="flex items-center gap-2">
                   <input
                     type="number"
                     value={minGradYear}
                     onChange={(e) => setMinGradYear(e.target.value)}
-                    placeholder="From"
-                    min="2000"
-                    max="2030"
-                    className="glass-input w-24 px-3 py-2 rounded-lg focus:outline-none text-sm text-white placeholder-white/50"
+                    placeholder="Year from"
+                    className="glass-input flex-1 px-3 py-2 rounded-lg text-sm text-white placeholder-white/40"
                   />
-                  <span className="text-white/70">-</span>
+                  <span className="text-white/30">-</span>
                   <input
                     type="number"
                     value={maxGradYear}
                     onChange={(e) => setMaxGradYear(e.target.value)}
-                    placeholder="To"
-                    min="2000"
-                    max="2030"
-                    className="glass-input w-24 px-3 py-2 rounded-lg focus:outline-none text-sm text-white placeholder-white/50"
+                    placeholder="to"
+                    className="glass-input flex-1 px-3 py-2 rounded-lg text-sm text-white placeholder-white/40"
                   />
-                  {(minGradYear || maxGradYear) && (
-                    <button
-                      onClick={() => {
-                        setMinGradYear('');
-                        setMaxGradYear('');
-                      }}
-                      className="text-xs text-white/70 hover:text-white drop-shadow"
-                    >
-                      Clear
-                    </button>
-                  )}
                 </div>
               </div>
-            </div>
+            </details>
           </div>
 
-          {/* Filter Info */}
+          {/* Filter Info - Compact */}
           {(selectedCity || selectedState) && (
-            <div className="glass-card p-3 sm:p-4 mb-4 sm:mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:justify-between">
-              <div>
-                <p className="text-sm font-medium text-white drop-shadow">
-                  {selectedCity 
-                    ? `Showing people in ${selectedCity}, ${selectedState}`
-                    : `Showing people in ${selectedState}`
-                  }
-                </p>
-                <p className="text-xs text-white/70 mt-1 drop-shadow">
-                  {selectedCity 
-                    ? 'All grads within 50 miles' 
-                    : 'Classmates from your institution + people within 50 miles'
-                  }
-                </p>
+            <div className="glass-card px-4 py-3 mb-4 flex items-center justify-between border border-cyan-500/20">
+              <div className="flex items-center gap-3">
+                <MapPin className="w-4 h-4 text-cyan-400" />
+                <span className="text-sm text-white">
+                  {selectedCity ? `${selectedCity}, ${selectedState}` : selectedState}
+                </span>
+                <span className="text-xs text-white/50">• {filteredUsers.length} found</span>
               </div>
               <button
                 onClick={handleClearFilter}
-                className="glass-light px-4 py-2 text-sm text-white rounded-lg hover:bg-white/20 transition-all"
+                className="text-xs text-rose-400 hover:text-rose-300 font-medium flex items-center gap-1"
               >
-                Clear Filter
+                <X className="w-3 h-3" />
+                Clear
               </button>
             </div>
           )}
 
           {/* Users Grid */}
           <div>
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-4 sm:mb-6">
-              <h3 className="text-base sm:text-lg font-semibold text-white drop-shadow">
-                {selectedCity || selectedState ? 'People in this area' : 'Your Network'}
-              </h3>
-              <p className="text-xs sm:text-sm text-white/80 drop-shadow">
-                {filteredUsers.length} {filteredUsers.length === 1 ? 'person' : 'people'} found
-              </p>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 text-rose-400" />
+                <h3 className="text-sm font-medium text-white/80">
+                  {selectedCity || selectedState ? 'People in this area' : 'Directory'}
+                </h3>
+              </div>
+              <span className="text-xs text-white/40">
+                {filteredUsers.length} {filteredUsers.length === 1 ? 'person' : 'people'}
+              </span>
             </div>
 
             {filteredUsers.length === 0 ? (
-              <div className="glass-card p-8 sm:p-12 text-center">
-                          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-pink-500/10 to-rose-500/10 flex items-center justify-center">
-                  <Search className="w-8 h-8 text-white/40" />
-                </div>
-                <h3 className="text-base sm:text-lg font-semibold text-white mb-2 drop-shadow">No results found</h3>
-                <p className="text-sm sm:text-base text-white/80 mb-4 max-w-md mx-auto drop-shadow px-4">
+              <div className="glass-card p-8 text-center border border-white/5">
+                <Search className="w-8 h-8 text-white/30 mx-auto mb-3" />
+                <p className="text-sm text-white/60 mb-3">
                   {hasActiveFilters 
-                    ? 'No people match your search criteria. Try adjusting or clearing your filters.'
+                    ? 'No people match your filters'
                     : selectedCity || selectedState 
-                      ? 'No people found in this area. Try selecting a different location on the map.'
-                      : 'No one in your network yet. The map shows where your classmates are located!'
+                      ? 'No people in this area'
+                      : 'No one in your network yet'
                   }
                 </p>
                 {hasActiveFilters && (
                   <button
                     onClick={handleClearSearch}
-                    className="glass-button px-4 py-2 text-white text-sm font-medium rounded-lg"
+                    className="text-xs text-rose-400 hover:text-rose-300 font-medium"
                   >
-                    Clear all filters
+                    Clear filters
                   </button>
                 )}
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
-                {filteredUsers.map((person) => (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
+                  {paginatedUsers.map((person) => (
                   <div
                     key={person.id}
-                    className="group glass-card p-6 hover:scale-[1.02] transition-all duration-300 relative overflow-hidden border border-white/5 hover:border-white/10"
+                    className="group glass-card p-4 hover:scale-[1.01] transition-all duration-200 relative overflow-hidden border border-white/5 hover:border-rose-500/20"
                   >
-                    {/* Animated gradient background on hover */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-rose-500/0 via-pink-500/0 to-rose-500/0 group-hover:from-rose-500/10 group-hover:via-pink-500/5 group-hover:to-rose-500/10 transition-all duration-500 pointer-events-none" />
-                    
-                    {/* Glow effect on hover */}
-                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
-                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-rose-400/50 to-transparent" />
-                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-pink-400/50 to-transparent" />
-                      </div>
-                    
                     <div className="relative z-10">
-                      {/* Header with Avatar and Name */}
-                      <div className="flex items-start gap-4 mb-4">
-                        {/* Avatar */}
-                        <div className="relative flex-shrink-0">
-                          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center ring-2 ring-white/10 group-hover:ring-rose-400/30 transition-all duration-300">
-                            <span className="text-xl font-bold text-white">
+                      {/* Compact Header */}
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="relative shrink-0">
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center ring-1 ring-white/10">
+                            <span className="text-sm font-bold text-white">
                               {person.full_name.charAt(0).toUpperCase()}
                             </span>
                           </div>
-                          {/* Status indicator */}
-                          <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-gradient-to-br from-rose-400 to-pink-500 ring-2 ring-[#0f0f23] flex items-center justify-center">
-                            <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                          </div>
                         </div>
-
-                        {/* Name and School */}
-                        <div className="flex-1 min-w-0 pt-1">
-                            <h4 className="font-bold text-white text-lg mb-1 truncate group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-rose-300 group-hover:via-pink-300 group-hover:to-rose-300 transition-all duration-300">
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold text-white text-sm truncate">
                             {person.full_name}
                           </h4>
-                          <div className="flex items-center gap-1.5 text-xs text-white/70 mb-0.5">
-                            <GraduationCap className="w-3.5 h-3.5 text-blue-400/80" />
-                            <span className="truncate">{person.institutions?.name || 'University'}</span>
-                          </div>
-                          <p className="text-xs text-white/60">
-                            Class of {person.grad_year}
+                          <p className="text-xs text-white/50 truncate">
+                            {person.institutions?.name || 'University'} &apos;{String(person.grad_year).slice(-2)}
                           </p>
                         </div>
                       </div>
 
-                      {/* Divider */}
-                      <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mb-4" />
-
-                      {/* Status/Work Info - Fixed Height */}
-                      <div className="mb-4 h-[72px] flex items-start">
+                      {/* Status Badge */}
+                      <div className="mb-3 min-h-[44px]">
                         {(person.status === 'employed' || person.status === 'internship') && (
-                          <div className="flex items-start gap-2 w-full">
-                            <Briefcase className="w-4 h-4 text-rose-400/80 mt-0.5 flex-shrink-0" />
+                          <div className="flex items-start gap-2">
+                            <Briefcase className="w-3.5 h-3.5 text-emerald-400 mt-0.5 shrink-0" />
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm text-white/90 font-medium leading-snug line-clamp-2">
+                              <p className="text-xs text-white/80 font-medium line-clamp-1">
                                 {person.job_title || 'Working'}
                               </p>
                               {person.show_employer !== false && person.employer && (
-                                <p className="text-xs text-white/70 mt-0.5 line-clamp-1">
-                                  at {person.employer}
+                                <p className="text-xs text-white/50 line-clamp-1">
+                                  {person.employer}
                                 </p>
-                              )}
-                              {person.status === 'internship' && (
-                                <span className="inline-block mt-1 px-2 py-0.5 text-xs bg-blue-500/20 text-blue-300 rounded-md">
-                                  Internship
-                                </span>
                               )}
                             </div>
                           </div>
                         )}
                         {person.status === 'grad_school' && (
-                          <div className="flex items-start gap-2 w-full">
-                            <GraduationCap className="w-4 h-4 text-rose-400/80 mt-0.5 flex-shrink-0" />
+                          <div className="flex items-start gap-2">
+                            <GraduationCap className="w-3.5 h-3.5 text-violet-400 mt-0.5 shrink-0" />
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm text-white/90 font-medium leading-snug line-clamp-2">
-                                {person.degree && `${person.degree} `}
-                                {person.program || 'Graduate Student'}
+                              <p className="text-xs text-white/80 font-medium line-clamp-1">
+                                {person.degree || ''} {person.program || 'Graduate Student'}
                               </p>
                               {person.show_school !== false && person.grad_school && (
-                                <p className="text-xs text-white/70 mt-0.5 line-clamp-1">
-                                  at {person.grad_school}
+                                <p className="text-xs text-white/50 line-clamp-1">
+                                  {person.grad_school}
                                 </p>
                               )}
                             </div>
                           </div>
                         )}
                         {person.status === 'looking' && (
-                          <div className="flex items-start gap-2 w-full">
-                            <Search className="w-4 h-4 text-yellow-400/80 mt-0.5 flex-shrink-0" />
-                            <p className="text-sm text-white/90 font-medium">
-                              Looking for opportunities
-                            </p>
+                          <div className="flex items-center gap-2">
+                            <Search className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                            <p className="text-xs text-white/80 font-medium">Looking for opportunities</p>
                           </div>
                         )}
                         {!person.status && (
-                          <div className="flex items-center justify-center w-full h-full text-white/40 text-xs">
-                            No status set
-                          </div>
+                          <p className="text-xs text-white/30 italic">No status set</p>
                         )}
                       </div>
 
-                      {/* Location - Fixed Height */}
-                      <div className="h-[40px] mb-4 flex items-center">
-                        {person.city && person.state ? (
-                          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 w-full">
-                            <MapPin className="w-3.5 h-3.5 text-cyan-400/80 flex-shrink-0" />
-                            <span className="text-sm text-white/80 truncate">
-                              {person.city}, {person.state}
-                            </span>
-                          </div>
-                        ) : (
-                          <div className="text-xs text-white/30 px-3">
-                            Location not set
-                          </div>
+                      {/* Location & Tags Row */}
+                      <div className="flex items-center gap-2 mb-3 flex-wrap">
+                        {person.city && person.state && (
+                          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-white/5 text-xs text-white/60">
+                            <MapPin className="w-3 h-3 text-cyan-400" />
+                            {person.city}
+                          </span>
                         )}
-                      </div>
-
-                      {/* Badges - Fixed Height */}
-                      <div className="h-[32px] mb-4 flex items-center">
                         {person.looking_for_roommate && (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs glass-light text-white/90 rounded-lg font-medium border border-white/10">
+                          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-pink-500/10 text-xs text-pink-300 border border-pink-500/20">
                             <HomeIcon className="w-3 h-3" />
-                            Looking for roommate
+                            Roommate
                           </span>
                         )}
                       </div>
 
-                      {/* Contact Buttons */}
-                      <button
-                        onClick={() => handleSendMessage(person.id)}
-                        className="group/btn w-full glass-button px-4 py-2.5 text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 relative overflow-hidden"
-                      >
-                        <div className="absolute inset-0 bg-gradient-to-r from-rose-500/0 via-rose-500/20 to-rose-500/0 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-1000" />
-                        <MessageCircle className="w-4 h-4 group-hover/btn:scale-110 transition-transform relative z-10" />
-                        <span className="relative z-10">Send Message</span>
-                      </button>
-
-                      {/* Social Links */}
-                      {(person.twitter_url || person.personal_website) && (
-                        <div className="flex gap-2 mt-3">{person.twitter_url && (
-                            <a
-                              href={person.twitter_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex-1 glass-light p-2.5 rounded-lg text-white/60 hover:text-sky-400 hover:bg-sky-500/10 transition-all hover:scale-105 flex items-center justify-center group/social"
-                              title="Twitter"
-                            >
-                              <Twitter className="w-4 h-4 group-hover/social:scale-110 transition-transform" />
-                            </a>
-                          )}
-                          {person.personal_website && (
-                            <a
-                              href={person.personal_website}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex-1 glass-light p-2.5 rounded-lg text-white/60 hover:text-rose-400 hover:bg-rose-500/10 transition-all hover:scale-105 flex items-center justify-center group/social"
-                              title="Website"
-                            >
-                              <Globe className="w-4 h-4 group-hover/social:scale-110 transition-transform" />
-                            </a>
-                          )}
-                        </div>
-                      )}
+                      {/* Action Row */}
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleSendMessage(person.id)}
+                          className="flex-1 glass-button px-3 py-2 text-white text-xs font-medium rounded-lg flex items-center justify-center gap-1.5 hover:shadow-lg transition-all"
+                        >
+                          <MessageCircle className="w-3.5 h-3.5" />
+                          Message
+                        </button>
+                        {(person.twitter_url || person.personal_website) && (
+                          <div className="flex gap-1">
+                            {person.twitter_url && (
+                              <a
+                                href={person.twitter_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="glass-light p-2 rounded-lg text-white/50 hover:text-sky-400 transition-colors"
+                              >
+                                <Twitter className="w-3.5 h-3.5" />
+                              </a>
+                            )}
+                            {person.personal_website && (
+                              <a
+                                href={person.personal_website}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="glass-light p-2 rounded-lg text-white/50 hover:text-rose-400 transition-colors"
+                              >
+                                <Globe className="w-3.5 h-3.5" />
+                              </a>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
-              </div>
+                </div>
+
+                {/* Pagination Controls - Compact */}
+                {totalPages > 1 && (
+                  <div className="mt-6 flex items-center justify-center gap-3">
+                    <button
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      className="glass-light p-2 rounded-lg text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/20 transition-all"
+                      aria-label="Previous page"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                        let page;
+                        if (totalPages <= 5) {
+                          page = i + 1;
+                        } else if (currentPage <= 3) {
+                          page = i + 1;
+                        } else if (currentPage >= totalPages - 2) {
+                          page = totalPages - 4 + i;
+                        } else {
+                          page = currentPage - 2 + i;
+                        }
+                        return (
+                          <button
+                            key={page}
+                            onClick={() => setCurrentPage(page)}
+                            className={`w-8 h-8 rounded-lg text-xs font-medium transition-all ${
+                              currentPage === page
+                                ? 'glass-button text-white'
+                                : 'text-white/60 hover:text-white hover:bg-white/10'
+                            }`}
+                          >
+                            {page}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    
+                    <button
+                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                      disabled={currentPage === totalPages}
+                      className="glass-light p-2 rounded-lg text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/20 transition-all"
+                      aria-label="Next page"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                    
+                    <span className="text-xs text-white/40 ml-2">
+                      {startIndex + 1}-{Math.min(endIndex, filteredUsers.length)} of {filteredUsers.length}
+                    </span>
+                  </div>
+                )}
+              </>
             )}
           </div>
 
@@ -832,29 +772,18 @@ export default function DashboardPage() {
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-rose-500/10 via-pink-500/10 to-rose-500/10 rounded-full blur-3xl" />
               </div>
 
-              {/* Section Header - More Dramatic */}
-              <div className="text-center mb-12 sm:mb-16 relative z-10">
-                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 tracking-tight">
-                  Your{' '}
-                  <span className="relative inline-block">
-                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-400 via-pink-400 to-rose-400 animate-gradient">
-                      {currentUser?.institutions?.name}
-                    </span>
-                    <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 200 8" fill="none">
-                      <path d="M0 4C50 0 150 8 200 4" stroke="url(#underline-grad)" strokeWidth="3" strokeLinecap="round"/>
-                      <defs>
-                        <linearGradient id="underline-grad" x1="0" y1="0" x2="200" y2="0">
-                          <stop stopColor="#F28B82" />
-                          <stop offset="0.5" stopColor="#EC4899" />
-                          <stop offset="1" stopColor="#F9C5D1" />
-                        </linearGradient>
-                      </defs>
-                    </svg>
-                  </span>
-                  {' '}Network
+              {/* Section Header */}
+              <div className="text-center mb-10 sm:mb-12 relative z-10">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 mb-4">
+                  <Users className="w-3.5 h-3.5 text-rose-400" />
+                  <span className="text-xs font-medium text-white/70">Network Analytics</span>
+                </div>
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 tracking-tight">
+                  {currentUser?.institutions?.name}{' '}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-pink-400">Network</span>
                 </h2>
-                <p className="text-base sm:text-lg text-white/60 max-w-2xl mx-auto">
-                  Real-time insights from {analytics.totalClassmates} alumni building their futures
+                <p className="text-sm sm:text-base text-white/50 max-w-xl mx-auto">
+                  {analytics.totalClassmates} alumni across {analytics.cities.length} cities
                 </p>
               </div>
 
@@ -1069,6 +998,9 @@ export default function DashboardPage() {
           )}
         </div>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

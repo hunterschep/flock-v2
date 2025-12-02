@@ -16,6 +16,7 @@ import {
 } from '@/lib/messaging/utils';
 import type { ConversationWithUser, MessageWithSender } from '@/lib/types/messaging';
 import { MessageCircle, ArrowLeft } from 'lucide-react';
+import { Footer } from '@/components/Footer';
 
 export default function MessagesPage() {
   const router = useRouter();
@@ -231,14 +232,14 @@ export default function MessagesPage() {
 
       {/* Main content */}
       <div className="flex-1 relative z-10 overflow-hidden">
-        <div className="h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="glass-strong rounded-3xl overflow-hidden h-full">
+        <div className="h-[calc(100vh-200px)] max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="glass-strong rounded-2xl overflow-hidden h-full border border-white/5">
             <div className="flex h-full">
               {/* Conversation list - Desktop always visible, mobile conditional */}
               <div
                 className={`${
                   showMobileList ? 'flex' : 'hidden'
-                } lg:flex lg:w-96 border-r border-white/10 flex-col w-full`}
+                } lg:flex lg:w-80 border-r border-white/10 flex-col w-full`}
               >
                 <ConversationList
                   conversations={conversations}
@@ -268,6 +269,9 @@ export default function MessagesPage() {
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

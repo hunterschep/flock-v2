@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
+import { Footer } from '@/components/Footer'
 
 export default function AuthPage() {
   const [email, setEmail] = useState('')
@@ -44,13 +45,14 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen gradient-mesh flex items-center justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8 overflow-hidden relative">
+    <div className="min-h-screen gradient-mesh flex flex-col overflow-hidden relative">
       {/* Floating orbs - Ultra Dark */}
       <div className="absolute top-1/4 left-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-pink-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse"></div>
       <div className="absolute bottom-1/4 right-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-rose-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse animation-delay-2000"></div>
       
-      <div className="max-w-md w-full space-y-6 relative z-10">
-        <div className="glass-strong rounded-2xl p-8 sm:p-10">
+      <div className="flex-1 flex items-center justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-6 relative z-10">
+          <div className="glass-strong rounded-2xl p-8 sm:p-10">
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 mb-6">
               <svg className="w-8 h-8 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -165,7 +167,11 @@ export default function AuthPage() {
             </Link>
           </div>
         </div>
+        </div>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }

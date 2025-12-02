@@ -437,3 +437,16 @@ html {
 .feature-card-pink:hover {
   box-shadow: 0 20px 60px rgba(236, 72, 153, 0.4), 0 0 40px rgba(219, 39, 119, 0.2);
 }
+
+/* Screen reader only - accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
