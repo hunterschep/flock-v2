@@ -89,8 +89,8 @@ export function MessageView({
     return (
       <div className="h-full flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center mb-4 mx-auto">
-            <Send className="w-8 h-8 text-purple-400" />
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center mb-4 mx-auto">
+            <Send className="w-8 h-8 text-rose-400" />
           </div>
           <p className="text-white/80 font-medium">Select a conversation</p>
           <p className="text-white/60 text-sm mt-1">Choose a conversation to start messaging</p>
@@ -112,7 +112,7 @@ export function MessageView({
           <ArrowLeft className="w-5 h-5 text-white" />
         </button>
 
-        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center">
+        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center">
           <span className="text-lg font-bold text-white">
             {conversation.other_user.full_name.charAt(0).toUpperCase()}
           </span>
@@ -190,7 +190,7 @@ export function MessageView({
                     </div>
 
                     {isOwn && (
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center">
                         <span className="text-sm font-bold text-white">
                           {message.sender?.full_name?.charAt(0)?.toUpperCase() || '?'}
                         </span>

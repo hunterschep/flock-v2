@@ -312,11 +312,11 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen gradient-mesh flex items-center justify-center px-4 relative overflow-hidden">
         {/* Floating orbs */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse animation-delay-2000"></div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-pink-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-rose-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse animation-delay-2000"></div>
         
         <div className="glass-strong rounded-3xl px-10 py-8 relative z-10 flex flex-col items-center gap-4">
-          <svg className="animate-spin h-12 w-12 text-purple-400" fill="none" viewBox="0 0 24 24">
+          <svg className="animate-spin h-12 w-12 text-rose-400" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
@@ -329,8 +329,8 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen flex flex-col gradient-mesh overflow-hidden relative">
       {/* Floating background orbs - Ultra Dark */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse"></div>
-      <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse animation-delay-2000"></div>
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-pink-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse"></div>
+      <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-rose-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse animation-delay-2000"></div>
       
       {/* Header */}
       <header className="glass-header shrink-0 z-20 sticky top-0">
@@ -386,8 +386,8 @@ export default function DashboardPage() {
           <div className="glass-card p-5 sm:p-6 md:p-8 mb-6 sm:mb-8 hover:shadow-2xl transition-shadow duration-300">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center">
-                  <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center">
+                    <svg className="w-5 h-5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
@@ -395,7 +395,7 @@ export default function DashboardPage() {
                   <h3 className="text-base sm:text-lg font-bold text-white drop-shadow">Search & Filter</h3>
                   {hasActiveFilters && (
                     <p className="text-xs text-white/70 mt-0.5 drop-shadow flex items-center gap-1.5">
-                      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-purple-500/20 text-xs font-bold text-purple-400">
+                      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-rose-500/20 text-xs font-bold text-rose-400">
                         {activeFilterCount}
                       </span>
                       {activeFilterCount} filter{activeFilterCount !== 1 ? 's' : ''} • {filteredUsers.length} of {users.length} people
@@ -631,7 +631,7 @@ export default function DashboardPage() {
 
             {filteredUsers.length === 0 ? (
               <div className="glass-card p-8 sm:p-12 text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-blue-500/10 to-purple-500/10 flex items-center justify-center">
+                          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-pink-500/10 to-rose-500/10 flex items-center justify-center">
                   <Search className="w-8 h-8 text-white/40" />
                 </div>
                 <h3 className="text-base sm:text-lg font-semibold text-white mb-2 drop-shadow">No results found</h3>
@@ -660,33 +660,33 @@ export default function DashboardPage() {
                     className="group glass-card p-6 hover:scale-[1.02] transition-all duration-300 relative overflow-hidden border border-white/5 hover:border-white/10"
                   >
                     {/* Animated gradient background on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/0 via-blue-500/0 to-cyan-500/0 group-hover:from-purple-500/10 group-hover:via-blue-500/5 group-hover:to-cyan-500/10 transition-all duration-500 pointer-events-none" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-rose-500/0 via-pink-500/0 to-rose-500/0 group-hover:from-rose-500/10 group-hover:via-pink-500/5 group-hover:to-rose-500/10 transition-all duration-500 pointer-events-none" />
                     
                     {/* Glow effect on hover */}
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
-                      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-purple-400/50 to-transparent" />
-                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-blue-400/50 to-transparent" />
-                    </div>
+                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-rose-400/50 to-transparent" />
+                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-pink-400/50 to-transparent" />
+                      </div>
                     
                     <div className="relative z-10">
                       {/* Header with Avatar and Name */}
                       <div className="flex items-start gap-4 mb-4">
                         {/* Avatar */}
                         <div className="relative flex-shrink-0">
-                          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center ring-2 ring-white/10 group-hover:ring-purple-400/30 transition-all duration-300">
+                          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center ring-2 ring-white/10 group-hover:ring-rose-400/30 transition-all duration-300">
                             <span className="text-xl font-bold text-white">
                               {person.full_name.charAt(0).toUpperCase()}
                             </span>
                           </div>
                           {/* Status indicator */}
-                          <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-gradient-to-br from-emerald-400 to-green-500 ring-2 ring-[#0f0f23] flex items-center justify-center">
+                          <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-gradient-to-br from-rose-400 to-pink-500 ring-2 ring-[#0f0f23] flex items-center justify-center">
                             <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
                           </div>
                         </div>
 
                         {/* Name and School */}
                         <div className="flex-1 min-w-0 pt-1">
-                          <h4 className="font-bold text-white text-lg mb-1 truncate group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-300 group-hover:via-blue-300 group-hover:to-cyan-300 transition-all duration-300">
+                            <h4 className="font-bold text-white text-lg mb-1 truncate group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-rose-300 group-hover:via-pink-300 group-hover:to-rose-300 transition-all duration-300">
                             {person.full_name}
                           </h4>
                           <div className="flex items-center gap-1.5 text-xs text-white/70 mb-0.5">
@@ -706,7 +706,7 @@ export default function DashboardPage() {
                       <div className="mb-4 h-[72px] flex items-start">
                         {(person.status === 'employed' || person.status === 'internship') && (
                           <div className="flex items-start gap-2 w-full">
-                            <Briefcase className="w-4 h-4 text-purple-400/80 mt-0.5 flex-shrink-0" />
+                            <Briefcase className="w-4 h-4 text-rose-400/80 mt-0.5 flex-shrink-0" />
                             <div className="flex-1 min-w-0">
                               <p className="text-sm text-white/90 font-medium leading-snug line-clamp-2">
                                 {person.job_title || 'Working'}
@@ -726,7 +726,7 @@ export default function DashboardPage() {
                         )}
                         {person.status === 'grad_school' && (
                           <div className="flex items-start gap-2 w-full">
-                            <GraduationCap className="w-4 h-4 text-purple-400/80 mt-0.5 flex-shrink-0" />
+                            <GraduationCap className="w-4 h-4 text-rose-400/80 mt-0.5 flex-shrink-0" />
                             <div className="flex-1 min-w-0">
                               <p className="text-sm text-white/90 font-medium leading-snug line-clamp-2">
                                 {person.degree && `${person.degree} `}
@@ -786,7 +786,7 @@ export default function DashboardPage() {
                         onClick={() => handleSendMessage(person.id)}
                         className="group/btn w-full glass-button px-4 py-2.5 text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 relative overflow-hidden"
                       >
-                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/0 via-purple-500/20 to-purple-500/0 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-1000" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-rose-500/0 via-rose-500/20 to-rose-500/0 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-1000" />
                         <MessageCircle className="w-4 h-4 group-hover/btn:scale-110 transition-transform relative z-10" />
                         <span className="relative z-10">Send Message</span>
                       </button>
@@ -809,7 +809,7 @@ export default function DashboardPage() {
                               href={person.personal_website}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex-1 glass-light p-2.5 rounded-lg text-white/60 hover:text-purple-400 hover:bg-purple-500/10 transition-all hover:scale-105 flex items-center justify-center group/social"
+                              className="flex-1 glass-light p-2.5 rounded-lg text-white/60 hover:text-rose-400 hover:bg-rose-500/10 transition-all hover:scale-105 flex items-center justify-center group/social"
                               title="Website"
                             >
                               <Globe className="w-4 h-4 group-hover/social:scale-110 transition-transform" />
@@ -830,11 +830,11 @@ export default function DashboardPage() {
               {/* Section Header */}
               <div className="text-center mb-8 sm:mb-12">
                 <div className="inline-flex items-center gap-2 glass-light px-4 py-2 rounded-full mb-4">
-                  <Users className="w-4 h-4 text-purple-400" />
+                  <Users className="w-4 h-4 text-rose-400" />
                   <span className="text-sm font-medium text-white/90">Network Analytics</span>
                 </div>
                 <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3">
-                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400">
+                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-400 via-pink-400 to-rose-400">
                     {currentUser?.institutions?.name}
                   </span>
                   {' '}Network
@@ -848,8 +848,8 @@ export default function DashboardPage() {
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 {/* Total Classmates */}
                 <div className="glass-card p-5 text-center group hover:scale-105 transition-all duration-300 border border-white/5">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-                    <Users className="w-6 h-6 text-purple-400" />
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                    <Users className="w-6 h-6 text-rose-400" />
                   </div>
                   <div className="text-3xl font-bold text-white mb-1">{analytics.totalClassmates}</div>
                   <div className="text-xs text-white/70">Total Network</div>
@@ -857,8 +857,8 @@ export default function DashboardPage() {
 
                 {/* Cities */}
                 <div className="glass-card p-5 text-center group hover:scale-105 transition-all duration-300 border border-white/5">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-                    <MapPin className="w-6 h-6 text-blue-400" />
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                    <MapPin className="w-6 h-6 text-rose-400" />
                   </div>
                   <div className="text-3xl font-bold text-white mb-1">{analytics.cities.length}</div>
                   <div className="text-xs text-white/70">Cities Worldwide</div>
@@ -866,8 +866,8 @@ export default function DashboardPage() {
 
                 {/* Companies */}
                 <div className="glass-card p-5 text-center group hover:scale-105 transition-all duration-300 border border-white/5">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-                    <Briefcase className="w-6 h-6 text-emerald-400" />
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                    <Briefcase className="w-6 h-6 text-rose-400" />
                   </div>
                   <div className="text-3xl font-bold text-white mb-1">{analytics.companies.length}</div>
                   <div className="text-xs text-white/70">Companies</div>
@@ -875,7 +875,7 @@ export default function DashboardPage() {
 
                 {/* Grad Schools */}
                 <div className="glass-card p-5 text-center group hover:scale-105 transition-all duration-300 border border-white/5">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
                     <GraduationCap className="w-6 h-6 text-pink-400" />
                   </div>
                   <div className="text-3xl font-bold text-white mb-1">{analytics.gradSchools.length}</div>
@@ -886,10 +886,10 @@ export default function DashboardPage() {
               {/* Detailed Analytics Grid */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Top Cities */}
-                <div className="glass-card p-6 group hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 border border-white/5">
+                <div className="glass-card p-6 group hover:shadow-2xl hover:shadow-rose-500/10 transition-all duration-300 border border-white/5">
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center ring-2 ring-blue-400/20">
-                      <MapPin className="w-6 h-6 text-blue-400" />
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center ring-2 ring-rose-400/20">
+                      <MapPin className="w-6 h-6 text-rose-400" />
                     </div>
                     <div className="flex-1">
                       <h3 className="font-bold text-white text-lg">Popular Cities</h3>
@@ -903,10 +903,10 @@ export default function DashboardPage() {
                         <div key={city.name} className="group/item">
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                              <div className="w-6 h-6 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
-                                <span className="text-xs font-bold text-blue-400">#{idx + 1}</span>
+                              <div className="w-6 h-6 rounded-lg bg-rose-500/10 flex items-center justify-center flex-shrink-0">
+                                <span className="text-xs font-bold text-rose-400">#{idx + 1}</span>
                               </div>
-                              <span className="text-sm font-medium text-white truncate group-hover/item:text-blue-300 transition-colors">
+                              <span className="text-sm font-medium text-white truncate group-hover/item:text-rose-300 transition-colors">
                                 {city.name}
                               </span>
                             </div>
@@ -914,7 +914,7 @@ export default function DashboardPage() {
                           </div>
                           <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
                             <div 
-                              className="h-full bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full transition-all duration-500"
+                              className="h-full bg-gradient-to-r from-rose-400 to-pink-400 rounded-full transition-all duration-500"
                               style={{ width: `${(city.count / analytics.cities[0].count) * 100}%` }}
                             />
                           </div>
@@ -934,10 +934,10 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Top Companies */}
-                <div className="glass-card p-6 group hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-300 border border-white/5">
+                <div className="glass-card p-6 group hover:shadow-2xl hover:shadow-rose-500/10 transition-all duration-300 border border-white/5">
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center ring-2 ring-emerald-400/20">
-                      <Briefcase className="w-6 h-6 text-emerald-400" />
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center ring-2 ring-rose-400/20">
+                      <Briefcase className="w-6 h-6 text-rose-400" />
                     </div>
                     <div className="flex-1">
                       <h3 className="font-bold text-white text-lg">Top Employers</h3>
@@ -951,10 +951,10 @@ export default function DashboardPage() {
                         <div key={company.name} className="group/item">
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                              <div className="w-6 h-6 rounded-lg bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
-                                <span className="text-xs font-bold text-emerald-400">#{idx + 1}</span>
+                              <div className="w-6 h-6 rounded-lg bg-rose-500/10 flex items-center justify-center flex-shrink-0">
+                                <span className="text-xs font-bold text-rose-400">#{idx + 1}</span>
                               </div>
-                              <span className="text-sm font-medium text-white truncate group-hover/item:text-emerald-300 transition-colors">
+                              <span className="text-sm font-medium text-white truncate group-hover/item:text-rose-300 transition-colors">
                                 {company.name}
                               </span>
                             </div>
@@ -962,7 +962,7 @@ export default function DashboardPage() {
                           </div>
                           <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
                             <div 
-                              className="h-full bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full transition-all duration-500"
+                              className="h-full bg-gradient-to-r from-rose-400 to-pink-400 rounded-full transition-all duration-500"
                               style={{ width: `${(company.count / analytics.companies[0].count) * 100}%` }}
                             />
                           </div>
@@ -982,10 +982,10 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Top Grad Schools */}
-                <div className="glass-card p-6 group hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 border border-white/5">
+                <div className="glass-card p-6 group hover:shadow-2xl hover:shadow-rose-500/10 transition-all duration-300 border border-white/5">
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center ring-2 ring-purple-400/20">
-                      <GraduationCap className="w-6 h-6 text-purple-400" />
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center ring-2 ring-rose-400/20">
+                      <GraduationCap className="w-6 h-6 text-rose-400" />
                     </div>
                     <div className="flex-1">
                       <h3 className="font-bold text-white text-lg">Grad Schools</h3>
@@ -999,10 +999,10 @@ export default function DashboardPage() {
                         <div key={school.name} className="group/item">
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                              <div className="w-6 h-6 rounded-lg bg-purple-500/10 flex items-center justify-center flex-shrink-0">
-                                <span className="text-xs font-bold text-purple-400">#{idx + 1}</span>
+                              <div className="w-6 h-6 rounded-lg bg-rose-500/10 flex items-center justify-center flex-shrink-0">
+                                <span className="text-xs font-bold text-rose-400">#{idx + 1}</span>
                               </div>
-                              <span className="text-sm font-medium text-white truncate group-hover/item:text-purple-300 transition-colors">
+                              <span className="text-sm font-medium text-white truncate group-hover/item:text-rose-300 transition-colors">
                                 {school.name}
                               </span>
                             </div>
@@ -1010,7 +1010,7 @@ export default function DashboardPage() {
                           </div>
                           <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
                             <div 
-                              className="h-full bg-gradient-to-r from-purple-400 to-pink-400 rounded-full transition-all duration-500"
+                              className="h-full bg-gradient-to-r from-rose-400 to-pink-400 rounded-full transition-all duration-500"
                               style={{ width: `${(school.count / analytics.gradSchools[0].count) * 100}%` }}
                             />
                           </div>

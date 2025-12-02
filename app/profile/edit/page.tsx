@@ -369,8 +369,8 @@ export default function EditProfilePage() {
   return (
     <div className="min-h-screen gradient-mesh py-8 sm:py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Floating orbs - Ultra Dark */}
-      <div className="absolute top-1/4 left-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-indigo-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-purple-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse animation-delay-2000"></div>
+      <div className="absolute top-1/4 left-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-pink-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-rose-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse animation-delay-2000"></div>
       
       <div className="max-w-3xl mx-auto relative z-10">
         <div className="mb-4 sm:mb-6">
@@ -485,8 +485,8 @@ export default function EditProfilePage() {
                     value: 'grad_school', 
                     label: 'Grad School',
                     icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" /></svg>,
-                    gradient: 'from-purple-500/20 to-pink-500/20',
-                    iconColor: 'text-purple-400'
+                    gradient: 'from-rose-500/20 to-pink-500/20',
+                    iconColor: 'text-rose-400'
                   },
                   { 
                     value: 'looking', 
@@ -500,7 +500,7 @@ export default function EditProfilePage() {
                     key={option.value}
                     className={`group flex items-center gap-3 p-4 glass-card rounded-xl cursor-pointer transition-all duration-300 ${
                       data.status === option.value
-                        ? 'bg-gradient-to-br from-purple-500/20 to-blue-500/20 border-purple-400/40 scale-[1.02]'
+                        ? 'bg-gradient-to-br from-rose-500/20 to-pink-500/20 border-rose-400/40 scale-[1.02]'
                         : 'hover:bg-white/5'
                     }`}
                   >
@@ -521,7 +521,7 @@ export default function EditProfilePage() {
                       {option.label}
                     </span>
                     {data.status === option.value && (
-                      <svg className="w-5 h-5 text-purple-400 ml-auto" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-5 h-5 text-rose-400 ml-auto" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
                     )}
@@ -684,8 +684,8 @@ export default function EditProfilePage() {
             <div className="space-y-4 pt-6 border-t border-white/10">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
-                    <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center">
+                    <svg className="w-5 h-5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>

@@ -346,8 +346,8 @@ export default function OnboardingPage() {
   return (
     <div className="min-h-screen gradient-mesh flex flex-col items-center justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Floating orbs - Ultra Dark */}
-      <div className="absolute top-1/4 left-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-indigo-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-purple-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse animation-delay-2000"></div>
+      <div className="absolute top-1/4 left-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-pink-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-rose-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse animation-delay-2000"></div>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 sm:w-[600px] sm:h-[600px] bg-blue-500/15 rounded-full mix-blend-lighten filter blur-3xl animate-pulse animation-delay-4000"></div>
       
       <div className="max-w-2xl w-full space-y-6 sm:space-y-8 relative z-10">
@@ -361,7 +361,7 @@ export default function OnboardingPage() {
           {/* Progress bar with glow */}
           <div className="relative w-full glass-light rounded-full h-3 overflow-hidden">
             <div
-              className="absolute inset-0 bg-gradient-to-r from-purple-500 via-blue-500 to-indigo-500 h-3 rounded-full transition-all duration-500 ease-out"
+              className="absolute inset-0 bg-gradient-to-r from-rose-500 via-pink-500 to-rose-500 h-3 rounded-full transition-all duration-500 ease-out"
               style={{ 
                 width: `${(step / 5) * 100}%`,
                 boxShadow: '0 0 20px rgba(139, 92, 246, 0.6), 0 0 40px rgba(99, 102, 241, 0.4)'
@@ -520,8 +520,8 @@ export default function OnboardingPage() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
                         </svg>
                       ),
-                      gradient: 'from-purple-500/20 to-pink-500/20',
-                      iconColor: 'text-purple-400'
+                      gradient: 'from-rose-500/20 to-pink-500/20',
+                      iconColor: 'text-rose-400'
                     },
                     { 
                       value: 'looking', 
@@ -540,7 +540,7 @@ export default function OnboardingPage() {
                       key={option.value}
                       className={`group flex items-start p-4 sm:p-5 glass-card rounded-xl cursor-pointer transition-all duration-300 ${
                         data.status === option.value
-                          ? 'bg-gradient-to-br from-purple-500/30 to-blue-500/30 border-purple-400/50 scale-[1.02] shadow-lg'
+                          ? 'bg-gradient-to-br from-rose-500/30 to-pink-500/30 border-rose-400/50 scale-[1.02] shadow-lg'
                           : 'hover:bg-white/10 hover:scale-[1.01]'
                       }`}
                       style={data.status === option.value ? {
@@ -564,7 +564,7 @@ export default function OnboardingPage() {
                         <div className="flex items-center gap-2 mb-1">
                           <div className="font-semibold text-white drop-shadow text-sm sm:text-base">{option.label}</div>
                           {data.status === option.value && (
-                            <svg className="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                            <svg className="w-5 h-5 text-rose-400" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                             </svg>
                           )}
@@ -616,7 +616,7 @@ export default function OnboardingPage() {
                       <input
                         type="checkbox"
                         id="hide_employer"
-                        className="mt-1 mr-3 h-5 w-5 rounded border-white/20 bg-white/10 text-purple-500 focus:ring-2 focus:ring-purple-400"
+                        className="mt-1 mr-3 h-5 w-5 rounded border-white/20 bg-white/10 text-rose-500 focus:ring-2 focus:ring-rose-400"
                         checked={!data.show_employer}
                         onChange={(e) => updateData('show_employer', !e.target.checked)}
                       />
@@ -755,7 +755,7 @@ export default function OnboardingPage() {
                       <input
                         type="checkbox"
                         id="hide_school"
-                        className="mt-1 mr-3 h-5 w-5 rounded border-white/20 bg-white/10 text-purple-500 focus:ring-2 focus:ring-purple-400"
+                        className="mt-1 mr-3 h-5 w-5 rounded border-white/20 bg-white/10 text-rose-500 focus:ring-2 focus:ring-rose-400"
                         checked={!data.show_school}
                         onChange={(e) => updateData('show_school', !e.target.checked)}
                       />
@@ -920,7 +920,7 @@ export default function OnboardingPage() {
               
               <div>
                 <label htmlFor="personal_website" className="block text-xs sm:text-sm font-medium text-white/90 mb-2 drop-shadow flex items-center gap-2">
-                  <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
                   </svg>
                   Personal Website (optional)

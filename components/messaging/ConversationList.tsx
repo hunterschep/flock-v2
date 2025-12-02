@@ -52,8 +52,8 @@ export function ConversationList({
       <div className="flex-1 overflow-y-auto">
         {filteredConversations.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full p-8 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center mb-4">
-              <MessageCircle className="w-8 h-8 text-purple-400" />
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center mb-4">
+              <MessageCircle className="w-8 h-8 text-rose-400" />
             </div>
             <p className="text-white/80 font-medium mb-1">No conversations yet</p>
             <p className="text-white/60 text-sm">
@@ -68,13 +68,13 @@ export function ConversationList({
                 onClick={() => onSelectConversation(conversation.id)}
                 className={`w-full p-4 text-left transition-all hover:bg-white/5 ${
                   selectedConversationId === conversation.id
-                    ? 'bg-purple-500/10 border-l-2 border-purple-400'
+                    ? 'bg-rose-500/10 border-l-2 border-rose-400'
                     : ''
                 }`}
               >
                 <div className="flex items-start gap-3">
                   {/* Avatar */}
-                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center">
                     <span className="text-lg font-bold text-white">
                       {conversation.other_user.full_name.charAt(0).toUpperCase()}
                     </span>
@@ -115,7 +115,7 @@ export function ConversationList({
                     {/* Unread badge */}
                     {conversation.unread_count > 0 && (
                       <div className="mt-2">
-                        <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-400 text-xs font-bold">
+                        <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400 text-xs font-bold">
                           {conversation.unread_count}
                         </span>
                       </div>

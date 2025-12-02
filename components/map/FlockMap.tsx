@@ -473,22 +473,22 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
           className="p-2 sm:p-3 cursor-pointer glass-light rounded-lg sm:rounded-xl transition-all duration-300 transform hover:scale-110 hover:bg-white/20 group shadow-lg"
           title="Zoom In"
         >
-          <Plus className="w-4 h-4 sm:w-5 sm:h-5 text-white drop-shadow group-hover:text-purple-300 transition-colors" />
+          <Plus className="w-4 h-4 sm:w-5 sm:h-5 text-white drop-shadow group-hover:text-rose-300 transition-colors" />
         </button>
         <button
           onClick={() => setViewState((s) => ({ ...s, zoom: Math.max(1, s.zoom / 1.2) }))}
           className="p-2 sm:p-3 cursor-pointer glass-light rounded-lg sm:rounded-xl transition-all duration-300 transform hover:scale-110 hover:bg-white/20 group shadow-lg"
           title="Zoom Out"
         >
-          <Minus className="w-4 h-4 sm:w-5 sm:h-5 text-white drop-shadow group-hover:text-purple-300 transition-colors" />
+          <Minus className="w-4 h-4 sm:w-5 sm:h-5 text-white drop-shadow group-hover:text-rose-300 transition-colors" />
         </button>
       </div>
 
       {/* Legend - Enhanced & Mobile Responsive */}
       <div className="absolute top-2 sm:top-4 left-2 sm:left-4 glass-strong rounded-xl sm:rounded-2xl p-3 sm:p-4 z-10 max-w-[200px] sm:max-w-xs shadow-2xl">
         <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
-          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center flex-shrink-0">
-            <svg className="w-3 h-3 sm:w-4 sm:h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center flex-shrink-0">
+            <svg className="w-3 h-3 sm:w-4 sm:h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
             </svg>
           </div>
@@ -566,8 +566,8 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect }) => {
         title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
       >
         {isFullscreen ? 
-          <Minimize2 className="w-4 h-4 sm:w-5 sm:h-5 drop-shadow group-hover:text-purple-300 transition-colors" /> : 
-          <Maximize2 className="w-4 h-4 sm:w-5 sm:h-5 drop-shadow group-hover:text-purple-300 transition-colors" />
+          <Minimize2 className="w-4 h-4 sm:w-5 sm:h-5 drop-shadow group-hover:text-rose-300 transition-colors" /> : 
+          <Maximize2 className="w-4 h-4 sm:w-5 sm:h-5 drop-shadow group-hover:text-rose-300 transition-colors" />
         }
       </button>
     </div>

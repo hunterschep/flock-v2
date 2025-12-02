@@ -12,8 +12,8 @@ import InteractiveStarfield from '@/components/InteractiveStarfield'
 const FlockMap = dynamic(() => import('@/components/map/FlockMap').then(mod => mod.FlockMap), { 
   ssr: false,
   loading: () => (
-    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-900/20 to-blue-900/20">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-400"></div>
+    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-rose-900/20 to-pink-900/20">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-rose-400"></div>
     </div>
   )
 })
@@ -36,7 +36,7 @@ export default function Home() {
   if (loading) {
     return (
       <div className="min-h-screen gradient-ocean flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-400"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-rose-400"></div>
       </div>
     )
   }
@@ -47,8 +47,8 @@ export default function Home() {
       <InteractiveStarfield />
       
       {/* Animated Background Orbs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse"></div>
-      <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-blue-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse animation-delay-2000"></div>
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-rose-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse"></div>
+      <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-pink-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse animation-delay-2000"></div>
       <div className="absolute bottom-1/4 left-1/3 w-96 h-96 bg-pink-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse animation-delay-4000"></div>
       
       {/* Hero Section */}
@@ -59,7 +59,7 @@ export default function Home() {
           <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white mb-6 drop-shadow-2xl leading-tight tracking-tight">
             Your network,
             <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 animate-gradient">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 via-pink-400 to-rose-400 animate-gradient">
               visualized
             </span>
           </h1>
@@ -74,12 +74,12 @@ export default function Home() {
               href="/auth"
               className="group relative px-8 py-4 glass-button rounded-2xl font-bold text-lg flex items-center gap-3 hover:scale-105 transition-all duration-300 overflow-hidden"
               style={{
-                boxShadow: '0 20px 60px rgba(139, 92, 246, 0.5), 0 0 40px rgba(99, 102, 241, 0.3)'
+                boxShadow: '0 20px 60px rgba(242, 139, 130, 0.5), 0 0 40px rgba(249, 197, 209, 0.3)'
               }}
             >
               <span className="relative z-10">Get Started Free</span>
               <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform relative z-10" />
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-600/0 via-purple-600/50 to-purple-600/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+              <div className="absolute inset-0 bg-gradient-to-r from-rose-600/0 via-rose-600/50 to-rose-600/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
             </Link>
             
             <div className="glass-light px-5 py-3 rounded-xl flex items-center gap-2">
@@ -123,9 +123,9 @@ export default function Home() {
               <div className="absolute inset-0 z-30 flex flex-col items-center justify-center p-4 sm:p-8 text-center">
                 {/* Animated Lock Icon */}
                 <div className="relative mb-4 sm:mb-6">
-                  <div className="absolute inset-0 bg-purple-500/30 rounded-full blur-2xl animate-pulse"></div>
+                  <div className="absolute inset-0 bg-rose-500/30 rounded-full blur-2xl animate-pulse"></div>
                   <div className="relative glass-strong p-4 sm:p-6 rounded-2xl sm:rounded-3xl">
-                    <Lock className="w-8 h-8 sm:w-12 sm:h-12 text-purple-400 animate-pulse" />
+                    <Lock className="w-8 h-8 sm:w-12 sm:h-12 text-rose-400 animate-pulse" />
                   </div>
                 </div>
                 
@@ -140,13 +140,13 @@ export default function Home() {
                   href="/auth"
                   className="group relative px-6 sm:px-8 py-3 sm:py-4 glass-button rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base flex items-center gap-2 sm:gap-3 hover:scale-105 transition-all duration-300 overflow-hidden"
                   style={{
-                    boxShadow: '0 15px 40px rgba(139, 92, 246, 0.4)'
+                    boxShadow: '0 15px 40px rgba(242, 139, 130, 0.4)'
                   }}
                 >
                   <Lock className="w-4 h-4 sm:w-5 sm:h-5 relative z-10" />
                   <span className="relative z-10">Unlock Full Access</span>
                   <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-2 transition-transform relative z-10" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600/0 via-purple-600/50 to-purple-600/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-rose-600/0 via-rose-600/50 to-rose-600/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
                 </Link>
 
                 {/* Feature Pills */}
@@ -156,7 +156,7 @@ export default function Home() {
                     <span className="text-xs sm:text-sm text-white/90">Live Map</span>
                   </div>
                   <div className="glass-light px-3 sm:px-4 py-1.5 sm:py-2 rounded-full flex items-center gap-1.5 sm:gap-2">
-                    <Users className="w-3 h-3 sm:w-4 sm:h-4 text-purple-400" />
+                    <Users className="w-3 h-3 sm:w-4 sm:h-4 text-rose-400" />
                     <span className="text-xs sm:text-sm text-white/90">Alumni Directory</span>
                   </div>
                   <div className="glass-light px-3 sm:px-4 py-1.5 sm:py-2 rounded-full flex items-center gap-1.5 sm:gap-2">
@@ -168,7 +168,7 @@ export default function Home() {
             </div>
 
             {/* Glow effect on hover */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-3xl opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500 -z-10"></div>
+            <div className="absolute -inset-1 bg-gradient-to-r from-rose-600 to-pink-600 rounded-3xl opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500 -z-10"></div>
           </div>
         </div>
 
@@ -197,7 +197,7 @@ export default function Home() {
                   { emoji: '🦅', name: 'Harvard', color: 'from-red-600/20 to-red-700/20' },
                   { emoji: '🌴', name: 'USC', color: 'from-yellow-500/20 to-red-500/20' },
                   { emoji: '🔵', name: 'Duke', color: 'from-blue-600/20 to-blue-700/20' },
-                  { emoji: '🐾', name: 'Northwestern', color: 'from-purple-500/20 to-purple-600/20' },
+                  { emoji: '🐾', name: 'Northwestern', color: 'from-rose-500/20 to-rose-600/20' },
                   { emoji: '🦁', name: 'Columbia', color: 'from-blue-400/20 to-blue-500/20' },
                 ].map((uni, idx) => (
                   <div
@@ -221,7 +221,7 @@ export default function Home() {
                   { emoji: '🦅', name: 'Harvard', color: 'from-red-600/20 to-red-700/20' },
                   { emoji: '🌴', name: 'USC', color: 'from-yellow-500/20 to-red-500/20' },
                   { emoji: '🔵', name: 'Duke', color: 'from-blue-600/20 to-blue-700/20' },
-                  { emoji: '🐾', name: 'Northwestern', color: 'from-purple-500/20 to-purple-600/20' },
+                  { emoji: '🐾', name: 'Northwestern', color: 'from-rose-500/20 to-rose-600/20' },
                   { emoji: '🦁', name: 'Columbia', color: 'from-blue-400/20 to-blue-500/20' },
                 ].map((uni, idx) => (
                   <div

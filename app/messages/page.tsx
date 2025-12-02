@@ -168,8 +168,8 @@ export default function MessagesPage() {
   return (
     <div className="min-h-screen flex flex-col gradient-mesh overflow-hidden relative">
       {/* Floating background orbs */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse" />
-      <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse animation-delay-2000" />
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-pink-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse" />
+      <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-rose-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse animation-delay-2000" />
 
       {/* Header */}
       <header className="glass-header shrink-0 z-20 sticky top-0">
@@ -182,8 +182,8 @@ export default function MessagesPage() {
               <ArrowLeft className="w-5 h-5 text-white" />
             </Link>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center">
-                <MessageCircle className="w-5 h-5 text-purple-400" />
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center">
+                <MessageCircle className="w-5 h-5 text-rose-400" />
               </div>
               <h1 className="text-xl sm:text-2xl font-bold text-white drop-shadow-lg">Messages</h1>
             </div>
