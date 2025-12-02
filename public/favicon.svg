@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F28B82"/>
+      <stop offset="100%" stop-color="#EC4899"/>
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="7" fill="#0a0a0f"/>
+  <!-- Stylized birds in flock formation -->
+  <path d="M6 14c2-2 4-3 6-2M5 17c2-2 4-3 6-2" stroke="url(#g)" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <path d="M13 10c3-3 5-4 8-3M12 14c3-3 5-4 8-3" stroke="url(#g)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+  <path d="M19 18c2-2 4-3 6-2M18 22c2-2 4-3 6-2" stroke="url(#g)" stroke-width="2" stroke-linecap="round" fill="none"/>
+</svg>

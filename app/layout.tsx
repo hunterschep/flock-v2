@@ -23,6 +23,12 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Flock - Connect with Alumni",
   description: "Connect with grads from your university and discover who's in your city",
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+    apple: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({

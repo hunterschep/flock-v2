@@ -12,8 +12,11 @@ import InteractiveStarfield from '@/components/InteractiveStarfield'
 const FlockMap = dynamic(() => import('@/components/map/FlockMap').then(mod => mod.FlockMap), { 
   ssr: false,
   loading: () => (
-    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-rose-900/20 to-pink-900/20">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-rose-400"></div>
+    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-rose-900/20 to-pink-900/20 rounded-3xl">
+      <div className="flex flex-col items-center gap-3">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-rose-400"></div>
+        <span className="text-white/60 text-sm">Loading map...</span>
+      </div>
     </div>
   )
 })
@@ -110,8 +113,10 @@ export default function Home() {
         {/* Locked Map Preview - EPIC Interactive Element */}
         <div className="max-w-6xl mx-auto animate-fade-in-up" style={{animationDelay: '500ms'}}>
           <div className="relative group">
-            {/* Map Container with blur - responsive height */}
+            {/* Map Container with blur - responsive height with skeleton */}
             <div className="glass-strong rounded-3xl overflow-hidden relative h-[350px] sm:h-[450px] md:h-[500px]">
+              {/* Map skeleton background for stable layout */}
+              <div className="absolute inset-0 bg-gradient-to-br from-rose-900/10 to-pink-900/10" />
               <div className="absolute inset-0 pointer-events-none z-10">
                 <FlockMap />
               </div>

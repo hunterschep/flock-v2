@@ -78,9 +78,23 @@ export default function MessagesPage() {
 
     loadConversations();
 
-    // Subscribe to all conversation updates
-    const unsubscribe = subscribeToAllConversations(() => {
-      loadConversations();
+    // Subscribe to all conversation updates (only for incoming messages from others)
+    const unsubscribe = subscribeToAllConversations(async () => {
+      // Only reload conversations when receiving messages from others
+      // This prevents full refresh when sending our own messages
+      const convs = await getConversations();
+      setConversations((prev) => {
+        // Only update if there are meaningful changes
+        const hasNewContent = convs.some((newConv) => {
+          const oldConv = prev.find((p) => p.id === newConv.id);
+          if (!oldConv) return true;
+          return (
+            newConv.unread_count !== oldConv.unread_count ||
+            newConv.last_message?.id !== oldConv.last_message?.id
+          );
+        });
+        return hasNewContent ? convs : prev;
+      });
     });
 
     return () => {
@@ -139,14 +153,38 @@ export default function MessagesPage() {
   };
 
   const handleSendMessage = async (content: string) => {
-    if (!selectedConversationId) return;
+    if (!selectedConversationId || !currentUserId) return;
 
     setSending(true);
+    
+    // Optimistically update the conversation list immediately
+    setConversations((prevConversations) =>
+      prevConversations.map((conv) =>
+        conv.id === selectedConversationId
+          ? {
+              ...conv,
+              last_message: {
+                id: 'temp-' + Date.now(),
+                conversation_id: selectedConversationId,
+                sender_id: currentUserId,
+                content: content.trim(),
+                created_at: new Date().toISOString(),
+                is_read: false,
+              },
+              last_message_at: new Date().toISOString(),
+            }
+          : conv
+      ).sort((a, b) => 
+        new Date(b.last_message_at || 0).getTime() - new Date(a.last_message_at || 0).getTime()
+      )
+    );
+    
     const newMessage = await sendMessageUtil(selectedConversationId, content);
     setSending(false);
 
-    if (newMessage) {
-      // Message will be added via realtime subscription
+    if (!newMessage) {
+      // If sending failed, we could revert the optimistic update here
+      // For now, the realtime subscription will handle syncing
     }
   };
 

@@ -824,214 +824,247 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {/* Network Insights - Bottom Section */}
+          {/* Network Insights - Bottom Section - EPIC REDESIGN */}
           {analytics.totalClassmates > 0 && (
-            <div className="mt-12 sm:mt-16">
-              {/* Section Header */}
-              <div className="text-center mb-8 sm:mb-12">
-                <div className="inline-flex items-center gap-2 glass-light px-4 py-2 rounded-full mb-4">
-                  <Users className="w-4 h-4 text-rose-400" />
-                  <span className="text-sm font-medium text-white/90">Network Analytics</span>
-                </div>
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3">
-                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-400 via-pink-400 to-rose-400">
-                    {currentUser?.institutions?.name}
+            <div className="mt-16 sm:mt-24 relative">
+              {/* Background glow effect */}
+              <div className="absolute inset-0 -top-20 pointer-events-none overflow-hidden">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-rose-500/10 via-pink-500/10 to-rose-500/10 rounded-full blur-3xl" />
+              </div>
+
+              {/* Section Header - More Dramatic */}
+              <div className="text-center mb-12 sm:mb-16 relative z-10">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 tracking-tight">
+                  Your{' '}
+                  <span className="relative inline-block">
+                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-400 via-pink-400 to-rose-400 animate-gradient">
+                      {currentUser?.institutions?.name}
+                    </span>
+                    <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 200 8" fill="none">
+                      <path d="M0 4C50 0 150 8 200 4" stroke="url(#underline-grad)" strokeWidth="3" strokeLinecap="round"/>
+                      <defs>
+                        <linearGradient id="underline-grad" x1="0" y1="0" x2="200" y2="0">
+                          <stop stopColor="#F28B82" />
+                          <stop offset="0.5" stopColor="#EC4899" />
+                          <stop offset="1" stopColor="#F9C5D1" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
                   </span>
                   {' '}Network
                 </h2>
-                <p className="text-sm sm:text-base text-white/70 max-w-2xl mx-auto">
-                  Discover where your {analytics.totalClassmates} classmates are heading and building their careers
+                <p className="text-base sm:text-lg text-white/60 max-w-2xl mx-auto">
+                  Real-time insights from {analytics.totalClassmates} alumni building their futures
                 </p>
               </div>
 
-              {/* Stats Overview Cards */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                {/* Total Classmates */}
-                <div className="glass-card p-5 text-center group hover:scale-105 transition-all duration-300 border border-white/5">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-                    <Users className="w-6 h-6 text-rose-400" />
+              {/* Hero Stats - Bento Grid Style */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-10 relative z-10">
+                {/* Main stat - Total Network */}
+                <div className="col-span-2 glass-card p-6 sm:p-8 relative overflow-hidden group hover:scale-[1.02] transition-all duration-500 border border-rose-500/20">
+                  <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-rose-500/20 to-transparent rounded-bl-full" />
+                  <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-pink-500/10 to-transparent rounded-tr-full" />
+                  <div className="relative z-10 flex items-center gap-6">
+                    <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-rose-500/30 to-pink-500/30 flex items-center justify-center ring-2 ring-rose-400/30 group-hover:scale-110 transition-transform duration-300">
+                      <Users className="w-10 h-10 text-rose-400" />
+                    </div>
+                    <div>
+                      <div className="text-5xl sm:text-6xl font-bold text-white mb-1 tracking-tight">
+                        {analytics.totalClassmates}
+                      </div>
+                      <div className="text-sm sm:text-base text-white/70 font-medium">Alumni in Your Network</div>
+                    </div>
                   </div>
-                  <div className="text-3xl font-bold text-white mb-1">{analytics.totalClassmates}</div>
-                  <div className="text-xs text-white/70">Total Network</div>
                 </div>
 
-                {/* Cities */}
-                <div className="glass-card p-5 text-center group hover:scale-105 transition-all duration-300 border border-white/5">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-                    <MapPin className="w-6 h-6 text-rose-400" />
+                {/* Cities stat */}
+                <div className="glass-card p-5 sm:p-6 relative overflow-hidden group hover:scale-105 transition-all duration-300 border border-cyan-500/20">
+                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent" />
+                  <div className="relative z-10 text-center">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+                      <MapPin className="w-7 h-7 text-cyan-400" />
+                    </div>
+                    <div className="text-4xl font-bold text-white mb-1">{analytics.cities.length}</div>
+                    <div className="text-xs text-white/60 font-medium uppercase tracking-wider">Cities</div>
                   </div>
-                  <div className="text-3xl font-bold text-white mb-1">{analytics.cities.length}</div>
-                  <div className="text-xs text-white/70">Cities Worldwide</div>
                 </div>
 
-                {/* Companies */}
-                <div className="glass-card p-5 text-center group hover:scale-105 transition-all duration-300 border border-white/5">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-                    <Briefcase className="w-6 h-6 text-rose-400" />
+                {/* Companies stat */}
+                <div className="glass-card p-5 sm:p-6 relative overflow-hidden group hover:scale-105 transition-all duration-300 border border-emerald-500/20">
+                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent" />
+                  <div className="relative z-10 text-center">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300">
+                      <Briefcase className="w-7 h-7 text-emerald-400" />
+                    </div>
+                    <div className="text-4xl font-bold text-white mb-1">{analytics.companies.length}</div>
+                    <div className="text-xs text-white/60 font-medium uppercase tracking-wider">Companies</div>
                   </div>
-                  <div className="text-3xl font-bold text-white mb-1">{analytics.companies.length}</div>
-                  <div className="text-xs text-white/70">Companies</div>
-                </div>
-
-                {/* Grad Schools */}
-                <div className="glass-card p-5 text-center group hover:scale-105 transition-all duration-300 border border-white/5">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-                    <GraduationCap className="w-6 h-6 text-pink-400" />
-                  </div>
-                  <div className="text-3xl font-bold text-white mb-1">{analytics.gradSchools.length}</div>
-                  <div className="text-xs text-white/70">Grad Schools</div>
                 </div>
               </div>
 
-              {/* Detailed Analytics Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Top Cities */}
-                <div className="glass-card p-6 group hover:shadow-2xl hover:shadow-rose-500/10 transition-all duration-300 border border-white/5">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center ring-2 ring-rose-400/20">
-                      <MapPin className="w-6 h-6 text-rose-400" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-bold text-white text-lg">Popular Cities</h3>
-                      <p className="text-xs text-white/60">Where classmates live</p>
-                    </div>
-                  </div>
-
-                  {analytics.cities.length > 0 ? (
-                    <div className="space-y-4">
-                      {analytics.cities.slice(0, 8).map((city, idx) => (
-                        <div key={city.name} className="group/item">
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                              <div className="w-6 h-6 rounded-lg bg-rose-500/10 flex items-center justify-center flex-shrink-0">
-                                <span className="text-xs font-bold text-rose-400">#{idx + 1}</span>
-                              </div>
-                              <span className="text-sm font-medium text-white truncate group-hover/item:text-rose-300 transition-colors">
-                                {city.name}
-                              </span>
-                            </div>
-                            <span className="text-sm font-bold text-white ml-2">{city.count}</span>
-                          </div>
-                          <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
-                            <div 
-                              className="h-full bg-gradient-to-r from-rose-400 to-pink-400 rounded-full transition-all duration-500"
-                              style={{ width: `${(city.count / analytics.cities[0].count) * 100}%` }}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                      {analytics.cities.length > 8 && (
-                        <div className="text-center pt-2">
-                          <span className="text-xs text-white/50">
-                            +{analytics.cities.length - 8} more cities
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-white/50 text-center py-8">No location data yet</p>
-                  )}
+              {/* Visual Bubbles for Top Destinations */}
+              <div className="mb-12 relative z-10">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-3">
+                    <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500/30 to-blue-500/30 flex items-center justify-center">
+                      <MapPin className="w-4 h-4 text-cyan-400" />
+                    </span>
+                    Top Destinations
+                  </h3>
+                  <span className="text-sm text-white/50">{analytics.cities.length} cities worldwide</span>
                 </div>
+                
+                {analytics.cities.length > 0 && (
+                  <div className="flex flex-wrap gap-2 sm:gap-3">
+                    {analytics.cities.slice(0, 12).map((city, idx) => {
+                      const sizes = ['text-lg px-5 py-2.5', 'text-base px-4 py-2', 'text-sm px-3.5 py-1.5', 'text-xs px-3 py-1.5'];
+                      const sizeClass = sizes[Math.min(Math.floor(idx / 3), 3)];
+                      const opacity = Math.max(0.4, 1 - (idx * 0.06));
+                      
+                      return (
+                        <button
+                          key={city.name}
+                          onClick={() => {
+                            const parts = city.name.split(', ');
+                            if (parts.length === 2) {
+                              setSelectedCity(parts[0]);
+                              setSelectedState(parts[1]);
+                            }
+                          }}
+                          className={`${sizeClass} glass-card font-medium text-white border border-white/10 rounded-full hover:border-cyan-400/50 hover:bg-cyan-500/10 hover:scale-105 transition-all duration-300 group flex items-center gap-2`}
+                          style={{ opacity }}
+                        >
+                          <span className="group-hover:text-cyan-300 transition-colors">{city.name}</span>
+                          <span className="text-white/40 group-hover:text-cyan-400/60 font-bold">{city.count}</span>
+                        </button>
+                      );
+                    })}
+                    {analytics.cities.length > 12 && (
+                      <span className="text-sm text-white/40 flex items-center px-3">
+                        +{analytics.cities.length - 12} more
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
 
-                {/* Top Companies */}
-                <div className="glass-card p-6 group hover:shadow-2xl hover:shadow-rose-500/10 transition-all duration-300 border border-white/5">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center ring-2 ring-rose-400/20">
-                      <Briefcase className="w-6 h-6 text-rose-400" />
+              {/* Companies & Grad Schools Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 relative z-10">
+                {/* Top Companies - Card with Visual Ranking */}
+                <div className="glass-card p-6 sm:p-8 relative overflow-hidden group border border-emerald-500/10 hover:border-emerald-500/30 transition-all duration-500">
+                  <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-emerald-500/10 to-transparent rounded-bl-full pointer-events-none" />
+                  
+                  <div className="flex items-center gap-4 mb-8">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center ring-2 ring-emerald-400/20">
+                      <Briefcase className="w-7 h-7 text-emerald-400" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-bold text-white text-lg">Top Employers</h3>
-                      <p className="text-xs text-white/60">Where classmates work</p>
+                      <h3 className="text-xl font-bold text-white">Where Alumni Work</h3>
+                      <p className="text-sm text-white/50">{analytics.companies.length} companies represented</p>
                     </div>
                   </div>
 
                   {analytics.companies.length > 0 ? (
                     <div className="space-y-4">
-                      {analytics.companies.slice(0, 8).map((company, idx) => (
-                        <div key={company.name} className="group/item">
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                              <div className="w-6 h-6 rounded-lg bg-rose-500/10 flex items-center justify-center flex-shrink-0">
-                                <span className="text-xs font-bold text-rose-400">#{idx + 1}</span>
-                              </div>
-                              <span className="text-sm font-medium text-white truncate group-hover/item:text-rose-300 transition-colors">
-                                {company.name}
+                      {analytics.companies.slice(0, 6).map((company, idx) => {
+                        const percentage = (company.count / analytics.companies[0].count) * 100;
+                        const medals = ['🥇', '🥈', '🥉'];
+                        
+                        return (
+                          <div key={company.name} className="group/item">
+                            <div className="flex items-center gap-3 mb-2">
+                              <span className="text-lg w-8 text-center">
+                                {idx < 3 ? medals[idx] : <span className="text-white/30 text-sm font-bold">#{idx + 1}</span>}
                               </span>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between gap-2">
+                                  <span className="font-semibold text-white truncate group-hover/item:text-emerald-300 transition-colors">
+                                    {company.name}
+                                  </span>
+                                  <span className="text-sm font-bold text-emerald-400 tabular-nums">{company.count}</span>
+                                </div>
+                              </div>
                             </div>
-                            <span className="text-sm font-bold text-white ml-2">{company.count}</span>
+                            <div className="ml-11 h-2 bg-white/5 rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-700 ease-out"
+                                style={{ width: `${percentage}%` }}
+                              />
+                            </div>
                           </div>
-                          <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
-                            <div 
-                              className="h-full bg-gradient-to-r from-rose-400 to-pink-400 rounded-full transition-all duration-500"
-                              style={{ width: `${(company.count / analytics.companies[0].count) * 100}%` }}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                      {analytics.companies.length > 8 && (
-                        <div className="text-center pt-2">
-                          <span className="text-xs text-white/50">
-                            +{analytics.companies.length - 8} more companies
-                          </span>
-                        </div>
-                      )}
+                        );
+                      })}
                     </div>
                   ) : (
-                    <p className="text-sm text-white/50 text-center py-8">No company data yet</p>
+                    <div className="text-center py-12">
+                      <Briefcase className="w-12 h-12 text-white/20 mx-auto mb-3" />
+                      <p className="text-white/40">No company data yet</p>
+                    </div>
                   )}
                 </div>
 
-                {/* Top Grad Schools */}
-                <div className="glass-card p-6 group hover:shadow-2xl hover:shadow-rose-500/10 transition-all duration-300 border border-white/5">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center ring-2 ring-rose-400/20">
-                      <GraduationCap className="w-6 h-6 text-rose-400" />
+                {/* Grad Schools - Card with Visual Ranking */}
+                <div className="glass-card p-6 sm:p-8 relative overflow-hidden group border border-violet-500/10 hover:border-violet-500/30 transition-all duration-500">
+                  <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-violet-500/10 to-transparent rounded-bl-full pointer-events-none" />
+                  
+                  <div className="flex items-center gap-4 mb-8">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500/20 to-purple-500/20 flex items-center justify-center ring-2 ring-violet-400/20">
+                      <GraduationCap className="w-7 h-7 text-violet-400" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-bold text-white text-lg">Grad Schools</h3>
-                      <p className="text-xs text-white/60">Higher education paths</p>
+                      <h3 className="text-xl font-bold text-white">Graduate Studies</h3>
+                      <p className="text-sm text-white/50">{analytics.gradSchools.length} grad schools</p>
                     </div>
                   </div>
 
                   {analytics.gradSchools.length > 0 ? (
                     <div className="space-y-4">
-                      {analytics.gradSchools.slice(0, 8).map((school, idx) => (
-                        <div key={school.name} className="group/item">
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                              <div className="w-6 h-6 rounded-lg bg-rose-500/10 flex items-center justify-center flex-shrink-0">
-                                <span className="text-xs font-bold text-rose-400">#{idx + 1}</span>
-                              </div>
-                              <span className="text-sm font-medium text-white truncate group-hover/item:text-rose-300 transition-colors">
-                                {school.name}
+                      {analytics.gradSchools.slice(0, 6).map((school, idx) => {
+                        const percentage = (school.count / analytics.gradSchools[0].count) * 100;
+                        const medals = ['🥇', '🥈', '🥉'];
+                        
+                        return (
+                          <div key={school.name} className="group/item">
+                            <div className="flex items-center gap-3 mb-2">
+                              <span className="text-lg w-8 text-center">
+                                {idx < 3 ? medals[idx] : <span className="text-white/30 text-sm font-bold">#{idx + 1}</span>}
                               </span>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between gap-2">
+                                  <span className="font-semibold text-white truncate group-hover/item:text-violet-300 transition-colors">
+                                    {school.name}
+                                  </span>
+                                  <span className="text-sm font-bold text-violet-400 tabular-nums">{school.count}</span>
+                                </div>
+                              </div>
                             </div>
-                            <span className="text-sm font-bold text-white ml-2">{school.count}</span>
+                            <div className="ml-11 h-2 bg-white/5 rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-gradient-to-r from-violet-500 to-purple-400 rounded-full transition-all duration-700 ease-out"
+                                style={{ width: `${percentage}%` }}
+                              />
+                            </div>
                           </div>
-                          <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
-                            <div 
-                              className="h-full bg-gradient-to-r from-rose-400 to-pink-400 rounded-full transition-all duration-500"
-                              style={{ width: `${(school.count / analytics.gradSchools[0].count) * 100}%` }}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                      {analytics.gradSchools.length > 8 && (
-                        <div className="text-center pt-2">
-                          <span className="text-xs text-white/50">
-                            +{analytics.gradSchools.length - 8} more schools
-                          </span>
-                        </div>
-                      )}
+                        );
+                      })}
                     </div>
                   ) : (
-                    <p className="text-sm text-white/50 text-center py-8">No grad school data yet</p>
+                    <div className="text-center py-12">
+                      <GraduationCap className="w-12 h-12 text-white/20 mx-auto mb-3" />
+                      <p className="text-white/40">No grad school data yet</p>
+                    </div>
                   )}
                 </div>
               </div>
 
-              {/* Bottom Divider */}
-              <div className="mt-12 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+              {/* Footer CTA */}
+              <div className="mt-12 text-center relative z-10">
+                <div className="inline-flex items-center gap-2 text-white/40 text-sm">
+                  <span className="w-12 h-px bg-gradient-to-r from-transparent to-white/20"></span>
+                  <span>Data updates in real-time as alumni join</span>
+                  <span className="w-12 h-px bg-gradient-to-l from-transparent to-white/20"></span>
+                </div>
+              </div>
             </div>
           )}
         </div>

@@ -401,7 +401,7 @@ export default function OnboardingPage() {
         <div className="glass-strong rounded-2xl sm:rounded-3xl px-6 sm:px-8 md:px-10 py-8 sm:py-10">
           <div className="mb-6 sm:mb-8">
             <h2 className="text-xl sm:text-2xl font-bold text-white mb-2 drop-shadow-lg">
-              {step === 1 && 'Welcome! Let&apos;s set up your profile'}
+              {step === 1 && "Welcome! Let's set up your profile"}
               {step === 2 && 'What are you up to?'}
               {step === 3 && 'Tell us more'}
               {step === 4 && 'Where are you located?'}
@@ -412,11 +412,14 @@ export default function OnboardingPage() {
             </p>
           </div>
 
-          {error && (
-            <div className="mb-6 p-3 sm:p-4 glass-card bg-red-500/20 border-red-300/30 rounded-xl">
-              <p className="text-xs sm:text-sm text-white drop-shadow">{error}</p>
-            </div>
-          )}
+          {/* Error message container with min-height to prevent layout shift */}
+          <div className="mb-6 min-h-[48px]">
+            {error && (
+              <div className="p-3 sm:p-4 glass-card bg-red-500/20 border-red-300/30 rounded-xl animate-fade-in">
+                <p className="text-xs sm:text-sm text-white drop-shadow">{error}</p>
+              </div>
+            )}
+          </div>
 
           {/* Step 1: Basic Info */}
           {step === 1 && (
@@ -842,23 +845,26 @@ export default function OnboardingPage() {
                   </div>
                 )}
               </div>
-              {data.city && data.state && (
-                <div className="glass-card bg-emerald-500/10 border-emerald-400/30 p-4 rounded-xl flex items-center gap-3 animate-fade-in">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center">
-                    <svg className="w-5 h-5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
+              {/* Location confirmation with min-height to prevent layout shift */}
+              <div className="min-h-[72px]">
+                {data.city && data.state && (
+                  <div className="glass-card bg-emerald-500/10 border-emerald-400/30 p-4 rounded-xl flex items-center gap-3 animate-fade-in">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center">
+                      <svg className="w-5 h-5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-white drop-shadow">
+                        Location confirmed
+                      </p>
+                      <p className="text-xs text-white/70 drop-shadow mt-0.5">
+                        {data.city}, {data.state}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-white drop-shadow">
-                      Location confirmed
-                    </p>
-                    <p className="text-xs text-white/70 drop-shadow mt-0.5">
-                      {data.city}, {data.state}
-                    </p>
-                  </div>
-                </div>
-              )}
+                )}
+              </div>
               <div className="glass-card p-4 rounded-xl">
                 <div className="flex gap-3">
                   <svg className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

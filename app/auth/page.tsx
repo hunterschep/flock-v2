@@ -84,29 +84,32 @@ export default function AuthPage() {
               />
             </div>
 
-            {message && (
-              <div className={`rounded-xl p-4 flex items-start gap-3 ${
-                  message.type === 'error'
-                    ? 'glass-card bg-red-500/10 border-red-400/20'
-                    : 'glass-card bg-emerald-500/10 border-emerald-400/20'
-                }`}
-              >
-                <div className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center ${
-                  message.type === 'error' ? 'bg-red-500/20' : 'bg-emerald-500/20'
-                }`}>
-                  {message.type === 'error' ? (
-                    <svg className="w-3 h-3 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
-                  ) : (
-                    <svg className="w-3 h-3 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  )}
+            {/* Message container with min-height to prevent layout shift */}
+            <div className="min-h-[52px]">
+              {message && (
+                <div className={`rounded-xl p-4 flex items-start gap-3 animate-fade-in ${
+                    message.type === 'error'
+                      ? 'glass-card bg-red-500/10 border-red-400/20'
+                      : 'glass-card bg-emerald-500/10 border-emerald-400/20'
+                  }`}
+                >
+                  <div className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center ${
+                    message.type === 'error' ? 'bg-red-500/20' : 'bg-emerald-500/20'
+                  }`}>
+                    {message.type === 'error' ? (
+                      <svg className="w-3 h-3 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    ) : (
+                      <svg className="w-3 h-3 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </div>
+                  <p className="text-sm text-white flex-1">{message.text}</p>
                 </div>
-                <p className="text-sm text-white flex-1">{message.text}</p>
-              </div>
-            )}
+              )}
+            </div>
 
             <button
               type="submit"
