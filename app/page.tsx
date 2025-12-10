@@ -69,7 +69,7 @@ export default function Home() {
           </h1>
           
           <p className="text-lg sm:text-xl text-white/70 mb-10 max-w-2xl mx-auto">
-            Discover alumni in your city. Build connections that matter.
+            Discover new grads in your area. Build connections that matter.
           </p>
           
           {/* CTA Buttons */}
@@ -197,21 +197,25 @@ export default function Home() {
               {/* First set of universities */}
               <div className="flex gap-4 sm:gap-6 shrink-0">
                 {[
-                  { emoji: '🌲', name: 'Stanford', color: 'from-red-500/20 to-red-600/20' },
-                  { emoji: '🐻', name: 'UC Berkeley', color: 'from-blue-500/20 to-yellow-500/20' },
-                  { emoji: '🌊', name: 'MIT', color: 'from-red-500/20 to-gray-500/20' },
-                  { emoji: '🦅', name: 'Harvard', color: 'from-red-600/20 to-red-700/20' },
-                  { emoji: '🌴', name: 'USC', color: 'from-yellow-500/20 to-red-500/20' },
-                  { emoji: '🔵', name: 'Duke', color: 'from-blue-600/20 to-blue-700/20' },
-                  { emoji: '🐾', name: 'Northwestern', color: 'from-rose-500/20 to-rose-600/20' },
-                  { emoji: '🦁', name: 'Columbia', color: 'from-blue-400/20 to-blue-500/20' },
+                  { image: '/schools/bc.png', name: '' },
+                  { image: '/schools/uw.png', name: '' },
+                  { image: '/schools/umass.png', name: '' },
+                  { image: '/schools/rice.png', name: '' },
+                  { image: '/schools/purdue.png', name: '' },
+                  { image: '/schools/bu.png', name: '' },
+                  { image: '/schools/neu.png', name: '' },
+                  { image: '/schools/wsu.png', name: '' },
                 ].map((uni, idx) => (
                   <div
                     key={`set1-${idx}`}
-                    className="glass-card p-4 sm:p-6 rounded-xl sm:rounded-2xl flex flex-col items-center gap-2 sm:gap-3 min-w-[110px] sm:min-w-[140px] hover:scale-105 transition-all duration-300 group cursor-pointer"
+                    className="backdrop-blur-xl bg-white/10 border border-white/20 p-4 sm:p-8 rounded-2xl sm:rounded-3xl flex flex-col items-center gap-2 sm:gap-3 min-w-[150px] sm:min-w-[200px] hover:scale-105 transition-all duration-300 group cursor-pointer hover:bg-white/15 hover:border-white/30"
                   >
-                    <div className={`w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br ${uni.color} flex items-center justify-center text-3xl sm:text-4xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
-                      {uni.emoji}
+                    <div className="w-16 h-16 sm:w-28 sm:h-28 rounded-lg sm:rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 overflow-hidden p-2 sm:p-3">
+                      <img 
+                        src={uni.image} 
+                        alt={uni.name}
+                        className="w-full h-full object-contain"
+                      />
                     </div>
                     <span className="text-xs sm:text-sm font-semibold text-white/90 text-center">{uni.name}</span>
                   </div>
@@ -221,21 +225,25 @@ export default function Home() {
               {/* Duplicate set for seamless loop */}
               <div className="flex gap-4 sm:gap-6 shrink-0 ml-4 sm:ml-6">
                 {[
-                  { emoji: '🌲', name: 'Stanford', color: 'from-red-500/20 to-red-600/20' },
-                  { emoji: '🐻', name: 'UC Berkeley', color: 'from-blue-500/20 to-yellow-500/20' },
-                  { emoji: '🌊', name: 'MIT', color: 'from-red-500/20 to-gray-500/20' },
-                  { emoji: '🦅', name: 'Harvard', color: 'from-red-600/20 to-red-700/20' },
-                  { emoji: '🌴', name: 'USC', color: 'from-yellow-500/20 to-red-500/20' },
-                  { emoji: '🔵', name: 'Duke', color: 'from-blue-600/20 to-blue-700/20' },
-                  { emoji: '🐾', name: 'Northwestern', color: 'from-rose-500/20 to-rose-600/20' },
-                  { emoji: '🦁', name: 'Columbia', color: 'from-blue-400/20 to-blue-500/20' },
+                  { image: '/schools/bc.png', name: '' },
+                  { image: '/schools/uw.png', name: '' },
+                  { image: '/schools/umass.png', name: '' },
+                  { image: '/schools/rice.png', name: '' },
+                  { image: '/schools/purdue.png', name: '' },
+                  { image: '/schools/bu.png', name: '' },
+                  { image: '/schools/neu.png', name: '' },
+                  { image: '/schools/wsu.png', name: '' },
                 ].map((uni, idx) => (
                   <div
                     key={`set2-${idx}`}
-                    className="glass-card p-4 sm:p-6 rounded-xl sm:rounded-2xl flex flex-col items-center gap-2 sm:gap-3 min-w-[110px] sm:min-w-[140px] hover:scale-105 transition-all duration-300 group cursor-pointer"
+                    className="backdrop-blur-xl bg-white/10 border border-white/20 p-4 sm:p-8 rounded-2xl sm:rounded-3xl flex flex-col items-center gap-2 sm:gap-3 min-w-[150px] sm:min-w-[200px] hover:scale-105 transition-all duration-300 group cursor-pointer hover:bg-white/15 hover:border-white/30"
                   >
-                    <div className={`w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br ${uni.color} flex items-center justify-center text-3xl sm:text-4xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
-                      {uni.emoji}
+                    <div className="w-16 h-16 sm:w-28 sm:h-28 rounded-lg sm:rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 overflow-hidden p-2 sm:p-3">
+                      <img 
+                        src={uni.image} 
+                        alt={uni.name}
+                        className="w-full h-full object-contain"
+                      />
                     </div>
                     <span className="text-xs sm:text-sm font-semibold text-white/90 text-center">{uni.name}</span>
                   </div>

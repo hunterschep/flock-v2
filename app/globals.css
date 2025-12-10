@@ -194,7 +194,7 @@ strong, b {
 }
 
 .animate-carousel {
-  animation: carousel 40s linear infinite;
+  animation: carousel 12s linear infinite;
 }
 
 .animate-carousel:hover {
