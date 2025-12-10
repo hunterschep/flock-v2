@@ -206,8 +206,8 @@ export default function MessagesPage() {
       </header>
 
       {/* Main content */}
-      <div className="flex-1 relative z-10 overflow-hidden">
-        <div className="h-[calc(100vh-180px)] max-w-6xl mx-auto px-4 md:px-6 py-6">
+      <div className="flex-1 relative z-10 overflow-hidden min-h-0">
+        <div className="h-[calc(100vh-140px)] md:h-[calc(100vh-180px)] max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-6">
           <div className="glass-card rounded-xl overflow-hidden h-full">
             <div className="flex h-full">
               {/* Conversation list */}

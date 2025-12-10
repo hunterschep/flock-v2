@@ -73,7 +73,7 @@ export default function Home() {
             <span className="block text-[var(--color-accent)]">worldwide</span>
           </h1>
           <p className="text-base md:text-lg text-white/50 max-w-lg mx-auto leading-relaxed">
-            Discover where your classmates are. Build connections, find roommates, and explore your university&apos;s reach across the globe.
+            Find your people: alumni everywhere, new grads near you
           </p>
         </div>
         
@@ -118,7 +118,7 @@ export default function Home() {
             <div className="relative rounded-2xl overflow-hidden border border-white/10">
               <div className="aspect-[16/10] md:aspect-[16/9] relative">
                 <div className="absolute inset-0 pointer-events-none">
-                  <FlockMap onLocationSelect={() => {}} />
+                  <FlockMap onLocationSelect={() => {}} hideControls />
                 </div>
                 
                 {/* Overlay */}

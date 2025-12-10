@@ -168,6 +168,7 @@ h1 { font-weight: 700; }
   color: white;
   font-weight: 600;
   border: none;
+  cursor: pointer;
   transition: transform var(--transition-fast), box-shadow var(--transition-base), background var(--transition-base);
 }
 
@@ -193,12 +194,23 @@ h1 { font-weight: 700; }
   color: var(--color-text-primary);
   border: 1px solid var(--color-border);
   font-weight: 500;
+  cursor: pointer;
   transition: background var(--transition-base), border-color var(--transition-base);
 }
 
 .btn-secondary:hover {
   background: var(--color-surface-hover);
   border-color: var(--color-border-hover);
+}
+
+/* Ensure all buttons have pointer cursor */
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+/* Interactive elements cursor */
+a, [role="button"], summary {
+  cursor: pointer;
 }
 
 /* ==============================================

@@ -29,7 +29,9 @@ export function MessageView({
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // Use instant scroll on initial load, smooth only for new messages
+    const scrollBehavior = messages.length <= 1 ? 'instant' : 'smooth';
+    messagesEndRef.current?.scrollIntoView({ behavior: scrollBehavior as ScrollBehavior, block: 'end' });
   }, [messages]);
 
   useEffect(() => {
@@ -95,7 +97,7 @@ export function MessageView({
       <div className="px-4 py-3 border-b border-white/[0.06] flex items-center gap-3 bg-black/10">
         <button
           onClick={onBack}
-          className="lg:hidden p-1.5 rounded-lg hover:bg-white/[0.05] transition-all"
+          className="lg:hidden p-1.5 rounded-lg hover:bg-white/[0.05] transition-all cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4 text-white/60" />
         </button>

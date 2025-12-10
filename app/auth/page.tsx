@@ -5,7 +5,6 @@ import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowLeft, ArrowRight, Mail, CheckCircle, XCircle, Eye, EyeOff, Lock, KeyRound } from 'lucide-react'
-import { Footer } from '@/components/Footer'
 import InteractiveStarfield from '@/components/InteractiveStarfield'
 
 type AuthMode = 'signin' | 'signup' | 'forgot' | 'reset' | 'verify'
@@ -595,15 +594,15 @@ export default function AuthPage() {
     <div className="min-h-screen bg-[var(--color-bg)] flex flex-col relative overflow-hidden">
       <InteractiveStarfield />
       
-      <div className="flex-1 flex items-center justify-center py-12 px-6 relative z-10">
+      <div className="flex-1 flex items-center justify-center py-8 md:py-12 px-4 md:px-6 relative z-10">
         <div className="max-w-sm w-full">
-          <div className="glass-strong rounded-2xl p-8">
+          <div className="glass-strong rounded-2xl p-6 md:p-8">
             {/* Header */}
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-[var(--color-accent)]/10 mb-5">
+            <div className="text-center mb-6 md:mb-8">
+              <div className="inline-flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-xl bg-[var(--color-accent)]/10 mb-4 md:mb-5">
                 {getIcon()}
               </div>
-              <h1 className="text-2xl font-bold text-white mb-2">
+              <h1 className="text-xl md:text-2xl font-bold text-white mb-2">
                 {getTitle()}
               </h1>
               <p className="text-sm text-white/50">
@@ -611,14 +610,17 @@ export default function AuthPage() {
               </p>
             </div>
             
-            {renderForm()}
+            {/* Form container with min-height to prevent layout shifts */}
+            <div className="min-h-[280px]">
+              {renderForm()}
+            </div>
           </div>
 
           {/* Back link */}
-          <div className="mt-6 text-center">
+          <div className="mt-4 md:mt-6 text-center">
             <Link 
               href="/" 
-              className="inline-flex items-center gap-2 text-sm text-white/50 hover:text-white transition-colors"
+              className="inline-flex items-center gap-2 text-sm text-white/50 hover:text-white transition-colors cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to home
@@ -627,7 +629,18 @@ export default function AuthPage() {
         </div>
       </div>
 
-      <Footer />
+      {/* Compact footer for auth page */}
+      <footer className="relative z-10 border-t border-white/[0.06] bg-[var(--color-bg)] py-4 md:py-6">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-white/30 text-xs">
+            © {new Date().getFullYear()} Flock
+          </p>
+          <div className="flex items-center gap-4 text-xs">
+            <Link href="/privacy" className="text-white/40 hover:text-white transition-colors">Privacy</Link>
+            <Link href="/terms" className="text-white/40 hover:text-white transition-colors">Terms</Link>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }

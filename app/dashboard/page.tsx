@@ -351,7 +351,7 @@ export default function DashboardPage() {
                   <button
                     key={filter.key}
                     onClick={filter.toggle}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer ${
                       filter.active 
                         ? 'bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/30' 
                         : 'bg-white/[0.03] text-white/60 border border-white/[0.06] hover:bg-white/[0.05]'
@@ -366,7 +366,7 @@ export default function DashboardPage() {
               {hasActiveFilters && (
                 <button
                   onClick={handleClearSearch}
-                  className="text-xs text-[var(--color-accent)] hover:text-[var(--color-accent-light)] font-medium flex items-center gap-1"
+                  className="text-xs text-[var(--color-accent)] hover:text-[var(--color-accent-light)] font-medium flex items-center gap-1 cursor-pointer"
                 >
                   <X className="w-3 h-3" />
                   Clear
@@ -381,13 +381,13 @@ export default function DashboardPage() {
                 More filters
               </summary>
               <div className="mt-3 pt-3 border-t border-white/[0.06] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                <input type="text" value={searchCity} onChange={(e) => setSearchCity(e.target.value)} placeholder="City" className="glass-input px-3 py-2 rounded-lg text-sm" />
-                <input type="text" value={searchJobTitle} onChange={(e) => setSearchJobTitle(e.target.value)} placeholder="Job Title" className="glass-input px-3 py-2 rounded-lg text-sm" />
-                <input type="text" value={searchCompany} onChange={(e) => setSearchCompany(e.target.value)} placeholder="Company" className="glass-input px-3 py-2 rounded-lg text-sm" />
-                <div className="flex items-center gap-2">
-                  <input type="number" value={minGradYear} onChange={(e) => setMinGradYear(e.target.value)} placeholder="Year from" className="glass-input flex-1 px-3 py-2 rounded-lg text-sm" />
-                  <span className="text-white/20">-</span>
-                  <input type="number" value={maxGradYear} onChange={(e) => setMaxGradYear(e.target.value)} placeholder="to" className="glass-input flex-1 px-3 py-2 rounded-lg text-sm" />
+                <input type="text" value={searchCity} onChange={(e) => setSearchCity(e.target.value)} placeholder="City" className="glass-input px-3 py-2 rounded-lg text-sm w-full" />
+                <input type="text" value={searchJobTitle} onChange={(e) => setSearchJobTitle(e.target.value)} placeholder="Job Title" className="glass-input px-3 py-2 rounded-lg text-sm w-full" />
+                <input type="text" value={searchCompany} onChange={(e) => setSearchCompany(e.target.value)} placeholder="Company" className="glass-input px-3 py-2 rounded-lg text-sm w-full" />
+                <div className="flex items-center gap-2 w-full">
+                  <input type="number" value={minGradYear} onChange={(e) => setMinGradYear(e.target.value)} placeholder="From" className="glass-input flex-1 min-w-0 px-2 py-2 rounded-lg text-sm" />
+                  <span className="text-white/20 shrink-0">-</span>
+                  <input type="number" value={maxGradYear} onChange={(e) => setMaxGradYear(e.target.value)} placeholder="To" className="glass-input flex-1 min-w-0 px-2 py-2 rounded-lg text-sm" />
                 </div>
               </div>
             </details>
@@ -401,7 +401,7 @@ export default function DashboardPage() {
                 <span className="text-sm text-white">{selectedCity ? `${selectedCity}, ${selectedState}` : selectedState}</span>
                 <span className="text-xs text-white/40">• {filteredUsers.length} found</span>
               </div>
-              <button onClick={handleClearFilter} className="text-xs text-[var(--color-accent)] hover:text-[var(--color-accent-light)] flex items-center gap-1">
+              <button onClick={handleClearFilter} className="text-xs text-[var(--color-accent)] hover:text-[var(--color-accent-light)] flex items-center gap-1 cursor-pointer">
                 <X className="w-3 h-3" />
                 Clear
               </button>
@@ -525,7 +525,7 @@ export default function DashboardPage() {
                   <button
                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
-                    className="p-2 rounded-lg bg-white/[0.03] border border-white/[0.06] text-white/60 disabled:opacity-30 hover:bg-white/[0.05] transition-all"
+                    className="p-2 rounded-lg bg-white/[0.03] border border-white/[0.06] text-white/60 disabled:opacity-30 hover:bg-white/[0.05] transition-all cursor-pointer disabled:cursor-not-allowed"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
@@ -534,10 +534,10 @@ export default function DashboardPage() {
                     {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
                       const page = totalPages <= 5 ? i + 1 : currentPage <= 3 ? i + 1 : currentPage >= totalPages - 2 ? totalPages - 4 + i : currentPage - 2 + i;
                       return (
-                        <button
+                          <button
                           key={page}
                           onClick={() => setCurrentPage(page)}
-                          className={`w-8 h-8 rounded-lg text-xs font-medium transition-all ${
+                          className={`w-8 h-8 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                             currentPage === page
                               ? 'bg-[var(--color-accent)] text-white'
                               : 'text-white/50 hover:text-white hover:bg-white/[0.05]'
@@ -552,7 +552,7 @@ export default function DashboardPage() {
                   <button
                     onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                     disabled={currentPage === totalPages}
-                    className="p-2 rounded-lg bg-white/[0.03] border border-white/[0.06] text-white/60 disabled:opacity-30 hover:bg-white/[0.05] transition-all"
+                    className="p-2 rounded-lg bg-white/[0.03] border border-white/[0.06] text-white/60 disabled:opacity-30 hover:bg-white/[0.05] transition-all cursor-pointer disabled:cursor-not-allowed"
                   >
                     <ChevronRight className="w-4 h-4" />
                   </button>
@@ -756,7 +756,7 @@ export default function DashboardPage() {
                             setSelectedState(parts[1]);
                           }
                         }}
-                        className="px-3 py-1.5 rounded-lg bg-white/[0.02] border border-white/[0.06] text-xs text-white/60 hover:bg-white/[0.04] hover:border-white/10 hover:text-white transition-all"
+                        className="px-3 py-1.5 rounded-lg bg-white/[0.02] border border-white/[0.06] text-xs text-white/60 hover:bg-white/[0.04] hover:border-white/10 hover:text-white transition-all cursor-pointer"
                       >
                         {city.name}
                         <span className="ml-1.5 text-white/30">{city.count}</span>
