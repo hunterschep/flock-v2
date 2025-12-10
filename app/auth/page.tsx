@@ -1,31 +1,151 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { ArrowLeft, ArrowRight, Mail, CheckCircle, XCircle, Eye, EyeOff, Lock, KeyRound } from 'lucide-react'
 import { Footer } from '@/components/Footer'
+import InteractiveStarfield from '@/components/InteractiveStarfield'
+
+type AuthMode = 'signin' | 'signup' | 'forgot' | 'reset' | 'verify'
 
 export default function AuthPage() {
-  const [email, setEmail] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
 
-  const handleAuth = async (e: React.FormEvent) => {
+  // Determine initial mode from URL params
+  const getInitialMode = (): AuthMode => {
+    const mode = searchParams.get('mode')
+    if (mode === 'reset') return 'reset'
+    if (mode === 'verify') return 'verify'
+    return 'signin'
+  }
+
+  const [mode, setMode] = useState<AuthMode>(getInitialMode)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+
+  // Check for URL params on mount
+  useEffect(() => {
+    const mode = searchParams.get('mode')
+    const error = searchParams.get('error')
+    const errorDescription = searchParams.get('error_description')
+    
+    if (mode === 'reset') setMode('reset')
+    if (mode === 'verify') {
+      setMode('verify')
+      setMessage({ type: 'success', text: 'Email verified successfully! You can now sign in.' })
+    }
+    if (error) {
+      setMessage({ type: 'error', text: errorDescription || 'Authentication error occurred' })
+    }
+  }, [searchParams])
+
+  const validateEmail = (email: string): string | null => {
+    if (!email) return 'Email is required'
+    if (!email.includes('@')) return 'Please enter a valid email'
+    if (!email.endsWith('.edu')) return 'Please use a .edu email address'
+    return null
+  }
+
+  const validatePassword = (password: string): string | null => {
+    if (!password) return 'Password is required'
+    if (password.length < 8) return 'Password must be at least 8 characters'
+    if (!/[A-Z]/.test(password)) return 'Password must contain an uppercase letter'
+    if (!/[a-z]/.test(password)) return 'Password must contain a lowercase letter'
+    if (!/[0-9]/.test(password)) return 'Password must contain a number'
+    return null
+  }
+
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setMessage(null)
 
-    // Validate .edu email
-    if (!email.endsWith('.edu')) {
-      setMessage({ type: 'error', text: 'Please use a .edu email address' })
+    const emailError = validateEmail(email)
+    if (emailError) {
+      setMessage({ type: 'error', text: emailError })
+      setLoading(false)
+      return
+    }
+
+    if (!password) {
+      setMessage({ type: 'error', text: 'Password is required' })
       setLoading(false)
       return
     }
 
     try {
-      const { error } = await supabase.auth.signInWithOtp({
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
+
+      if (error) {
+        if (error.message.includes('Email not confirmed')) {
+          setMessage({ type: 'error', text: 'Please verify your email before signing in. Check your inbox for the verification link.' })
+        } else if (error.message.includes('Invalid login credentials')) {
+          setMessage({ type: 'error', text: 'Invalid email or password. Please try again.' })
+        } else {
+          throw error
+        }
+        return
+      }
+
+      // Check onboarding status
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data: userData } = await supabase
+          .from('users')
+          .select('onboarding_completed')
+          .eq('id', user.id)
+          .single()
+
+        if (!userData || !userData.onboarding_completed) {
+          router.push('/onboarding')
+        } else {
+          router.push('/dashboard')
+        }
+      }
+    } catch (error: unknown) {
+      setMessage({ type: 'error', text: error instanceof Error ? error.message : 'An error occurred' })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setMessage(null)
+
+    const emailError = validateEmail(email)
+    if (emailError) {
+      setMessage({ type: 'error', text: emailError })
+      setLoading(false)
+      return
+    }
+
+    const passwordError = validatePassword(password)
+    if (passwordError) {
+      setMessage({ type: 'error', text: passwordError })
+      setLoading(false)
+      return
+    }
+
+    if (password !== confirmPassword) {
+      setMessage({ type: 'error', text: 'Passwords do not match' })
+      setLoading(false)
+      return
+    }
+
+    try {
+      const { error } = await supabase.auth.signUp({
         email,
+        password,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
@@ -33,9 +153,45 @@ export default function AuthPage() {
 
       if (error) throw error
 
-      setMessage({ 
-        type: 'success', 
-        text: 'Check your email for the magic link!' 
+      setMessage({
+        type: 'success',
+        text: 'Account created! Check your email for the verification link to complete your registration.',
+      })
+      setPassword('')
+      setConfirmPassword('')
+    } catch (error: unknown) {
+      if (error instanceof Error && error.message.includes('already registered')) {
+        setMessage({ type: 'error', text: 'An account with this email already exists. Try signing in instead.' })
+      } else {
+        setMessage({ type: 'error', text: error instanceof Error ? error.message : 'An error occurred' })
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setMessage(null)
+
+    const emailError = validateEmail(email)
+    if (emailError) {
+      setMessage({ type: 'error', text: emailError })
+      setLoading(false)
+      return
+    }
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth?mode=reset`,
+      })
+
+      if (error) throw error
+
+      setMessage({
+        type: 'success',
+        text: 'Password reset link sent! Check your email.',
       })
     } catch (error: unknown) {
       setMessage({ type: 'error', text: error instanceof Error ? error.message : 'An error occurred' })
@@ -44,41 +200,95 @@ export default function AuthPage() {
     }
   }
 
-  return (
-    <div className="min-h-screen gradient-mesh flex flex-col overflow-hidden relative">
-      {/* Floating orbs - Ultra Dark */}
-      <div className="absolute top-1/4 left-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-pink-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-rose-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse animation-delay-2000"></div>
-      
-      <div className="flex-1 flex items-center justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-6 relative z-10">
-          <div className="glass-strong rounded-2xl p-8 sm:p-10">
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 mb-6">
-              <svg className="w-8 h-8 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            </div>
-            <h2 className="text-3xl font-bold text-white drop-shadow-lg tracking-tight">
-              Welcome to Flock
-            </h2>
-            <p className="mt-3 text-sm text-white/70">
-              Access your alumni network
-            </p>
-          </div>
-          
-          <form className="space-y-6" onSubmit={handleAuth}>
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setMessage(null)
+
+    const passwordError = validatePassword(password)
+    if (passwordError) {
+      setMessage({ type: 'error', text: passwordError })
+      setLoading(false)
+      return
+    }
+
+    if (password !== confirmPassword) {
+      setMessage({ type: 'error', text: 'Passwords do not match' })
+      setLoading(false)
+      return
+    }
+
+    try {
+      const { error } = await supabase.auth.updateUser({ password })
+
+      if (error) throw error
+
+      setMessage({ type: 'success', text: 'Password updated successfully!' })
+      setTimeout(() => {
+        setMode('signin')
+        setPassword('')
+        setConfirmPassword('')
+        router.push('/auth')
+      }, 2000)
+    } catch (error: unknown) {
+      setMessage({ type: 'error', text: error instanceof Error ? error.message : 'An error occurred' })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleResendVerification = async () => {
+    setLoading(true)
+    setMessage(null)
+
+    const emailError = validateEmail(email)
+    if (emailError) {
+      setMessage({ type: 'error', text: emailError })
+      setLoading(false)
+      return
+    }
+
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+
+      if (error) throw error
+
+      setMessage({ type: 'success', text: 'Verification email sent! Check your inbox.' })
+    } catch (error: unknown) {
+      setMessage({ type: 'error', text: error instanceof Error ? error.message : 'An error occurred' })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const switchMode = (newMode: AuthMode) => {
+    setMode(newMode)
+    setMessage(null)
+    setPassword('')
+    setConfirmPassword('')
+  }
+
+  const renderForm = () => {
+    switch (mode) {
+      case 'signup':
+        return (
+          <form className="space-y-4" onSubmit={handleSignUp}>
             <div>
-              <label htmlFor="email-address" className="block text-sm font-medium text-white/90 mb-2.5">
+              <label htmlFor="email" className="block text-sm font-medium text-white/70 mb-2">
                 University Email
               </label>
               <input
-                id="email-address"
-                name="email"
+                id="email"
                 type="email"
                 autoComplete="email"
                 required
-                className="glass-input appearance-none rounded-xl block w-full px-4 py-3.5 placeholder-white/40 text-white focus:outline-none text-base"
+                className="glass-input w-full px-4 py-3 rounded-lg text-white placeholder-white/30 text-sm"
                 placeholder="name@university.edu"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -86,93 +296,355 @@ export default function AuthPage() {
               />
             </div>
 
-            {/* Message container with min-height to prevent layout shift */}
-            <div className="min-h-[52px]">
-              {message && (
-                <div className={`rounded-xl p-4 flex items-start gap-3 animate-fade-in ${
-                    message.type === 'error'
-                      ? 'glass-card bg-red-500/10 border-red-400/20'
-                      : 'glass-card bg-emerald-500/10 border-emerald-400/20'
-                  }`}
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-white/70 mb-2">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
+                  required
+                  className="glass-input w-full px-4 py-3 pr-12 rounded-lg text-white placeholder-white/30 text-sm"
+                  placeholder="Create a strong password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={loading}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/60 transition-colors"
                 >
-                  <div className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center ${
-                    message.type === 'error' ? 'bg-red-500/20' : 'bg-emerald-500/20'
-                  }`}>
-                    {message.type === 'error' ? (
-                      <svg className="w-3 h-3 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                      </svg>
-                    ) : (
-                      <svg className="w-3 h-3 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    )}
-                  </div>
-                  <p className="text-sm text-white flex-1">{message.text}</p>
-                </div>
-              )}
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              <p className="text-xs text-white/40 mt-2">
+                8+ characters, uppercase, lowercase, and number
+              </p>
             </div>
+
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-white/70 mb-2">
+                Confirm Password
+              </label>
+              <input
+                id="confirmPassword"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="new-password"
+                required
+                className="glass-input w-full px-4 py-3 rounded-lg text-white placeholder-white/30 text-sm"
+                placeholder="Confirm your password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                disabled={loading}
+              />
+            </div>
+
+            {message && <MessageBox message={message} />}
 
             <button
               type="submit"
               disabled={loading}
-              className="glass-button w-full flex items-center justify-center gap-2 py-3.5 px-4 text-base font-semibold rounded-xl text-white disabled:opacity-50 disabled:cursor-not-allowed"
+              className="glass-button w-full py-3 rounded-lg text-sm font-semibold flex items-center justify-center gap-2"
             >
               {loading ? (
-                <>
-                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Sending magic link...
-                </>
+                <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Creating account...</>
               ) : (
-                <>
-                  Continue
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                  </svg>
-                </>
+                <>Create Account<ArrowRight className="w-4 h-4" /></>
+              )}
+            </button>
+
+            <p className="text-center text-sm text-white/50">
+              Already have an account?{' '}
+              <button type="button" onClick={() => switchMode('signin')} className="text-[var(--color-accent)] hover:underline">
+                Sign in
+              </button>
+            </p>
+          </form>
+        )
+
+      case 'forgot':
+        return (
+          <form className="space-y-4" onSubmit={handleForgotPassword}>
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-white/70 mb-2">
+                University Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                autoComplete="email"
+                required
+                className="glass-input w-full px-4 py-3 rounded-lg text-white placeholder-white/30 text-sm"
+                placeholder="name@university.edu"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
+              />
+            </div>
+
+            {message && <MessageBox message={message} />}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="glass-button w-full py-3 rounded-lg text-sm font-semibold flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Sending link...</>
+              ) : (
+                <>Send Reset Link<ArrowRight className="w-4 h-4" /></>
+              )}
+            </button>
+
+            <p className="text-center text-sm text-white/50">
+              Remember your password?{' '}
+              <button type="button" onClick={() => switchMode('signin')} className="text-[var(--color-accent)] hover:underline">
+                Sign in
+              </button>
+            </p>
+          </form>
+        )
+
+      case 'reset':
+        return (
+          <form className="space-y-4" onSubmit={handleResetPassword}>
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-white/70 mb-2">
+                New Password
+              </label>
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
+                  required
+                  className="glass-input w-full px-4 py-3 pr-12 rounded-lg text-white placeholder-white/30 text-sm"
+                  placeholder="Enter your new password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={loading}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/60 transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              <p className="text-xs text-white/40 mt-2">
+                8+ characters, uppercase, lowercase, and number
+              </p>
+            </div>
+
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-white/70 mb-2">
+                Confirm New Password
+              </label>
+              <input
+                id="confirmPassword"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="new-password"
+                required
+                className="glass-input w-full px-4 py-3 rounded-lg text-white placeholder-white/30 text-sm"
+                placeholder="Confirm your new password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                disabled={loading}
+              />
+            </div>
+
+            {message && <MessageBox message={message} />}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="glass-button w-full py-3 rounded-lg text-sm font-semibold flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Updating...</>
+              ) : (
+                <>Update Password<ArrowRight className="w-4 h-4" /></>
               )}
             </button>
           </form>
+        )
 
-          <div className="mt-8 space-y-4">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-white/10"></div>
+      default: // signin
+        return (
+          <form className="space-y-4" onSubmit={handleSignIn}>
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-white/70 mb-2">
+                University Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                autoComplete="email"
+                required
+                className="glass-input w-full px-4 py-3 rounded-lg text-white placeholder-white/30 text-sm"
+                placeholder="name@university.edu"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
+              />
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label htmlFor="password" className="block text-sm font-medium text-white/70">
+                  Password
+                </label>
+                <button
+                  type="button"
+                  onClick={() => switchMode('forgot')}
+                  className="text-xs text-[var(--color-accent)] hover:underline"
+                >
+                  Forgot password?
+                </button>
               </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 glass-light text-white/60 text-xs rounded-full">
-                  Magic link authentication
-                </span>
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  required
+                  className="glass-input w-full px-4 py-3 pr-12 rounded-lg text-white placeholder-white/30 text-sm"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={loading}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/60 transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
             </div>
-            
-            <div className="glass-card bg-blue-500/10 border-blue-400/20 p-4 rounded-xl">
-              <p className="text-xs text-center text-white/80 leading-relaxed">
-                <span className="font-semibold text-white">New or returning?</span> We&apos;ll send a secure link to your email.
-                <br />
-                No password required – the same link works for both sign in and sign up!
+
+            {message && <MessageBox message={message} />}
+
+            {message?.text.includes('verify your email') && (
+              <button
+                type="button"
+                onClick={handleResendVerification}
+                disabled={loading}
+                className="w-full py-2.5 rounded-lg bg-white/[0.03] border border-white/[0.06] text-white/70 hover:bg-white/[0.05] text-sm font-medium transition-all"
+              >
+                Resend verification email
+              </button>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="glass-button w-full py-3 rounded-lg text-sm font-semibold flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Signing in...</>
+              ) : (
+                <>Sign In<ArrowRight className="w-4 h-4" /></>
+              )}
+            </button>
+
+            <p className="text-center text-sm text-white/50">
+              Don&apos;t have an account?{' '}
+              <button type="button" onClick={() => switchMode('signup')} className="text-[var(--color-accent)] hover:underline">
+                Create one
+              </button>
+            </p>
+          </form>
+        )
+    }
+  }
+
+  const getIcon = () => {
+    switch (mode) {
+      case 'signup': return <Mail className="w-6 h-6 text-[var(--color-accent)]" />
+      case 'forgot': return <KeyRound className="w-6 h-6 text-[var(--color-accent)]" />
+      case 'reset': return <Lock className="w-6 h-6 text-[var(--color-accent)]" />
+      default: return <Lock className="w-6 h-6 text-[var(--color-accent)]" />
+    }
+  }
+
+  const getTitle = () => {
+    switch (mode) {
+      case 'signup': return 'Create Account'
+      case 'forgot': return 'Reset Password'
+      case 'reset': return 'Set New Password'
+      default: return 'Welcome Back'
+    }
+  }
+
+  const getSubtitle = () => {
+    switch (mode) {
+      case 'signup': return 'Sign up with your university email'
+      case 'forgot': return 'Enter your email to receive a reset link'
+      case 'reset': return 'Choose a new secure password'
+      default: return 'Sign in to your account'
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-[var(--color-bg)] flex flex-col relative overflow-hidden">
+      <InteractiveStarfield />
+      
+      <div className="flex-1 flex items-center justify-center py-12 px-6 relative z-10">
+        <div className="max-w-sm w-full">
+          <div className="glass-strong rounded-2xl p-8">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-[var(--color-accent)]/10 mb-5">
+                {getIcon()}
+              </div>
+              <h1 className="text-2xl font-bold text-white mb-2">
+                {getTitle()}
+              </h1>
+              <p className="text-sm text-white/50">
+                {getSubtitle()}
               </p>
             </div>
+            
+            {renderForm()}
           </div>
 
-          <div className="mt-6 pt-6 border-t border-white/10">
-            <Link href="/" className="text-sm text-center block text-white/70 hover:text-white transition-colors font-medium flex items-center justify-center gap-2">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
+          {/* Back link */}
+          <div className="mt-6 text-center">
+            <Link 
+              href="/" 
+              className="inline-flex items-center gap-2 text-sm text-white/50 hover:text-white transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
               Back to home
             </Link>
           </div>
         </div>
-        </div>
       </div>
 
-      {/* Footer */}
       <Footer />
     </div>
   )
 }
 
+function MessageBox({ message }: { message: { type: 'success' | 'error'; text: string } }) {
+  return (
+    <div className={`rounded-lg p-4 flex items-start gap-3 animate-fade-in ${
+      message.type === 'error'
+        ? 'bg-red-500/10 border border-red-500/20'
+        : 'bg-emerald-500/10 border border-emerald-500/20'
+    }`}>
+      {message.type === 'error' ? (
+        <XCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+      ) : (
+        <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+      )}
+      <p className="text-sm text-white/80">{message.text}</p>
+    </div>
+  )
+}

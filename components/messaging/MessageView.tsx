@@ -28,12 +28,10 @@ export function MessageView({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Focus input when conversation changes
   useEffect(() => {
     if (conversation) {
       inputRef.current?.focus();
@@ -42,10 +40,8 @@ export function MessageView({
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     const content = messageInput.trim();
     if (!content || sending) return;
-
     setMessageInput('');
     await onSendMessage(content);
   };
@@ -58,13 +54,9 @@ export function MessageView({
   };
 
   const formatMessageTime = (date: Date) => {
-    if (isToday(date)) {
-      return format(date, 'h:mm a');
-    } else if (isYesterday(date)) {
-      return `Yesterday ${format(date, 'h:mm a')}`;
-    } else {
-      return format(date, 'MMM d, h:mm a');
-    }
+    if (isToday(date)) return format(date, 'h:mm a');
+    if (isYesterday(date)) return `Yesterday ${format(date, 'h:mm a')}`;
+    return format(date, 'MMM d, h:mm a');
   };
 
   const groupMessagesByDate = (msgs: MessageWithSender[]) => {
@@ -73,7 +65,6 @@ export function MessageView({
 
     msgs.forEach((msg) => {
       const msgDate = format(new Date(msg.created_at), 'yyyy-MM-dd');
-      
       if (msgDate !== currentDate) {
         currentDate = msgDate;
         groups.push({ date: msgDate, messages: [msg] });
@@ -87,10 +78,10 @@ export function MessageView({
 
   if (!conversation) {
     return (
-      <div className="h-full flex items-center justify-center bg-black/10">
+      <div className="h-full flex items-center justify-center bg-black/5">
         <div className="text-center">
-          <Send className="w-8 h-8 text-white/30 mx-auto mb-3" />
-          <p className="text-white/60 text-sm">Select a conversation</p>
+          <Send className="w-8 h-8 text-white/20 mx-auto mb-3" />
+          <p className="text-white/50 text-sm">Select a conversation</p>
         </div>
       </div>
     );
@@ -99,25 +90,25 @@ export function MessageView({
   const messageGroups = groupMessagesByDate(messages);
 
   return (
-    <div className="h-full flex flex-col bg-black/10">
-      {/* Header - Compact */}
-      <div className="px-4 py-3 border-b border-white/5 flex items-center gap-3 bg-black/20">
+    <div className="h-full flex flex-col bg-black/5">
+      {/* Header */}
+      <div className="px-4 py-3 border-b border-white/[0.06] flex items-center gap-3 bg-black/10">
         <button
           onClick={onBack}
-          className="lg:hidden p-1.5 rounded-lg hover:bg-white/10 transition-all"
+          className="lg:hidden p-1.5 rounded-lg hover:bg-white/[0.05] transition-all"
         >
-          <ArrowLeft className="w-4 h-4 text-white/70" />
+          <ArrowLeft className="w-4 h-4 text-white/60" />
         </button>
 
-        <div className="shrink-0 w-9 h-9 rounded-xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center">
-          <span className="text-sm font-bold text-white">
+        <div className="shrink-0 w-9 h-9 rounded-lg bg-[var(--color-accent)]/10 flex items-center justify-center">
+          <span className="text-sm font-semibold text-[var(--color-accent)]">
             {conversation.other_user.full_name.charAt(0).toUpperCase()}
           </span>
         </div>
 
         <div className="flex-1 min-w-0">
           <h2 className="font-medium text-white text-sm truncate">{conversation.other_user.full_name}</h2>
-          <p className="text-xs text-white/50 truncate">
+          <p className="text-xs text-white/40 truncate">
             {conversation.other_user.city && conversation.other_user.state 
               ? `${conversation.other_user.city}, ${conversation.other_user.state}`
               : conversation.other_user.institutions?.name || ''}
@@ -129,13 +120,13 @@ export function MessageView({
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {loading ? (
           <div className="flex items-center justify-center h-full">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-400" />
+            <div className="w-6 h-6 border-2 border-white/20 border-t-[var(--color-accent)] rounded-full animate-spin" />
           </div>
         ) : messageGroups.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
-              <p className="text-white/60 text-sm">No messages yet</p>
-              <p className="text-white/40 text-xs mt-1">Send a message to start the conversation</p>
+              <p className="text-white/50 text-sm">No messages yet</p>
+              <p className="text-white/30 text-xs mt-1">Send a message to start</p>
             </div>
           </div>
         ) : (
@@ -143,7 +134,7 @@ export function MessageView({
             <div key={group.date}>
               {/* Date divider */}
               <div className="flex items-center justify-center my-6">
-                <div className="glass-light px-3 py-1 rounded-full text-xs text-white/70">
+                <div className="px-3 py-1 rounded-full bg-white/[0.05] border border-white/[0.06] text-xs text-white/50">
                   {isToday(new Date(group.date))
                     ? 'Today'
                     : isYesterday(new Date(group.date))
@@ -162,8 +153,8 @@ export function MessageView({
                     className={`flex gap-2 mb-2 ${isOwn ? 'justify-end' : 'justify-start'}`}
                   >
                     {!isOwn && (
-                      <div className="shrink-0 w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center">
-                        <span className="text-xs font-medium text-white/80">
+                      <div className="shrink-0 w-7 h-7 rounded-lg bg-white/[0.05] flex items-center justify-center">
+                        <span className="text-xs font-medium text-white/60">
                           {message.sender?.full_name?.charAt(0)?.toUpperCase() || '?'}
                         </span>
                       </div>
@@ -173,8 +164,8 @@ export function MessageView({
                       <div
                         className={`rounded-xl px-3 py-2 ${
                           isOwn
-                            ? 'bg-rose-500/20 border border-rose-500/30 text-white'
-                            : 'bg-white/5 border border-white/10 text-white/90'
+                            ? 'bg-[var(--color-accent)]/20 border border-[var(--color-accent)]/30 text-white'
+                            : 'bg-white/[0.03] border border-white/[0.06] text-white/90'
                         }`}
                       >
                         <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
@@ -192,8 +183,8 @@ export function MessageView({
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input - Compact */}
-      <form onSubmit={handleSend} className="p-3 border-t border-white/5 bg-black/20">
+      {/* Input */}
+      <form onSubmit={handleSend} className="p-3 border-t border-white/[0.06] bg-black/10">
         <div className="flex gap-2">
           <textarea
             ref={inputRef}
@@ -202,17 +193,17 @@ export function MessageView({
             onKeyDown={handleKeyDown}
             placeholder="Type a message..."
             rows={1}
-            className="glass-input flex-1 px-3 py-2.5 rounded-xl resize-none focus:outline-none text-white placeholder-white/40 text-sm"
+            className="glass-input flex-1 px-3 py-2.5 rounded-xl resize-none text-sm"
             style={{ minHeight: '40px', maxHeight: '100px' }}
             disabled={sending}
           />
           <button
             type="submit"
             disabled={!messageInput.trim() || sending}
-            className="glass-button px-3 py-2.5 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+            className="glass-button px-3 py-2.5 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {sending ? (
-              <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-white" />
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             ) : (
               <Send className="w-4 h-4 text-white" />
             )}
@@ -222,4 +213,3 @@ export function MessageView({
     </div>
   );
 }
-

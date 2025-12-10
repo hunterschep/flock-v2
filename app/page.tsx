@@ -4,20 +4,16 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Users, MapPin, Home as HomeIcon, ArrowRight, Lock } from 'lucide-react'
+import { ArrowRight, Lock, Users, Check } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import InteractiveStarfield from '@/components/InteractiveStarfield'
 import { Footer } from '@/components/Footer'
 
-// Dynamically import the map to avoid SSR issues
 const FlockMap = dynamic(() => import('@/components/map/FlockMap').then(mod => mod.FlockMap), { 
   ssr: false,
   loading: () => (
-    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-rose-900/20 to-pink-900/20 rounded-3xl">
-      <div className="flex flex-col items-center gap-3">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-rose-400"></div>
-        <span className="text-white/60 text-sm">Loading map...</span>
-      </div>
+    <div className="absolute inset-0 flex items-center justify-center bg-[#0a0a0f]">
+      <div className="w-8 h-8 border-2 border-white/20 border-t-[var(--color-accent)] rounded-full animate-spin" />
     </div>
   )
 })
@@ -39,222 +35,177 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="min-h-screen gradient-ocean flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-rose-400"></div>
+      <div className="min-h-screen bg-[var(--color-bg)] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-white/20 border-t-[var(--color-accent)] rounded-full animate-spin" />
       </div>
     )
   }
 
+  const universities = [
+    { image: '/schools/bc.png', name: 'Boston College' },
+    { image: '/schools/uw.png', name: 'UW' },
+    { image: '/schools/umass.png', name: 'UMass' },
+    { image: '/schools/rice.png', name: 'Rice' },
+    { image: '/schools/purdue.png', name: 'Purdue' },
+    { image: '/schools/bu.png', name: 'BU' },
+    { image: '/schools/neu.png', name: 'Northeastern' },
+    { image: '/schools/wsu.png', name: 'WSU' },
+  ]
+
   return (
-    <div id="main-content" className="min-h-screen gradient-ocean overflow-hidden relative">
-      {/* EPIC Interactive Starfield */}
+    <div id="main-content" className="min-h-screen bg-[var(--color-bg)] relative overflow-hidden">
       <InteractiveStarfield />
       
-      {/* Animated Background Orbs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-rose-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse"></div>
-      <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-pink-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse animation-delay-2000"></div>
-      <div className="absolute bottom-1/4 left-1/3 w-96 h-96 bg-pink-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse animation-delay-4000"></div>
-      
-      {/* Hero Section */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-20 pb-16 sm:pb-24">
+      {/* Hero */}
+      <section className="relative z-10 max-w-6xl mx-auto px-6 pt-16 pb-12 md:pt-28 md:pb-20">
+        {/* Badge */}
+        <div className="flex justify-center mb-6 animate-fade-in-up">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.02]">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-xs text-white/60">Now in beta at 50+ universities</span>
+          </div>
+        </div>
 
-        {/* Hero Text */}
-        <div className="text-center max-w-4xl mx-auto mb-12 animate-fade-in-up" style={{animationDelay: '100ms'}}>
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white mb-6 drop-shadow-2xl leading-tight tracking-tight">
-            Your network,
-            <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 via-pink-400 to-rose-400 animate-gradient">
-              visualized
-            </span>
+        {/* Headline */}
+        <div className="text-center max-w-3xl mx-auto mb-10 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-5 tracking-tight leading-[1.1]">
+            Find your classmates
+            <span className="block text-[var(--color-accent)]">worldwide</span>
           </h1>
-          
-          <p className="text-lg sm:text-xl text-white/70 mb-10 max-w-2xl mx-auto">
-            Discover new grads in your area. Build connections that matter.
+          <p className="text-base md:text-lg text-white/50 max-w-lg mx-auto leading-relaxed">
+            Discover where your classmates are. Build connections, find roommates, and explore your university&apos;s reach across the globe.
           </p>
-          
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-            <Link
-              href="/auth"
-              className="group relative px-8 py-4 glass-button rounded-2xl font-bold text-lg flex items-center gap-3 hover:scale-105 transition-all duration-300 overflow-hidden"
-              style={{
-                boxShadow: '0 20px 60px rgba(242, 139, 130, 0.5), 0 0 40px rgba(249, 197, 209, 0.3)'
-              }}
-            >
-              <span className="relative z-10">Get Started Free</span>
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform relative z-10" />
-              <div className="absolute inset-0 bg-gradient-to-r from-rose-600/0 via-rose-600/50 to-rose-600/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-            </Link>
-            
-            <div className="glass-light px-5 py-3 rounded-xl flex items-center gap-2">
-              <svg className="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              <span className="text-sm text-white/90">.edu email required</span>
-            </div>
-          </div>
-
-          {/* Stats */}
-          <div className="flex flex-wrap justify-center gap-6 sm:gap-8 text-center">
-            <div className="animate-fade-in-up" style={{animationDelay: '200ms'}}>
-              <div className="text-3xl sm:text-4xl font-bold text-white drop-shadow">10K+</div>
-              <div className="text-sm text-white/60">Alumni Connected</div>
-            </div>
-            <div className="animate-fade-in-up" style={{animationDelay: '300ms'}}>
-              <div className="text-3xl sm:text-4xl font-bold text-white drop-shadow">50+</div>
-              <div className="text-sm text-white/60">Universities</div>
-            </div>
-            <div className="animate-fade-in-up" style={{animationDelay: '400ms'}}>
-              <div className="text-3xl sm:text-4xl font-bold text-white drop-shadow">100+</div>
-              <div className="text-sm text-white/60">Cities</div>
-            </div>
+        </div>
+        
+        {/* CTA */}
+        <div className="flex flex-col sm:flex-row gap-3 justify-center items-center animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+          <Link
+            href="/auth"
+            className="group glass-button px-7 py-3.5 rounded-xl text-sm font-semibold flex items-center gap-2"
+          >
+            Get Started Free
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+          <div className="flex items-center gap-1.5 text-white/40 text-xs">
+            <Check className="w-3.5 h-3.5 text-emerald-500" />
+            Free with .edu email
           </div>
         </div>
 
-        {/* Locked Map Preview - EPIC Interactive Element */}
-        <div className="max-w-6xl mx-auto animate-fade-in-up" style={{animationDelay: '500ms'}}>
+        {/* Stats */}
+        <div className="flex justify-center gap-10 md:gap-16 mt-12 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
+          {[
+            { value: '10K+', label: 'Alumni' },
+            { value: '50+', label: 'Universities' },
+            { value: '100+', label: 'Cities' },
+          ].map((stat, i) => (
+            <div key={i} className="text-center">
+              <div className="text-xl md:text-2xl font-bold text-white">{stat.value}</div>
+              <div className="text-xs text-white/40">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Map Preview */}
+      <section className="relative z-10 max-w-5xl mx-auto px-6 pb-20 md:pb-28">
+        <div className="animate-fade-in-up" style={{ animationDelay: '400ms' }}>
           <div className="relative group">
-            {/* Map Container with blur - responsive height with skeleton */}
-            <div className="glass-strong rounded-3xl overflow-hidden relative h-[350px] sm:h-[450px] md:h-[500px]">
-              {/* Map skeleton background for stable layout */}
-              <div className="absolute inset-0 bg-gradient-to-br from-rose-900/10 to-pink-900/10" />
-              <div className="absolute inset-0 pointer-events-none z-10">
-                <FlockMap />
-              </div>
-              
-              {/* Lighter Blur Overlay - tease the user! */}
-              <div className="absolute inset-0 backdrop-blur-sm bg-black/30 z-20"></div>
-              
-              {/* Lock UI */}
-              <div className="absolute inset-0 z-30 flex flex-col items-center justify-center p-4 sm:p-8 text-center">
-                {/* Animated Lock Icon */}
-                <div className="relative mb-4 sm:mb-6">
-                  <div className="absolute inset-0 bg-rose-500/30 rounded-full blur-2xl animate-pulse"></div>
-                  <div className="relative glass-strong p-4 sm:p-6 rounded-2xl sm:rounded-3xl">
-                    <Lock className="w-8 h-8 sm:w-12 sm:h-12 text-rose-400 animate-pulse" />
-                  </div>
-                </div>
-                
-                <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4 drop-shadow-lg px-4">
-                  Your Network Awaits
-                </h3>
-                <p className="text-sm sm:text-base md:text-lg text-white/80 mb-6 sm:mb-8 max-w-md px-4">
-                  Sign in to explore the interactive alumni map and connect with your network
-                </p>
-                
-                <Link
-                  href="/auth"
-                  className="group relative px-6 sm:px-8 py-3 sm:py-4 glass-button rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base flex items-center gap-2 sm:gap-3 hover:scale-105 transition-all duration-300 overflow-hidden"
-                  style={{
-                    boxShadow: '0 15px 40px rgba(242, 139, 130, 0.4)'
-                  }}
-                >
-                  <Lock className="w-4 h-4 sm:w-5 sm:h-5 relative z-10" />
-                  <span className="relative z-10">Unlock Full Access</span>
-                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-2 transition-transform relative z-10" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-rose-600/0 via-rose-600/50 to-rose-600/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                </Link>
-
-                {/* Feature Pills */}
-                <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mt-6 sm:mt-8 px-4">
-                  <div className="glass-light px-3 sm:px-4 py-1.5 sm:py-2 rounded-full flex items-center gap-1.5 sm:gap-2">
-                    <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400" />
-                    <span className="text-xs sm:text-sm text-white/90">Live Map</span>
-                  </div>
-                  <div className="glass-light px-3 sm:px-4 py-1.5 sm:py-2 rounded-full flex items-center gap-1.5 sm:gap-2">
-                    <Users className="w-3 h-3 sm:w-4 sm:h-4 text-rose-400" />
-                    <span className="text-xs sm:text-sm text-white/90">Alumni Directory</span>
-                  </div>
-                  <div className="glass-light px-3 sm:px-4 py-1.5 sm:py-2 rounded-full flex items-center gap-1.5 sm:gap-2">
-                    <HomeIcon className="w-3 h-3 sm:w-4 sm:h-4 text-pink-400" />
-                    <span className="text-xs sm:text-sm text-white/90">Roommate Finder</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Glow effect on hover */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-rose-600 to-pink-600 rounded-3xl opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500 -z-10"></div>
-          </div>
-        </div>
-
-        {/* University Carousel - EPIC */}
-        <div className="max-w-6xl mx-auto mt-16 sm:mt-24 overflow-hidden pb-12 sm:pb-16">
-          <div className="text-center mb-8 sm:mb-12">
-            <p className="text-xs sm:text-sm uppercase tracking-wider text-white/50 font-semibold mb-3 sm:mb-4">Trusted By Students At</p>
-            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white drop-shadow-lg">
-              Top Universities Nationwide
-            </h3>
-          </div>
-
-          {/* Infinite Scrolling Carousel */}
-          <div className="relative">
-            {/* Fade gradients on edges for seamless effect */}
-            <div className="absolute left-0 top-0 bottom-0 w-24 sm:w-32 bg-gradient-to-r from-[#000000] via-[#000000]/50 to-transparent z-10 pointer-events-none"></div>
-            <div className="absolute right-0 top-0 bottom-0 w-24 sm:w-32 bg-gradient-to-l from-[#000000] via-[#000000]/50 to-transparent z-10 pointer-events-none"></div>
+            {/* Glow effect */}
+            <div className="absolute -inset-1 bg-gradient-to-r from-[var(--color-accent)]/20 via-transparent to-[var(--color-accent)]/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
             
-            <div className="flex animate-carousel">
-              {/* First set of universities */}
-              <div className="flex gap-4 sm:gap-6 shrink-0">
-                {[
-                  { image: '/schools/bc.png', name: '' },
-                  { image: '/schools/uw.png', name: '' },
-                  { image: '/schools/umass.png', name: '' },
-                  { image: '/schools/rice.png', name: '' },
-                  { image: '/schools/purdue.png', name: '' },
-                  { image: '/schools/bu.png', name: '' },
-                  { image: '/schools/neu.png', name: '' },
-                  { image: '/schools/wsu.png', name: '' },
-                ].map((uni, idx) => (
-                  <div
-                    key={`set1-${idx}`}
-                    className="backdrop-blur-xl bg-white/10 border border-white/20 p-4 sm:p-8 rounded-2xl sm:rounded-3xl flex flex-col items-center gap-2 sm:gap-3 min-w-[150px] sm:min-w-[200px] hover:scale-105 transition-all duration-300 group cursor-pointer hover:bg-white/15 hover:border-white/30"
-                  >
-                    <div className="w-16 h-16 sm:w-28 sm:h-28 rounded-lg sm:rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 overflow-hidden p-2 sm:p-3">
-                      <img 
-                        src={uni.image} 
-                        alt={uni.name}
-                        className="w-full h-full object-contain"
-                      />
+            {/* Map container */}
+            <div className="relative rounded-2xl overflow-hidden border border-white/10">
+              <div className="aspect-[16/10] md:aspect-[16/9] relative">
+                <div className="absolute inset-0 pointer-events-none">
+                  <FlockMap onLocationSelect={() => {}} />
+                </div>
+                
+                {/* Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-20" />
+                
+                {/* CTA overlay */}
+                <div className="absolute inset-0 z-30 flex flex-col items-center justify-center p-6">
+                  <div className="text-center max-w-md">
+                    <div className="w-14 h-14 mx-auto mb-5 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center">
+                      <Lock className="w-6 h-6 text-white/80" />
                     </div>
-                    <span className="text-xs sm:text-sm font-semibold text-white/90 text-center">{uni.name}</span>
+                    <h3 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+                      Explore Your Network
+                    </h3>
+                    <p className="text-white/50 mb-6 text-sm">
+                      Sign in to unlock the full interactive map and alumni directory.
+                    </p>
+                    <Link
+                      href="/auth"
+                      className="inline-flex items-center gap-2 glass-button px-5 py-2.5 rounded-lg text-sm font-semibold"
+                    >
+                      <Lock className="w-4 h-4" />
+                      Unlock Map
+                    </Link>
                   </div>
-                ))}
-              </div>
-              
-              {/* Duplicate set for seamless loop */}
-              <div className="flex gap-4 sm:gap-6 shrink-0 ml-4 sm:ml-6">
-                {[
-                  { image: '/schools/bc.png', name: '' },
-                  { image: '/schools/uw.png', name: '' },
-                  { image: '/schools/umass.png', name: '' },
-                  { image: '/schools/rice.png', name: '' },
-                  { image: '/schools/purdue.png', name: '' },
-                  { image: '/schools/bu.png', name: '' },
-                  { image: '/schools/neu.png', name: '' },
-                  { image: '/schools/wsu.png', name: '' },
-                ].map((uni, idx) => (
-                  <div
-                    key={`set2-${idx}`}
-                    className="backdrop-blur-xl bg-white/10 border border-white/20 p-4 sm:p-8 rounded-2xl sm:rounded-3xl flex flex-col items-center gap-2 sm:gap-3 min-w-[150px] sm:min-w-[200px] hover:scale-105 transition-all duration-300 group cursor-pointer hover:bg-white/15 hover:border-white/30"
-                  >
-                    <div className="w-16 h-16 sm:w-28 sm:h-28 rounded-lg sm:rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 overflow-hidden p-2 sm:p-3">
-                      <img 
-                        src={uni.image} 
-                        alt={uni.name}
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                    <span className="text-xs sm:text-sm font-semibold text-white/90 text-center">{uni.name}</span>
-                  </div>
-                ))}
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Footer */}
+      {/* Social Proof */}
+      <section className="relative z-10 pb-20 md:pb-28 overflow-hidden">
+        <div className="text-center mb-10">
+          <p className="text-xs uppercase tracking-widest text-white/30 mb-2">Trusted by students at</p>
+          <h2 className="text-lg md:text-xl font-semibold text-white">
+            Top Universities Nationwide
+          </h2>
+        </div>
+
+        <div className="relative">
+          {/* Fade edges */}
+          <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[var(--color-bg)] to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[var(--color-bg)] to-transparent z-10 pointer-events-none" />
+          
+          <div className="flex animate-carousel">
+            {[...universities, ...universities].map((uni, idx) => (
+              <div
+                key={idx}
+                className="flex flex-col items-center gap-3 p-5 min-w-[140px] shrink-0 mx-2 rounded-xl bg-white/[0.02] border border-white/[0.06]"
+              >
+                <div className="w-14 h-14 flex items-center justify-center">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img 
+                    src={uni.image} 
+                    alt={uni.name}
+                    className="w-full h-full object-contain opacity-70"
+                    loading="lazy"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="relative z-10 max-w-3xl mx-auto px-6 pb-24 md:pb-32 text-center">
+        <div className="p-8 md:p-12 rounded-2xl bg-gradient-to-b from-white/[0.04] to-transparent border border-white/[0.08]">
+          <Users className="w-10 h-10 text-[var(--color-accent)] mx-auto mb-5" />
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
+            Join your alumni network
+          </h2>
+          <p className="text-white/50 mb-8 max-w-md mx-auto text-sm">
+            Connect with thousands of graduates from your university. It only takes a minute to get started.
+          </p>
+          <Link
+            href="/auth"
+            className="inline-flex items-center gap-2 glass-button px-8 py-4 rounded-xl text-base font-semibold"
+          >
+            Get Started
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      </section>
+
       <Footer />
     </div>
   )

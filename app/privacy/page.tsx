@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, Shield } from 'lucide-react';
+import { Footer } from '@/components/Footer';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
@@ -9,42 +10,42 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen gradient-mesh">
+    <div className="min-h-screen bg-[var(--color-bg)] flex flex-col">
       {/* Header */}
       <header className="glass-header sticky top-0 z-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center gap-4">
+        <div className="max-w-4xl mx-auto px-4 md:px-6 py-4 flex items-center gap-4">
           <Link
             href="/"
-            className="glass-light p-2 rounded-lg hover:bg-white/20 transition-all"
+            className="p-2 rounded-lg bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] transition-all"
             aria-label="Back to home"
           >
-            <ArrowLeft className="w-5 h-5 text-white" />
+            <ArrowLeft className="w-5 h-5 text-white/70" />
           </Link>
-          <h1 className="text-xl font-bold text-white">Privacy Policy</h1>
+          <h1 className="text-lg font-semibold text-white">Privacy Policy</h1>
         </div>
       </header>
 
       {/* Content */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="glass-card p-8 sm:p-12">
+      <main className="flex-1 max-w-4xl mx-auto px-4 md:px-6 py-12">
+        <div className="glass-card rounded-xl p-6 md:p-10">
           <div className="flex items-center gap-4 mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center">
-              <Shield className="w-8 h-8 text-rose-400" />
+            <div className="w-14 h-14 rounded-xl bg-[var(--color-accent)]/10 flex items-center justify-center">
+              <Shield className="w-7 h-7 text-[var(--color-accent)]" />
             </div>
             <div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-white">Privacy Policy</h2>
-              <p className="text-white/60 text-sm">Last updated: December 2024</p>
+              <h2 className="text-2xl font-bold text-white">Privacy Policy</h2>
+              <p className="text-white/50 text-sm">Last updated: December 2024</p>
             </div>
           </div>
 
-          <div className="prose prose-invert max-w-none space-y-6 text-white/80">
+          <div className="space-y-8 text-white/70">
             <section>
-              <h3 className="text-xl font-semibold text-white mb-3">1. Information We Collect</h3>
-              <p>
+              <h3 className="text-lg font-semibold text-white mb-3">1. Information We Collect</h3>
+              <p className="mb-3">
                 We collect information you provide directly to us, such as when you create an account, 
                 update your profile, or communicate with other users. This includes:
               </p>
-              <ul className="list-disc list-inside space-y-2 ml-4">
+              <ul className="list-disc list-inside space-y-2 ml-4 text-white/60">
                 <li>Name and email address (including .edu email)</li>
                 <li>Graduation year and university information</li>
                 <li>Current location (city and state)</li>
@@ -54,9 +55,9 @@ export default function PrivacyPage() {
             </section>
 
             <section>
-              <h3 className="text-xl font-semibold text-white mb-3">2. How We Use Your Information</h3>
-              <p>We use the information we collect to:</p>
-              <ul className="list-disc list-inside space-y-2 ml-4">
+              <h3 className="text-lg font-semibold text-white mb-3">2. How We Use Your Information</h3>
+              <p className="mb-3">We use the information we collect to:</p>
+              <ul className="list-disc list-inside space-y-2 ml-4 text-white/60">
                 <li>Provide, maintain, and improve our services</li>
                 <li>Connect you with alumni from your university</li>
                 <li>Send you notifications about new connections and messages</li>
@@ -65,7 +66,7 @@ export default function PrivacyPage() {
             </section>
 
             <section>
-              <h3 className="text-xl font-semibold text-white mb-3">3. Information Sharing</h3>
+              <h3 className="text-lg font-semibold text-white mb-3">3. Information Sharing</h3>
               <p>
                 Your profile information is visible to other verified users from your university network. 
                 We do not sell your personal information to third parties. Your exact location coordinates 
@@ -74,7 +75,7 @@ export default function PrivacyPage() {
             </section>
 
             <section>
-              <h3 className="text-xl font-semibold text-white mb-3">4. Data Security</h3>
+              <h3 className="text-lg font-semibold text-white mb-3">4. Data Security</h3>
               <p>
                 We implement appropriate security measures to protect your personal information against 
                 unauthorized access, alteration, disclosure, or destruction. All data is encrypted in 
@@ -83,9 +84,9 @@ export default function PrivacyPage() {
             </section>
 
             <section>
-              <h3 className="text-xl font-semibold text-white mb-3">5. Your Rights</h3>
-              <p>You have the right to:</p>
-              <ul className="list-disc list-inside space-y-2 ml-4">
+              <h3 className="text-lg font-semibold text-white mb-3">5. Your Rights</h3>
+              <p className="mb-3">You have the right to:</p>
+              <ul className="list-disc list-inside space-y-2 ml-4 text-white/60">
                 <li>Access and update your personal information</li>
                 <li>Delete your account and associated data</li>
                 <li>Control your profile visibility settings</li>
@@ -94,10 +95,10 @@ export default function PrivacyPage() {
             </section>
 
             <section>
-              <h3 className="text-xl font-semibold text-white mb-3">6. Contact Us</h3>
+              <h3 className="text-lg font-semibold text-white mb-3">6. Contact Us</h3>
               <p>
                 If you have any questions about this Privacy Policy, please contact us at{' '}
-                <a href="mailto:privacy@flock.app" className="text-rose-400 hover:text-rose-300 transition-colors">
+                <a href="mailto:privacy@flock.app" className="text-[var(--color-accent)] hover:underline">
                   privacy@flock.app
                 </a>
               </p>
@@ -105,7 +106,8 @@ export default function PrivacyPage() {
           </div>
         </div>
       </main>
+      
+      <Footer />
     </div>
   );
 }
-

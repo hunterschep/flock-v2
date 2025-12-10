@@ -32,7 +32,6 @@ export default function MessagesPage() {
   const [sending, setSending] = useState(false);
   const [showMobileList, setShowMobileList] = useState(true);
 
-  // Get current user
   useEffect(() => {
     const getCurrentUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -59,7 +58,6 @@ export default function MessagesPage() {
     getCurrentUser();
   }, [router, supabase]);
 
-  // Load conversations
   useEffect(() => {
     if (!currentUserId) return;
 
@@ -69,7 +67,6 @@ export default function MessagesPage() {
       setConversations(convs);
       setLoading(false);
 
-      // If conversation ID is in URL, auto-select it
       const conversationParam = searchParams.get('conversation');
       if (conversationParam) {
         setSelectedConversationId(conversationParam);
@@ -79,13 +76,9 @@ export default function MessagesPage() {
 
     loadConversations();
 
-    // Subscribe to all conversation updates (only for incoming messages from others)
     const unsubscribe = subscribeToAllConversations(async () => {
-      // Only reload conversations when receiving messages from others
-      // This prevents full refresh when sending our own messages
       const convs = await getConversations();
       setConversations((prev) => {
-        // Only update if there are meaningful changes
         const hasNewContent = convs.some((newConv) => {
           const oldConv = prev.find((p) => p.id === newConv.id);
           if (!oldConv) return true;
@@ -103,7 +96,6 @@ export default function MessagesPage() {
     };
   }, [currentUserId, searchParams]);
 
-  // Load messages when conversation is selected
   useEffect(() => {
     if (!selectedConversationId || !currentUserId) {
       return;
@@ -114,16 +106,12 @@ export default function MessagesPage() {
       const msgs = await getMessages(selectedConversationId);
       setMessages(msgs);
       setMessagesLoading(false);
-
-      // Mark messages as read
       await markMessagesAsRead(selectedConversationId);
     };
 
     loadMessages();
 
-    // Subscribe to new messages in this conversation
     const unsubscribe = subscribeToConversation(selectedConversationId, async (newMessage) => {
-      // Fetch sender details for the new message
       const { data: sender } = await supabase
         .from('users')
         .select('id, full_name, email')
@@ -137,7 +125,6 @@ export default function MessagesPage() {
       
       setMessages((prev) => [...prev, messageWithSender]);
       
-      // Mark as read if user is viewing this conversation
       if (newMessage.sender_id !== currentUserId) {
         markMessagesAsRead(selectedConversationId);
       }
@@ -158,7 +145,6 @@ export default function MessagesPage() {
 
     setSending(true);
     
-    // Optimistically update the conversation list immediately
     setConversations((prevConversations) =>
       prevConversations.map((conv) =>
         conv.id === selectedConversationId
@@ -180,13 +166,8 @@ export default function MessagesPage() {
       )
     );
     
-    const newMessage = await sendMessageUtil(selectedConversationId, content);
+    await sendMessageUtil(selectedConversationId, content);
     setSending(false);
-
-    if (!newMessage) {
-      // If sending failed, we could revert the optimistic update here
-      // For now, the realtime subscription will handle syncing
-    }
   };
 
   const handleBack = () => {
@@ -198,48 +179,42 @@ export default function MessagesPage() {
 
   if (!currentUserId) {
     return (
-      <div className="min-h-screen gradient-mesh flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-400" />
+      <div className="min-h-screen bg-[var(--color-bg)] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-white/20 border-t-[var(--color-accent)] rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col gradient-mesh overflow-hidden relative">
-      {/* Floating background orbs */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-pink-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse" />
-      <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-rose-500/20 rounded-full mix-blend-lighten filter blur-3xl animate-pulse animation-delay-2000" />
-
+    <div className="min-h-screen flex flex-col bg-[var(--color-bg)]">
       {/* Header */}
       <header className="glass-header shrink-0 z-20 sticky top-0">
-        <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <Link
-              href="/dashboard"
-              className="glass-light p-2 rounded-lg hover:bg-white/20 transition-all"
-            >
-              <ArrowLeft className="w-5 h-5 text-white" />
-            </Link>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center">
-                <MessageCircle className="w-5 h-5 text-rose-400" />
-              </div>
-              <h1 className="text-xl sm:text-2xl font-bold text-white drop-shadow-lg">Messages</h1>
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center gap-4">
+          <Link
+            href="/dashboard"
+            className="p-2 rounded-lg bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] transition-all"
+          >
+            <ArrowLeft className="w-5 h-5 text-white/70" />
+          </Link>
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-[var(--color-accent)]/10 flex items-center justify-center">
+              <MessageCircle className="w-5 h-5 text-[var(--color-accent)]" />
             </div>
+            <h1 className="text-lg font-semibold text-white">Messages</h1>
           </div>
         </div>
       </header>
 
       {/* Main content */}
       <div className="flex-1 relative z-10 overflow-hidden">
-        <div className="h-[calc(100vh-200px)] max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="glass-strong rounded-2xl overflow-hidden h-full border border-white/5">
+        <div className="h-[calc(100vh-180px)] max-w-6xl mx-auto px-4 md:px-6 py-6">
+          <div className="glass-card rounded-xl overflow-hidden h-full">
             <div className="flex h-full">
-              {/* Conversation list - Desktop always visible, mobile conditional */}
+              {/* Conversation list */}
               <div
                 className={`${
                   showMobileList ? 'flex' : 'hidden'
-                } lg:flex lg:w-80 border-r border-white/10 flex-col w-full`}
+                } lg:flex lg:w-80 border-r border-white/[0.06] flex-col w-full`}
               >
                 <ConversationList
                   conversations={conversations}
@@ -249,7 +224,7 @@ export default function MessagesPage() {
                 />
               </div>
 
-              {/* Message view - Desktop always visible, mobile conditional */}
+              {/* Message view */}
               <div
                 className={`${
                   !showMobileList ? 'flex' : 'hidden'
@@ -270,9 +245,7 @@ export default function MessagesPage() {
         </div>
       </div>
 
-      {/* Footer */}
       <Footer />
     </div>
   );
 }
-
