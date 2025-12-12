@@ -1,9 +1,22 @@
-import { createBrowserClient } from '@supabase/ssr'
+import { createBrowserClient, type SupabaseClient } from '@supabase/ssr'
 
+// Singleton instance to avoid creating multiple clients
+let supabaseInstance: SupabaseClient | null = null
+
+/**
+ * Get the browser Supabase client (singleton pattern)
+ * Creates one instance and reuses it across the app
+ */
 export function createClient() {
-  return createBrowserClient(
+  if (supabaseInstance) {
+    return supabaseInstance
+  }
+  
+  supabaseInstance = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
+  
+  return supabaseInstance
 }
 

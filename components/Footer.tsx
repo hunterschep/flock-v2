@@ -8,7 +8,7 @@ export function Footer() {
   return (
     <footer className="relative z-10 border-t border-white/[0.06] bg-[var(--color-bg)]">
       <div className="max-w-6xl mx-auto px-4 md:px-6 py-8 md:py-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-6 md:gap-8">
           {/* Brand */}
           <div className="col-span-2">
             <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
@@ -67,6 +67,33 @@ export function Footer() {
                 <Link href="/profile/edit" className="text-white/50 hover:text-white text-xs md:text-sm transition-colors">
                   Profile
                 </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* API Links */}
+          <div>
+            <h3 className="text-[10px] md:text-xs font-medium text-white/70 mb-2 md:mb-4 uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1.5">
+                API
+                <span className="px-1 py-0.5 text-[8px] md:text-[9px] rounded bg-[var(--color-accent)]/20 text-[var(--color-accent)] font-semibold">NEW</span>
+              </span>
+            </h3>
+            <ul className="space-y-2 md:space-y-3">
+              <li>
+                <Link href="/api/docs" className="text-white/50 hover:text-white text-xs md:text-sm transition-colors">
+                  Documentation
+                </Link>
+              </li>
+              <li>
+                <Link href="/api/docs#tiers" className="text-white/50 hover:text-white text-xs md:text-sm transition-colors">
+                  Pricing
+                </Link>
+              </li>
+              <li>
+                <a href="mailto:api@flock.app" className="text-white/50 hover:text-white text-xs md:text-sm transition-colors">
+                  Get Access
+                </a>
               </li>
             </ul>
           </div>

@@ -534,7 +534,7 @@ export default function DashboardPage() {
                     {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
                       const page = totalPages <= 5 ? i + 1 : currentPage <= 3 ? i + 1 : currentPage >= totalPages - 2 ? totalPages - 4 + i : currentPage - 2 + i;
                       return (
-                          <button
+                        <button
                           key={page}
                           onClick={() => setCurrentPage(page)}
                           className={`w-8 h-8 rounded-lg text-xs font-medium transition-all cursor-pointer ${
@@ -615,13 +615,13 @@ export default function DashboardPage() {
                     {/* Mini bar chart */}
                     <div className="mt-6 flex items-end gap-1 h-16">
                     {analytics.cities.slice(0, 8).map((city) => (
-                      <div 
-                        key={city.name}
-                        className="flex-1 bg-[var(--color-accent)] rounded-t opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
-                        style={{ height: `${Math.max(8, (city.count / (analytics.cities[0]?.count || 1)) * 100)}%` }}
-                        title={`${city.name}: ${city.count}`}
-                      />
-                    ))}
+                        <div 
+                          key={city.name}
+                          className="flex-1 bg-[var(--color-accent)] rounded-t opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+                          style={{ height: `${Math.max(8, (city.count / (analytics.cities[0]?.count || 1)) * 100)}%` }}
+                          title={`${city.name}: ${city.count}`}
+                        />
+                      ))}
                     </div>
                   </div>
                 </div>

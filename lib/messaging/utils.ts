@@ -25,6 +25,7 @@ export async function getOrCreateConversation(otherUserId: string): Promise<stri
 
 /**
  * Get all conversations for the current user with user details
+ * Optimized to avoid N+1 queries - uses batch fetching
  */
 export async function getConversations(): Promise<ConversationWithUser[]> {
   const supabase = createClient();
@@ -32,72 +33,89 @@ export async function getConversations(): Promise<ConversationWithUser[]> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return [];
   
-  // Get conversations
+  // Get conversations with a single query
   const { data: conversations, error: convError } = await supabase
     .from('conversations')
     .select('*')
     .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`)
     .order('last_message_at', { ascending: false });
   
-  if (convError || !conversations) {
-    console.error('Error fetching conversations:', convError);
+  if (convError || !conversations || conversations.length === 0) {
+    if (convError) console.error('Error fetching conversations:', convError);
     return [];
   }
   
-  // Fetch other user details and last messages
-  const conversationsWithDetails = await Promise.all(
-    conversations.map(async (conv) => {
-      const otherUserId = conv.user1_id === user.id ? conv.user2_id : conv.user1_id;
-      
-      // Get other user details
-      const { data: otherUser } = await supabase
-        .from('users')
-        .select(`
-          id,
-          full_name,
-          email,
-          grad_year,
-          city,
-          state,
-          employer,
-          job_title,
-          institutions:institution_id (
-            name,
-            domain
-          )
-        `)
-        .eq('id', otherUserId)
-        .single();
-      
-      // Get last message
-      const { data: lastMessage } = await supabase
-        .from('messages')
-        .select('*')
-        .eq('conversation_id', conv.id)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
-      
-      // Get unread count
-      const { count: unreadCount } = await supabase
-        .from('messages')
-        .select('*', { count: 'exact', head: true })
-        .eq('conversation_id', conv.id)
-        .eq('is_read', false)
-        .neq('sender_id', user.id);
-      
-      return {
-        id: conv.id,
-        other_user: otherUser as ConversationWithUser['other_user'],
-        last_message: lastMessage as Message | null,
-        unread_count: unreadCount || 0,
-        last_message_at: conv.last_message_at,
-        created_at: conv.created_at,
-      };
-    })
+  // Extract all other user IDs and conversation IDs in one pass
+  const otherUserIds = conversations.map(conv => 
+    conv.user1_id === user.id ? conv.user2_id : conv.user1_id
   );
+  const conversationIds = conversations.map(conv => conv.id);
   
-  return conversationsWithDetails;
+  // Batch fetch all other users in ONE query
+  const { data: otherUsers } = await supabase
+    .from('users')
+    .select(`
+      id,
+      full_name,
+      email,
+      grad_year,
+      city,
+      state,
+      employer,
+      job_title,
+      institutions:institution_id (
+        name,
+        domain
+      )
+    `)
+    .in('id', otherUserIds);
+  
+  // Create lookup map for O(1) access
+  const userMap = new Map((otherUsers || []).map(u => [u.id, u]));
+  
+  // Batch fetch last messages for all conversations
+  // Using a raw query approach to get latest message per conversation efficiently
+  const { data: lastMessages } = await supabase
+    .from('messages')
+    .select('*')
+    .in('conversation_id', conversationIds)
+    .order('created_at', { ascending: false });
+  
+  // Group messages by conversation and take first (latest) for each
+  const lastMessageMap = new Map<string, Message>();
+  (lastMessages || []).forEach(msg => {
+    if (!lastMessageMap.has(msg.conversation_id)) {
+      lastMessageMap.set(msg.conversation_id, msg as Message);
+    }
+  });
+  
+  // Batch fetch unread counts - get all unread messages and count per conversation
+  const { data: unreadMessages } = await supabase
+    .from('messages')
+    .select('conversation_id')
+    .in('conversation_id', conversationIds)
+    .eq('is_read', false)
+    .neq('sender_id', user.id);
+  
+  // Count unread per conversation
+  const unreadCountMap = new Map<string, number>();
+  (unreadMessages || []).forEach(msg => {
+    unreadCountMap.set(msg.conversation_id, (unreadCountMap.get(msg.conversation_id) || 0) + 1);
+  });
+  
+  // Assemble final result (no async needed - all data fetched)
+  return conversations.map(conv => {
+    const otherUserId = conv.user1_id === user.id ? conv.user2_id : conv.user1_id;
+    
+    return {
+      id: conv.id,
+      other_user: userMap.get(otherUserId) as ConversationWithUser['other_user'],
+      last_message: lastMessageMap.get(conv.id) || null,
+      unread_count: unreadCountMap.get(conv.id) || 0,
+      last_message_at: conv.last_message_at,
+      created_at: conv.created_at,
+    };
+  });
 }
 
 /**

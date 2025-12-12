@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, Lock, Users, Check } from 'lucide-react'
+import { ArrowRight, Lock, Users, Check, Code, Building, BarChart3 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import InteractiveStarfield from '@/components/InteractiveStarfield'
 import { Footer } from '@/components/Footer'
@@ -182,6 +182,87 @@ export default function Home() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* API Section - For Institutions */}
+      <section className="relative z-10 max-w-6xl mx-auto px-6 pb-20 md:pb-28">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          {/* Left - Content */}
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[var(--color-accent)]/20 bg-[var(--color-accent)]/5 mb-6">
+              <Code className="w-3.5 h-3.5 text-[var(--color-accent)]" />
+              <span className="text-xs text-[var(--color-accent)] font-medium">Flock API</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Alumni data for
+              <span className="block text-[var(--color-accent)]">institutions</span>
+            </h2>
+            <p className="text-white/50 mb-6 leading-relaxed">
+              Access aggregated, anonymized alumni outcomes data via our REST API. 
+              Build career outcome dashboards, track employment trends, and measure graduate success.
+            </p>
+            <ul className="space-y-3 mb-8">
+              {[
+                { icon: BarChart3, text: 'Location & employment analytics' },
+                { icon: Building, text: 'Top employers & grad school data' },
+                { icon: Lock, text: 'Privacy-first with k-anonymity' },
+              ].map((item, idx) => (
+                <li key={idx} className="flex items-center gap-3 text-sm text-white/60">
+                  <div className="w-8 h-8 rounded-lg bg-[var(--color-accent)]/10 flex items-center justify-center shrink-0">
+                    <item.icon className="w-4 h-4 text-[var(--color-accent)]" />
+                  </div>
+                  {item.text}
+                </li>
+              ))}
+            </ul>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Link
+                href="/api/docs"
+                className="inline-flex items-center justify-center gap-2 glass-button px-6 py-3 rounded-lg text-sm font-semibold"
+              >
+                View API Docs
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <a
+                href="mailto:api@flock.app"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg text-sm font-medium text-white/60 hover:text-white border border-white/[0.06] hover:bg-white/[0.03] transition-all"
+              >
+                Contact Sales
+              </a>
+            </div>
+          </div>
+
+          {/* Right - Code Preview */}
+          <div className="glass-card rounded-2xl overflow-hidden border border-white/10">
+            <div className="flex items-center gap-2 px-4 py-3 bg-black/30 border-b border-white/[0.06]">
+              <div className="flex gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-red-500/60" />
+                <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
+                <div className="w-3 h-3 rounded-full bg-green-500/60" />
+              </div>
+              <span className="text-xs text-white/30 ml-2 font-mono">GET /v1/institutions/:id/locations</span>
+            </div>
+            <pre className="p-4 text-xs md:text-sm font-mono text-white/70 overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "institution": {
+      "name": "Boston College",
+      "total_alumni": 2450
+    },
+    "distribution": [
+      { "location": "New York, NY", 
+        "count": 342, "percentage": 14.0 },
+      { "location": "Boston, MA", 
+        "count": 298, "percentage": 12.2 },
+      { "location": "San Francisco, CA", 
+        "count": 186, "percentage": 7.6 }
+    ]
+  }
+}`}
+            </pre>
           </div>
         </div>
       </section>

@@ -307,86 +307,86 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect, hideContro
 
       {/* Tooltips - rendered outside MapGL but inside container for proper bounds */}
       {hoverInfo && !selectedState && !hideControls && (
-        <div
+          <div
           className="absolute px-3 py-2 rounded-lg pointer-events-none z-50 bg-black/90 backdrop-blur-sm border border-white/10"
           style={{ left: containerWidth ? Math.min(hoverInfo.x + 12, containerWidth - 150) : hoverInfo.x + 12, top: hoverInfo.y - 10 }}
-        >
-          <div className="font-medium text-white text-sm">{hoverInfo.name}</div>
-          <div className="text-white/60 text-xs">{hoverInfo.value} {hoverInfo.value === 1 ? 'person' : 'people'}</div>
-        </div>
-      )}
+          >
+            <div className="font-medium text-white text-sm">{hoverInfo.name}</div>
+            <div className="text-white/60 text-xs">{hoverInfo.value} {hoverInfo.value === 1 ? 'person' : 'people'}</div>
+          </div>
+        )}
       {hoveredCity && !hideControls && (
-        <div
+          <div
           className="absolute px-3 py-2 rounded-lg z-50 pointer-events-none bg-black/90 backdrop-blur-sm border border-white/10"
           style={{ left: containerWidth ? Math.min(hoveredCity.x + 12, containerWidth - 150) : hoveredCity.x + 12, top: hoveredCity.y - 10 }}
-        >
-          <div className="font-medium text-white text-sm">{hoveredCity.city}</div>
-          <div className="text-white/60 text-xs">{hoveredCity.value} people</div>
-        </div>
-      )}
+          >
+            <div className="font-medium text-white text-sm">{hoveredCity.city}</div>
+            <div className="text-white/60 text-xs">{hoveredCity.value} people</div>
+          </div>
+        )}
 
       {/* Legend */}
       {!hideControls && (
         <div className="absolute top-3 left-3 md:top-4 md:left-4 bg-black/80 backdrop-blur-md rounded-xl p-3 md:p-4 z-10 max-w-[140px] md:max-w-[220px] border border-white/10">
-          <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center gap-2 mb-3">
             <div className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-[var(--color-accent)]/20 flex items-center justify-center shrink-0">
               <MapPin className="w-3.5 h-3.5 md:w-4 md:h-4 text-[var(--color-accent)]" />
-            </div>
+          </div>
             <div className="min-w-0">
               <div className="text-[10px] md:text-sm font-semibold text-white leading-tight truncate">
-                {selectedState || (selectedCountry && selectedCountry !== 'United States' ? selectedCountry : selectedCountry === 'United States' ? 'USA' : 'World')}
-              </div>
+              {selectedState || (selectedCountry && selectedCountry !== 'United States' ? selectedCountry : selectedCountry === 'United States' ? 'USA' : 'World')}
+            </div>
               <div className="text-[9px] md:text-xs text-white/50 truncate">
-                {selectedState || (selectedCountry && selectedCountry !== 'United States') ? 'Cities' : 'Alumni by region'}
-              </div>
+              {selectedState || (selectedCountry && selectedCountry !== 'United States') ? 'Cities' : 'Alumni by region'}
             </div>
           </div>
+        </div>
           <div className="hidden md:block">
-            {showSkeleton ? (
-              <div className="space-y-2">
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded bg-white/10 animate-pulse" />
-                    <div className="h-3 w-12 bg-white/10 rounded animate-pulse" />
-                  </div>
-                ))}
+        {showSkeleton ? (
+          <div className="space-y-2">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded bg-white/10 animate-pulse" />
+                <div className="h-3 w-12 bg-white/10 rounded animate-pulse" />
               </div>
-            ) : (
-              <Legend colorScale={colorScale} />
-            )}
+            ))}
           </div>
+        ) : (
+          <Legend colorScale={colorScale} />
+        )}
+      </div>
         </div>
       )}
 
       {/* Controls */}
       {!hideControls && (
-        <div className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-10">
-          <button
-            onClick={() => setViewState((s) => ({ ...s, zoom: Math.min(8, s.zoom * 1.2) }))}
+      <div className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-10">
+        <button
+          onClick={() => setViewState((s) => ({ ...s, zoom: Math.min(8, s.zoom * 1.2) }))}
             className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-lg bg-black/80 backdrop-blur-sm border border-white/10 text-white/70 hover:text-white hover:bg-black/90 transition-all cursor-pointer"
-            title="Zoom In"
-          >
-            <Plus className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => setViewState((s) => ({ ...s, zoom: Math.max(1, s.zoom / 1.2) }))}
+          title="Zoom In"
+        >
+          <Plus className="w-4 h-4" />
+        </button>
+        <button
+          onClick={() => setViewState((s) => ({ ...s, zoom: Math.max(1, s.zoom / 1.2) }))}
             className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-lg bg-black/80 backdrop-blur-sm border border-white/10 text-white/70 hover:text-white hover:bg-black/90 transition-all cursor-pointer"
-            title="Zoom Out"
-          >
-            <Minus className="w-4 h-4" />
-          </button>
-        </div>
+          title="Zoom Out"
+        >
+          <Minus className="w-4 h-4" />
+        </button>
+      </div>
       )}
 
       {/* Fullscreen */}
       {!hideControls && (
-        <button
-          onClick={toggleFullscreen}
+      <button
+        onClick={toggleFullscreen}
           className="absolute top-3 right-3 md:top-4 md:right-4 w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-lg bg-black/80 backdrop-blur-sm border border-white/10 text-white/70 hover:text-white hover:bg-black/90 transition-all z-10 cursor-pointer"
-          title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
-        >
-          {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-        </button>
+        title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
+      >
+        {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+      </button>
       )}
 
       {/* Back button */}

@@ -15,7 +15,7 @@ export default function InteractiveStarfield() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const mouseRef = useRef({ x: 0, y: 0 })
   const starsRef = useRef<Star[]>([])
-  const animationFrameRef = useRef<number>()
+  const animationFrameRef = useRef<number | undefined>(undefined)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -132,17 +132,19 @@ export default function InteractiveStarfield() {
       animationFrameRef.current = requestAnimationFrame(animate)
     }
 
-    window.addEventListener('mousemove', handleMouseMove)
-    window.addEventListener('resize', () => {
+    const handleResize = () => {
       setCanvasSize()
       createStars()
-    })
+    }
+
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('resize', handleResize)
 
     animate()
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove)
-      window.removeEventListener('resize', setCanvasSize)
+      window.removeEventListener('resize', handleResize)
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current)
       }

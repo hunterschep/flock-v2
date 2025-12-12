@@ -2,6 +2,43 @@ import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { ABBREV_TO_STATE_NAME } from '@/lib/constants/location';
 
+// ============================================
+// In-Memory Cache for Location Data
+// ============================================
+
+interface CacheEntry {
+  data: unknown;
+  expiresAt: number;
+}
+
+const locationCache = new Map<string, CacheEntry>();
+const CACHE_TTL_MS = 2 * 60 * 1000; // 2 minutes (location data updates less frequently)
+
+function getCached<T>(key: string): T | null {
+  const entry = locationCache.get(key);
+  if (!entry) return null;
+  
+  if (Date.now() > entry.expiresAt) {
+    locationCache.delete(key);
+    return null;
+  }
+  
+  return entry.data as T;
+}
+
+function setCache(key: string, data: unknown): void {
+  locationCache.set(key, {
+    data,
+    expiresAt: Date.now() + CACHE_TTL_MS,
+  });
+  
+  // Prevent memory bloat
+  if (locationCache.size > 200) {
+    const firstKey = locationCache.keys().next().value;
+    if (firstKey) locationCache.delete(firstKey);
+  }
+}
+
 // Haversine formula to calculate distance between two lat/lng points in meters
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371000; // Earth's radius in meters
@@ -24,6 +61,19 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const searchParams = request.nextUrl.searchParams;
+    const stateAbbrev = searchParams.get('state');
+    const country = searchParams.get('country');
+
+    // Check cache first (key includes user context for personalized data)
+    const cacheKey = `loc:${user.id}:${stateAbbrev || ''}:${country || ''}`;
+    const cached = getCached<{ locations: unknown; coordinates: unknown }>(cacheKey);
+    if (cached) {
+      return NextResponse.json(cached, {
+        headers: { 'X-Cache': 'HIT', 'Cache-Control': 'private, max-age=120' }
+      });
+    }
+
     // Get current user's data
     const { data: currentUser } = await supabase
       .from('users')
@@ -34,10 +84,6 @@ export async function GET(request: NextRequest) {
     if (!currentUser) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
-
-    const searchParams = request.nextUrl.searchParams;
-    const stateAbbrev = searchParams.get('state');
-    const country = searchParams.get('country');
 
     // If country parameter is provided (non-US), return city-level data for that country
     if (country && country !== 'United States') {
@@ -98,9 +144,10 @@ export async function GET(request: NextRequest) {
         }
       });
 
-      return NextResponse.json({
-        locations: locationData,
-        coordinates,
+      const result = { locations: locationData, coordinates };
+      setCache(cacheKey, result);
+      return NextResponse.json(result, {
+        headers: { 'X-Cache': 'MISS', 'Cache-Control': 'private, max-age=120' }
       });
     }
 
@@ -164,9 +211,10 @@ export async function GET(request: NextRequest) {
         }
       });
 
-      return NextResponse.json({
-        locations: locationData,
-        coordinates,
+      const result = { locations: locationData, coordinates };
+      setCache(cacheKey, result);
+      return NextResponse.json(result, {
+        headers: { 'X-Cache': 'MISS', 'Cache-Control': 'private, max-age=120' }
       });
     }
 
@@ -204,9 +252,10 @@ export async function GET(request: NextRequest) {
         }
       });
 
-      return NextResponse.json({ 
-        locations: locationData,
-        coordinates: {} // Empty coordinates for state-level view
+      const result = { locations: locationData, coordinates: {} };
+      setCache(cacheKey, result);
+      return NextResponse.json(result, {
+        headers: { 'X-Cache': 'MISS', 'Cache-Control': 'private, max-age=120' }
       });
     }
 
@@ -248,9 +297,10 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    return NextResponse.json({ 
-      locations: locationData,
-      coordinates: {} // Empty coordinates for country-level view
+    const result = { locations: locationData, coordinates: {} };
+    setCache(cacheKey, result);
+    return NextResponse.json(result, {
+      headers: { 'X-Cache': 'MISS', 'Cache-Control': 'private, max-age=120' }
     });
   } catch (error) {
     console.error('Error in /api/locations:', error);

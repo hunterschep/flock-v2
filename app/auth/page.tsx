@@ -612,7 +612,7 @@ export default function AuthPage() {
             
             {/* Form container with min-height to prevent layout shifts */}
             <div className="min-h-[280px]">
-              {renderForm()}
+            {renderForm()}
             </div>
           </div>
 

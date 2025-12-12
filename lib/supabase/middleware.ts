@@ -35,8 +35,8 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Protected routes
-  const protectedPaths = ['/dashboard', '/profile', '/onboarding']
+  // Protected routes - these require authentication
+  const protectedPaths = ['/dashboard', '/profile', '/onboarding', '/messages']
   const isProtectedRoute = protectedPaths.some(path => 
     request.nextUrl.pathname.startsWith(path)
   )
@@ -48,16 +48,17 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Redirect to onboarding if user hasn't completed it
-  if (user && !request.nextUrl.pathname.startsWith('/onboarding')) {
-    // Check if user has completed onboarding (we'll check this in the database)
+  // Only check onboarding for protected routes that aren't already the onboarding page
+  // This avoids unnecessary DB calls on public pages like /, /privacy, /terms, /api/*
+  if (user && isProtectedRoute && !request.nextUrl.pathname.startsWith('/onboarding')) {
+    // Check if user has completed onboarding
     const { data: profile } = await supabase
       .from('users')
       .select('onboarding_completed')
       .eq('id', user.id)
       .single()
 
-    if (profile && !profile.onboarding_completed && !request.nextUrl.pathname.startsWith('/onboarding')) {
+    if (profile && !profile.onboarding_completed) {
       const url = request.nextUrl.clone()
       url.pathname = '/onboarding'
       return NextResponse.redirect(url)
