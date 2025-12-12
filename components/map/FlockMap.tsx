@@ -269,15 +269,16 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect, hideContro
           </Source>
         )}
 
-        {/* City bubbles */}
+        {/* City cluster markers */}
         {(selectedState || (selectedCountry && selectedCountry !== 'United States')) &&
           locationData &&
           Object.entries(locationData).map(([city, value]) => {
             const coords = cityCoordinates[city];
             if (!coords) return null;
-            const normalizedValue = Math.sqrt(value) / Math.sqrt(maxValue);
-            const bubbleSize = Math.min(50, 18 + normalizedValue * 36);
             const isHovered = hoveredCity?.city === city;
+            // Size based on count: min 36px, max 56px
+            const baseSize = Math.min(56, Math.max(36, 28 + Math.sqrt(value) * 6));
+            const size = isHovered ? baseSize * 1.1 : baseSize;
 
             return (
               <Marker key={city} longitude={coords[0]} latitude={coords[1]}>
@@ -286,19 +287,59 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect, hideContro
                   onMouseEnter={(e) => setHoveredCity({ city, value, x: e.clientX, y: e.clientY })}
                   onMouseMove={(e) => setHoveredCity({ city, value, x: e.clientX, y: e.clientY })}
                   onMouseLeave={() => setHoveredCity(null)}
-                  className="transition-all duration-200 cursor-pointer"
+                  className="cursor-pointer group"
                   style={{
-                    width: `${bubbleSize}px`,
-                    height: `${bubbleSize}px`,
-                    backgroundColor: colorScale(value),
-                    borderRadius: '50%',
-                    opacity: isHovered ? 1 : 0.8,
-                    border: isHovered ? '2px solid rgba(255,255,255,0.8)' : '1px solid rgba(255,255,255,0.3)',
-                    transform: `translate(-50%, -50%) scale(${isHovered ? 1.15 : 1})`,
+                    transform: 'translate(-50%, -50%)',
                     zIndex: isHovered ? 200 : 100,
-                    boxShadow: isHovered ? '0 0 20px rgba(249, 112, 102, 0.5)' : '0 2px 8px rgba(0,0,0,0.3)',
                   }}
-                />
+                >
+                  {/* Outer ring (pulse on hover) */}
+                  <div 
+                    className={`absolute inset-0 rounded-full transition-all duration-300 ${isHovered ? 'animate-ping' : ''}`}
+                    style={{
+                      width: size,
+                      height: size,
+                      backgroundColor: 'rgba(249, 112, 102, 0.2)',
+                      animationDuration: '1.5s',
+                    }}
+                  />
+                  {/* Main marker */}
+                  <div
+                    className="relative flex items-center justify-center transition-all duration-200"
+                    style={{
+                      width: size,
+                      height: size,
+                      background: isHovered 
+                        ? 'linear-gradient(135deg, #F97066 0%, #FB7185 100%)' 
+                        : 'linear-gradient(135deg, rgba(249, 112, 102, 0.9) 0%, rgba(251, 113, 133, 0.9) 100%)',
+                      borderRadius: '50%',
+                      border: isHovered ? '2px solid rgba(255,255,255,0.9)' : '2px solid rgba(255,255,255,0.4)',
+                      boxShadow: isHovered 
+                        ? '0 4px 20px rgba(249, 112, 102, 0.5), 0 0 0 4px rgba(249, 112, 102, 0.2)' 
+                        : '0 2px 8px rgba(0,0,0,0.3), 0 0 0 2px rgba(249, 112, 102, 0.1)',
+                    }}
+                  >
+                    {/* Count */}
+                    <span 
+                      className="font-bold text-white drop-shadow-sm"
+                      style={{ 
+                        fontSize: value >= 100 ? '11px' : value >= 10 ? '13px' : '14px',
+                        letterSpacing: '-0.02em',
+                      }}
+                    >
+                      {value}
+                    </span>
+                  </div>
+                  {/* City name label (shows on hover) */}
+                  {isHovered && (
+                    <div 
+                      className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-1 rounded-md bg-black/90 text-white text-xs font-medium border border-white/10 shadow-lg"
+                      style={{ top: size + 8 }}
+                    >
+                      {city}
+                    </div>
+                  )}
+                </div>
               </Marker>
             );
           })}

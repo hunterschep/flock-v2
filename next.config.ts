@@ -9,46 +9,45 @@ const nextConfig: NextConfig = {
   
   // Security headers
   async headers() {
-    return [
+    const securityHeaders = [
       {
-        // Apply to all routes
-        source: '/:path*',
-        headers: [
-          {
-            key: 'X-DNS-Prefetch-Control',
-            value: 'on'
-          },
-          {
-            key: 'X-Frame-Options',
-            value: 'SAMEORIGIN'
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff'
-          },
-          {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block'
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin'
-          },
-          {
-            key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=(self)'
-          },
-        ],
+        key: 'X-DNS-Prefetch-Control',
+        value: 'on'
       },
       {
-        // Strict transport security for production
+        key: 'X-Frame-Options',
+        value: 'SAMEORIGIN'
+      },
+      {
+        key: 'X-Content-Type-Options',
+        value: 'nosniff'
+      },
+      {
+        key: 'X-XSS-Protection',
+        value: '1; mode=block'
+      },
+      {
+        key: 'Referrer-Policy',
+        value: 'strict-origin-when-cross-origin'
+      },
+      {
+        key: 'Permissions-Policy',
+        value: 'camera=(), microphone=(), geolocation=(self)'
+      },
+    ];
+    
+    // Add HSTS in production only
+    if (process.env.NODE_ENV === 'production') {
+      securityHeaders.push({
+        key: 'Strict-Transport-Security',
+        value: 'max-age=63072000; includeSubDomains; preload'
+      });
+    }
+    
+    return [
+      {
         source: '/:path*',
-        headers: process.env.NODE_ENV === 'production' ? [
-          {
-            key: 'Strict-Transport-Security',
-            value: 'max-age=63072000; includeSubDomains; preload'
-          },
-        ] : [],
+        headers: securityHeaders,
       },
     ];
   },

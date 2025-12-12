@@ -43,6 +43,7 @@ interface UserProfile {
   linkedin_url: string | null;
   twitter_url: string | null;
   personal_website: string | null;
+  instagram_url: string | null;
   institutions: {
     name: string;
     domain: string;
@@ -427,92 +428,115 @@ export default function DashboardPage() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                 {paginatedUsers.map((person) => {
                   const statusStyle = getStatusStyle(person.status);
                   
                   return (
-                    <div key={person.id} className="glass-card rounded-xl p-4 hover:bg-white/[0.04] transition-all">
-                      {/* Header */}
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="w-10 h-10 rounded-lg bg-[var(--color-accent)]/10 flex items-center justify-center">
-                          <span className="text-sm font-semibold text-[var(--color-accent)]">
-                            {person.full_name.charAt(0).toUpperCase()}
-                          </span>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-medium text-white text-sm truncate">{person.full_name}</h3>
-                          <p className="text-xs text-white/40 truncate">
-                            {person.institutions?.name} &apos;{String(person.grad_year).slice(-2)}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Status */}
-                      <div className="mb-3 min-h-[40px]">
-                        {statusStyle && (
-                          <div className="flex items-start gap-2">
-                            <statusStyle.icon className={`w-3.5 h-3.5 ${statusStyle.color} mt-0.5`} />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs text-white/70 font-medium truncate">
-                                {person.status === 'grad_school' 
-                                  ? `${person.degree || ''} ${person.program || 'Graduate Student'}`
-                                  : person.job_title || 'Working'
-                                }
-                              </p>
-                              {((person.status === 'employed' || person.status === 'internship') && person.show_employer !== false && person.employer) && (
-                                <p className="text-xs text-white/40 truncate">{person.employer}</p>
-                              )}
-                              {(person.status === 'grad_school' && person.show_school !== false && person.grad_school) && (
-                                <p className="text-xs text-white/40 truncate">{person.grad_school}</p>
-                              )}
-                              {person.status === 'looking' && (
-                                <p className="text-xs text-white/40">Seeking opportunities</p>
+                    <div 
+                      key={person.id} 
+                      className="group relative bg-white/[0.02] hover:bg-white/[0.04] border border-white/[0.06] hover:border-white/[0.12] rounded-2xl transition-all duration-200 overflow-hidden"
+                    >
+                      {/* Status accent bar */}
+                      {statusStyle && (
+                        <div className={`absolute top-0 left-0 right-0 h-0.5 ${statusStyle.bg.replace('/10', '/40')}`} />
+                      )}
+                      
+                      <div className="p-4">
+                        {/* Header with avatar and actions */}
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center gap-3 min-w-0 flex-1">
+                            {/* Avatar */}
+                            <div className="relative shrink-0">
+                              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[var(--color-accent)]/20 to-[var(--color-accent)]/5 flex items-center justify-center ring-1 ring-white/[0.08]">
+                                <span className="text-base font-semibold text-[var(--color-accent)]">
+                                  {person.full_name.charAt(0).toUpperCase()}
+                                </span>
+                              </div>
+                              {/* Online indicator or status dot */}
+                              {statusStyle && (
+                                <div className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full ${statusStyle.bg} border-2 border-[var(--color-bg)] flex items-center justify-center`}>
+                                  <statusStyle.icon className={`w-2 h-2 ${statusStyle.color}`} />
+                                </div>
                               )}
                             </div>
+                            
+                            {/* Name & school */}
+                            <div className="min-w-0 flex-1">
+                              <h3 className="font-semibold text-white text-sm truncate leading-tight">{person.full_name}</h3>
+                              <p className="text-xs text-white/40 truncate mt-0.5">
+                                {person.institutions?.name} &apos;{String(person.grad_year).slice(-2)}
+                              </p>
+                            </div>
+                          </div>
+                          
+                          {/* Quick actions - compact */}
+                          <div className="flex items-center gap-1 shrink-0 ml-2">
+                            <button
+                              onClick={() => handleSendMessage(person.id)}
+                              className="p-2 rounded-lg text-white/40 hover:text-[var(--color-accent)] hover:bg-[var(--color-accent)]/10 transition-all"
+                              title="Send message"
+                            >
+                              <MessageCircle className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Status & role info */}
+                        {statusStyle && (
+                          <div className={`${statusStyle.bg} ${statusStyle.border} border rounded-lg px-3 py-2 mb-3`}>
+                            <p className="text-xs font-medium text-white truncate">
+                              {person.status === 'grad_school' 
+                                ? `${person.degree || ''} ${person.program || 'Graduate Student'}`.trim()
+                                : person.status === 'looking'
+                                ? 'Open to opportunities'
+                                : person.job_title || (person.status === 'internship' ? 'Intern' : 'Working')
+                              }
+                            </p>
+                            {((person.status === 'employed' || person.status === 'internship') && person.show_employer !== false && person.employer) && (
+                              <p className="text-xs text-white/50 truncate mt-0.5">{person.employer}</p>
+                            )}
+                            {(person.status === 'grad_school' && person.show_school !== false && person.grad_school) && (
+                              <p className="text-xs text-white/50 truncate mt-0.5">{person.grad_school}</p>
+                            )}
                           </div>
                         )}
-                      </div>
 
-                      {/* Tags */}
-                      <div className="flex items-center gap-2 mb-3 flex-wrap">
-                        {person.city && person.state && (
-                          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-white/[0.03] text-xs text-white/50 border border-white/[0.06]">
-                            <MapPin className="w-3 h-3" />
-                            {person.city}
-                          </span>
-                        )}
-                        {person.looking_for_roommate && (
-                          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[var(--color-accent)]/10 text-xs text-[var(--color-accent)] border border-[var(--color-accent)]/20">
-                            <HomeIcon className="w-3 h-3" />
-                            Roommate
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Actions */}
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleSendMessage(person.id)}
-                          className="flex-1 glass-button px-3 py-2 text-xs font-medium rounded-lg flex items-center justify-center gap-1.5"
-                        >
-                          <MessageCircle className="w-3.5 h-3.5" />
-                          Message
-                        </button>
-                        {(person.twitter_url || person.personal_website) && (
-                          <div className="flex gap-1">
+                        {/* Footer: location & tags */}
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            {person.city && person.state && (
+                              <span className="inline-flex items-center gap-1 text-xs text-white/40 truncate">
+                                <MapPin className="w-3 h-3 shrink-0" />
+                                <span className="truncate">{person.city}, {person.state}</span>
+                              </span>
+                            )}
+                          </div>
+                          
+                          <div className="flex items-center gap-1 shrink-0">
+                            {person.looking_for_roommate && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--color-accent)]/10 text-[10px] font-medium text-[var(--color-accent)]">
+                                <HomeIcon className="w-2.5 h-2.5" />
+                                Roommate
+                              </span>
+                            )}
+                            {person.linkedin_url && (
+                              <a href={person.linkedin_url} target="_blank" rel="noopener noreferrer" className="p-1.5 rounded-md text-white/30 hover:text-blue-400 transition-colors">
+                                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                              </a>
+                            )}
                             {person.twitter_url && (
-                              <a href={person.twitter_url} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-white/[0.03] border border-white/[0.06] text-white/40 hover:text-white hover:bg-white/[0.05] transition-all">
+                              <a href={person.twitter_url} target="_blank" rel="noopener noreferrer" className="p-1.5 rounded-md text-white/30 hover:text-sky-400 transition-colors">
                                 <Twitter className="w-3.5 h-3.5" />
                               </a>
                             )}
                             {person.personal_website && (
-                              <a href={person.personal_website} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-white/[0.03] border border-white/[0.06] text-white/40 hover:text-white hover:bg-white/[0.05] transition-all">
+                              <a href={person.personal_website} target="_blank" rel="noopener noreferrer" className="p-1.5 rounded-md text-white/30 hover:text-white transition-colors">
                                 <Globe className="w-3.5 h-3.5" />
                               </a>
                             )}
                           </div>
-                        )}
+                        </div>
                       </div>
                     </div>
                   );

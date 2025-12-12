@@ -50,34 +50,34 @@ export async function getConversations(): Promise<ConversationWithUser[]> {
     conv.user1_id === user.id ? conv.user2_id : conv.user1_id
   );
   const conversationIds = conversations.map(conv => conv.id);
-  
+      
   // Batch fetch all other users in ONE query
   const { data: otherUsers } = await supabase
-    .from('users')
-    .select(`
-      id,
-      full_name,
-      email,
-      grad_year,
-      city,
-      state,
-      employer,
-      job_title,
-      institutions:institution_id (
-        name,
-        domain
-      )
-    `)
+        .from('users')
+        .select(`
+          id,
+          full_name,
+          email,
+          grad_year,
+          city,
+          state,
+          employer,
+          job_title,
+          institutions:institution_id (
+            name,
+            domain
+          )
+        `)
     .in('id', otherUserIds);
   
   // Create lookup map for O(1) access
   const userMap = new Map((otherUsers || []).map(u => [u.id, u]));
-  
+      
   // Batch fetch last messages for all conversations
   // Using a raw query approach to get latest message per conversation efficiently
   const { data: lastMessages } = await supabase
-    .from('messages')
-    .select('*')
+        .from('messages')
+        .select('*')
     .in('conversation_id', conversationIds)
     .order('created_at', { ascending: false });
   
@@ -88,14 +88,14 @@ export async function getConversations(): Promise<ConversationWithUser[]> {
       lastMessageMap.set(msg.conversation_id, msg as Message);
     }
   });
-  
+      
   // Batch fetch unread counts - get all unread messages and count per conversation
   const { data: unreadMessages } = await supabase
-    .from('messages')
+        .from('messages')
     .select('conversation_id')
     .in('conversation_id', conversationIds)
-    .eq('is_read', false)
-    .neq('sender_id', user.id);
+        .eq('is_read', false)
+        .neq('sender_id', user.id);
   
   // Count unread per conversation
   const unreadCountMap = new Map<string, number>();
@@ -106,15 +106,15 @@ export async function getConversations(): Promise<ConversationWithUser[]> {
   // Assemble final result (no async needed - all data fetched)
   return conversations.map(conv => {
     const otherUserId = conv.user1_id === user.id ? conv.user2_id : conv.user1_id;
-    
-    return {
-      id: conv.id,
+      
+      return {
+        id: conv.id,
       other_user: userMap.get(otherUserId) as ConversationWithUser['other_user'],
       last_message: lastMessageMap.get(conv.id) || null,
       unread_count: unreadCountMap.get(conv.id) || 0,
-      last_message_at: conv.last_message_at,
-      created_at: conv.created_at,
-    };
+        last_message_at: conv.last_message_at,
+        created_at: conv.created_at,
+      };
   });
 }
 
