@@ -18,7 +18,7 @@ async function isAdmin(request: NextRequest): Promise<boolean> {
 
 // GET - List all API keys
 export async function GET(_request: NextRequest) {
-  if (!await isAdmin(request)) {
+  if (!await isAdmin(_request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
