@@ -20,7 +20,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
     default: "Flock - Connect with Alumni",
     template: "%s | Flock"
@@ -39,7 +42,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://flock.app",
+    url: siteUrl,
     siteName: "Flock",
     title: "Flock - Connect with Alumni",
     description: "Connect with grads from your university and discover who's in your city. Build meaningful connections with alumni in your network.",
@@ -57,7 +60,6 @@ export const metadata: Metadata = {
     title: "Flock - Connect with Alumni",
     description: "Connect with grads from your university and discover who's in your city.",
     images: ["/og-image.png"],
-    creator: "@flockapp",
   },
   robots: {
     index: true,
@@ -69,9 +71,6 @@ export const metadata: Metadata = {
       "max-image-preview": "large",
       "max-snippet": -1,
     },
-  },
-  verification: {
-    google: "your-google-verification-code",
   },
 };
 

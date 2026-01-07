@@ -48,9 +48,11 @@ export function logApiUsage(params: UsageLogParams): void {
     p_ip_address: params.ipAddress || null,
     p_user_agent: params.userAgent || null,
     p_billable_units: params.billableUnits || 1,
-  }).catch(error => {
-    // Log error but don't throw - usage logging should never break the API
-    console.error('Failed to log API usage:', error);
+  }).then(({ error }) => {
+    if (error) {
+      // Log error but don't throw - usage logging should never break the API
+      console.error('Failed to log API usage:', error);
+    }
   });
 }
 

@@ -1,14 +1,14 @@
-import { Metadata } from 'next';
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Shield, Database, Eye, Lock, Share2, Globe, Server, UserCheck, Bell, Mail } from 'lucide-react';
 import { Footer } from '@/components/Footer';
-
-export const metadata: Metadata = {
-  title: 'Privacy Policy',
-  description: 'Flock Privacy Policy - Learn how we collect, use, protect, and share your personal information.',
-};
+import { ContactModal } from '@/components/ContactForm';
 
 export default function PrivacyPage() {
+  const [contactOpen, setContactOpen] = useState(false);
+  
   return (
     <div className="min-h-screen bg-[var(--color-bg)] flex flex-col">
       {/* Header */}
@@ -44,7 +44,7 @@ export default function PrivacyPage() {
           </div>
           <div className="mt-6 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
             <p className="text-sm text-white/60">
-              At Flock, we take your privacy seriously. This Privacy Policy explains how Flock, Inc. (&quot;Flock,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) collects, uses, discloses, and protects your personal information when you use our platform and services.
+              At Flock, we take your privacy seriously. This Privacy Policy explains how Flock (&quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) collects, uses, discloses, and protects your personal information when you use our platform and services.
             </p>
           </div>
         </div>
@@ -450,7 +450,7 @@ export default function PrivacyPage() {
               </div>
 
               <p className="mt-4">
-                <strong className="text-white">How to Exercise Your Rights:</strong> You can access and update most of your information directly through your account settings. For other requests, contact us at <a href="mailto:privacy@flock.app" className="text-[var(--color-accent)] hover:underline">privacy@flock.app</a>.
+                <strong className="text-white">How to Exercise Your Rights:</strong> You can access and update most of your information directly through your account settings. For other requests, <button onClick={() => setContactOpen(true)} className="text-[var(--color-accent)] hover:underline">contact us</button>.
               </p>
 
               <div className="mt-4 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
@@ -523,7 +523,7 @@ export default function PrivacyPage() {
                 Flock is not intended for users under the age of 18. We do not knowingly collect personal information from children. If we learn that we have collected personal information from a child under 18, we will take steps to delete that information as quickly as possible.
               </p>
               <p>
-                If you believe a child has provided us with personal information, please contact us at <a href="mailto:privacy@flock.app" className="text-[var(--color-accent)] hover:underline">privacy@flock.app</a>.
+                If you believe a child has provided us with personal information, please <button onClick={() => setContactOpen(true)} className="text-[var(--color-accent)] hover:underline">contact us</button>.
               </p>
             </div>
           </section>
@@ -554,16 +554,16 @@ export default function PrivacyPage() {
             <Mail className="w-12 h-12 text-emerald-400 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-white mb-3">Contact Us About Privacy</h3>
             <p className="text-white/60 mb-6 max-w-lg mx-auto">
-              If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact our Privacy Team.
+              If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices, please get in touch.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="mailto:privacy@flock.app"
+              <button
+                onClick={() => setContactOpen(true)}
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-500 text-white text-sm font-semibold hover:bg-emerald-600 transition-all"
               >
                 <Mail className="w-4 h-4" />
-                privacy@flock.app
-              </a>
+                Contact Us
+              </button>
               <Link
                 href="/terms"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white/[0.05] border border-white/[0.1] text-white/80 text-sm font-medium hover:bg-white/[0.08] transition-all"
@@ -572,13 +572,20 @@ export default function PrivacyPage() {
               </Link>
             </div>
             <p className="text-xs text-white/30 mt-6">
-              Flock, Inc. • Delaware, USA
+              Flock • Delaware, USA
             </p>
           </section>
         </div>
       </main>
       
       <Footer />
+      
+      <ContactModal 
+        isOpen={contactOpen}
+        onClose={() => setContactOpen(false)}
+        subject="Privacy Inquiry"
+        title="Privacy Inquiry"
+      />
     </div>
   );
 }

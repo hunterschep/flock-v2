@@ -4,10 +4,11 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, Lock, Users, Check, Code, Building, BarChart3 } from 'lucide-react'
+import { ArrowRight, Lock, Users, Check, Code, Building, BarChart3, MessageSquare } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import InteractiveStarfield from '@/components/InteractiveStarfield'
 import { Footer } from '@/components/Footer'
+import { ContactModal } from '@/components/ContactForm'
 
 const FlockMap = dynamic(() => import('@/components/map/FlockMap').then(mod => mod.FlockMap), { 
   ssr: false,
@@ -21,16 +22,19 @@ const FlockMap = dynamic(() => import('@/components/map/FlockMap').then(mod => m
 export default function Home() {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
+  const [contactOpen, setContactOpen] = useState(false)
 
   useEffect(() => {
-    const supabase = createClient()
-    supabase.auth.getUser().then(({ data }) => {
+    const checkUser = async () => {
+      const supabase = createClient()
+      const { data } = await supabase.auth.getUser()
       if (data.user) {
         router.push('/dashboard')
       } else {
         setLoading(false)
       }
-    })
+    }
+    checkUser()
   }, [router])
 
   if (loading) {
@@ -225,12 +229,13 @@ export default function Home() {
                 View API Docs
                 <ArrowRight className="w-4 h-4" />
               </Link>
-              <a
-                href="mailto:api@flock.app"
+              <button
+                onClick={() => setContactOpen(true)}
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg text-sm font-medium text-white/60 hover:text-white border border-white/[0.06] hover:bg-white/[0.03] transition-all"
               >
-                Contact Sales
-              </a>
+                <MessageSquare className="w-4 h-4" />
+                Request Access
+              </button>
             </div>
           </div>
 
@@ -288,6 +293,13 @@ export default function Home() {
       </section>
 
       <Footer />
+      
+      <ContactModal 
+        isOpen={contactOpen}
+        onClose={() => setContactOpen(false)}
+        subject="API Access Request"
+        title="Request API Access"
+      />
     </div>
   )
 }

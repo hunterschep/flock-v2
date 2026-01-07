@@ -136,9 +136,22 @@ npm install
 
 Create `.env.local`:
 
-```
+```bash
+# Required - Supabase
 NEXT_PUBLIC_SUPABASE_URL=https://<project>.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key>
+SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
+
+# Required for production
+NEXT_PUBLIC_SITE_URL=https://your-domain.com
+ALLOWED_ORIGINS=https://your-domain.com
+
+# Optional - Contact form email delivery
+RESEND_API_KEY=re_your-key
+CONTACT_EMAIL=your-email@gmail.com
+
+# Optional - Map tiles
+NEXT_PUBLIC_STADIA_MAPS_API_KEY=<stadia-key>
 ```
 
 ### Database Setup
@@ -173,9 +186,38 @@ Runs at `http://localhost:3000`.
 
 ## Deployment
 
-1. Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` on host
-2. Update Supabase Auth redirect URLs for production domain
-3. Run any pending SQL migrations
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for a detailed step-by-step guide.
+
+### Quick Deploy to Vercel
+
+1. Push your code to GitHub
+2. Go to [vercel.com/new](https://vercel.com/new) and import your repository
+3. Add these environment variables:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `NEXT_PUBLIC_SITE_URL` (your production URL)
+   - `ALLOWED_ORIGINS` (comma-separated allowed origins)
+4. Deploy
+
+### Supabase Configuration
+
+1. In Supabase Auth > URL Configuration, set your Site URL
+2. Add `https://your-domain.com/auth/callback` to redirect URLs
+3. Run any pending SQL migrations from `supabase/` folder
+
+### Admin Access
+
+Add your email to `ADMIN_EMAILS` in `/app/admin/layout.tsx` to access the admin panel at `/admin`.
+
+## API
+
+The Flock API provides aggregated, anonymized alumni data for institutions.
+
+- **Free tier**: 10 requests/minute, 100/day (max 50 results per query)
+- **Extended access**: Contact us for higher limits
+
+See `/api/docs` for full documentation.
 
 ## License
 

@@ -35,7 +35,5 @@ export const GET = withApiAuth(async ({ context }) => {
   requiredScope: 'read:aggregates',
 });
 
-export const OPTIONS = withApiAuth(async () => {
-  return new Response(null, { status: 204 });
-});
+// OPTIONS is handled by the middleware - no separate handler needed
 

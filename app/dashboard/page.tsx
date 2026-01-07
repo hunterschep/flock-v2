@@ -23,6 +23,7 @@ import {
 import { UnreadBadge } from '@/components/messaging/UnreadBadge';
 import { getOrCreateConversation } from '@/lib/messaging/utils';
 import { Footer } from '@/components/Footer';
+import { CollegeLogo } from '@/components/CollegeLogo';
 
 interface UserProfile {
   id: string;
@@ -277,13 +278,22 @@ export default function DashboardPage() {
       {/* Header */}
       <header className="glass-header sticky top-0 z-20">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <h1 className="text-xl font-semibold text-white">Flock</h1>
-            {currentUser && (
-              <span className="text-sm text-white/50 hidden md:inline">
-                {currentUser.institutions?.name} &apos;{String(currentUser.grad_year).slice(-2)}
-              </span>
+          <div className="flex items-center gap-3">
+            {currentUser?.institutions?.domain && (
+              <CollegeLogo 
+                domain={currentUser.institutions.domain} 
+                size="md"
+                className="hidden sm:flex"
+              />
             )}
+            <div>
+              <h1 className="text-lg font-semibold text-white">Flock</h1>
+              {currentUser && (
+                <span className="text-xs text-white/50 hidden md:block">
+                  {currentUser.institutions?.name} &apos;{String(currentUser.grad_year).slice(-2)}
+                </span>
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <Link 
@@ -464,9 +474,18 @@ export default function DashboardPage() {
                             {/* Name & school */}
                             <div className="min-w-0 flex-1">
                               <h3 className="font-semibold text-white text-sm truncate leading-tight">{person.full_name}</h3>
-                              <p className="text-xs text-white/40 truncate mt-0.5">
-                                {person.institutions?.name} &apos;{String(person.grad_year).slice(-2)}
-                              </p>
+                              <div className="flex items-center gap-1.5 mt-0.5">
+                                {person.institutions?.domain && (
+                                  <CollegeLogo 
+                                    domain={person.institutions.domain} 
+                                    size="sm"
+                                    className="!w-4 !h-4 !rounded"
+                                  />
+                                )}
+                                <p className="text-xs text-white/40 truncate">
+                                  &apos;{String(person.grad_year).slice(-2)}
+                                </p>
+                              </div>
                             </div>
                           </div>
                           

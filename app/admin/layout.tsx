@@ -14,10 +14,10 @@ import {
   LogOut
 } from 'lucide-react';
 
-// Admin email whitelist (in production, use a proper role system)
+// Admin email whitelist - add your admin emails here
 const ADMIN_EMAILS = [
   'scheppat@bc.edu',
-  // Add your admin emails here
+  'hunterschep@gmail.com',
 ];
 
 export default function AdminLayout({
@@ -45,9 +45,7 @@ export default function AdminLayout({
       }
 
       // Check if user is admin
-      // In production, use a proper role column in the users table
-      const isAdminUser = ADMIN_EMAILS.includes(user.email || '') || 
-                          user.email?.endsWith('@flock.app');
+      const isAdminUser = ADMIN_EMAILS.includes(user.email || '');
       
       if (!isAdminUser) {
         router.push('/dashboard');

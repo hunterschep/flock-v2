@@ -7,7 +7,9 @@ import {
   Copy,
   Trash2,
   Key,
-  Check
+  Check,
+  X,
+  Loader2
 } from 'lucide-react';
 
 interface ApiKey {
@@ -28,9 +30,16 @@ export default function ApiKeysPage() {
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [_showCreateModal, _setShowCreateModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const [newKeyValue, setNewKeyValue] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [deleting, setDeleting] = useState<string | null>(null);
+  
+  // Form state
+  const [customerName, setCustomerName] = useState('');
+  const [keyName, setKeyName] = useState('');
+  const [environment, setEnvironment] = useState<'production' | 'development' | 'test'>('production');
 
   useEffect(() => {
     loadApiKeys();
@@ -38,52 +47,68 @@ export default function ApiKeysPage() {
 
   const loadApiKeys = async () => {
     try {
-      // Mock data - replace with actual API call
-      setApiKeys([
-        {
-          id: '1',
-          customer_id: '1',
-          customer_name: 'Boston College',
-          name: 'Production Key',
-          key_prefix: 'flock_sk_prod_abc',
-          scopes: ['read:aggregates', 'read:trends'],
-          environment: 'production',
-          is_active: true,
-          last_used_at: '2024-12-10T08:30:00Z',
-          usage_count: 15420,
-          created_at: '2024-01-15T00:00:00Z',
-        },
-        {
-          id: '2',
-          customer_id: '1',
-          customer_name: 'Boston College',
-          name: 'Development Key',
-          key_prefix: 'flock_sk_dev_xyz',
-          scopes: ['read:aggregates'],
-          environment: 'development',
-          is_active: true,
-          last_used_at: '2024-12-09T14:20:00Z',
-          usage_count: 342,
-          created_at: '2024-02-01T00:00:00Z',
-        },
-        {
-          id: '3',
-          customer_id: '2',
-          customer_name: 'Stanford Analytics',
-          name: 'Main Key',
-          key_prefix: 'flock_sk_prod_def',
-          scopes: ['read:aggregates', 'read:trends', 'read:compare', 'read:all'],
-          environment: 'production',
-          is_active: true,
-          last_used_at: '2024-12-10T09:15:00Z',
-          usage_count: 89210,
-          created_at: '2024-02-20T00:00:00Z',
-        },
-      ]);
+      const response = await fetch('/api/admin/api-keys');
+      if (response.ok) {
+        const data = await response.json();
+        setApiKeys(data.keys || []);
+      }
     } catch (error) {
       console.error('Error loading API keys:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const createApiKey = async () => {
+    if (!customerName || !keyName) return;
+    
+    setCreating(true);
+    try {
+      const response = await fetch('/api/admin/api-keys', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customer_name: customerName,
+          key_name: keyName,
+          environment,
+          scopes: ['read:aggregates'],
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setNewKeyValue(data.key);
+        setShowCreateModal(false);
+        setCustomerName('');
+        setKeyName('');
+        setEnvironment('production');
+        loadApiKeys(); // Reload the list
+      }
+    } catch (error) {
+      console.error('Error creating API key:', error);
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const revokeApiKey = async (keyId: string) => {
+    if (!confirm('Are you sure you want to revoke this API key? This cannot be undone.')) {
+      return;
+    }
+    
+    setDeleting(keyId);
+    try {
+      const response = await fetch(`/api/admin/api-keys?id=${keyId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        loadApiKeys(); // Reload the list
+      }
+    } catch (error) {
+      console.error('Error revoking API key:', error);
+    } finally {
+      setDeleting(null);
     }
   };
 
@@ -115,7 +140,7 @@ export default function ApiKeysPage() {
         <div>
           <h1 className="text-2xl font-bold text-white mb-2">API Keys</h1>
           <p className="text-white/50 text-sm">
-            Manage API keys for all customers
+            Generate and manage API keys for customers
           </p>
         </div>
         <button
@@ -211,7 +236,7 @@ export default function ApiKeysPage() {
             ) : filteredKeys.length === 0 ? (
               <tr>
                 <td colSpan={7} className="px-6 py-12 text-center text-white/40 text-sm">
-                  No API keys found
+                  {apiKeys.length === 0 ? 'No API keys yet. Generate one to get started.' : 'No API keys found'}
                 </td>
               </tr>
             ) : (
@@ -273,12 +298,20 @@ export default function ApiKeysPage() {
                           <Copy className="w-4 h-4 text-white/40" />
                         )}
                       </button>
-                      <button
-                        className="p-2 rounded-lg hover:bg-red-500/10 transition-colors"
-                        title="Revoke key"
-                      >
-                        <Trash2 className="w-4 h-4 text-white/40 hover:text-red-400" />
-                      </button>
+                      {key.is_active && (
+                        <button
+                          onClick={() => revokeApiKey(key.id)}
+                          disabled={deleting === key.id}
+                          className="p-2 rounded-lg hover:bg-red-500/10 transition-colors disabled:opacity-50"
+                          title="Revoke key"
+                        >
+                          {deleting === key.id ? (
+                            <Loader2 className="w-4 h-4 text-white/40 animate-spin" />
+                          ) : (
+                            <Trash2 className="w-4 h-4 text-white/40 hover:text-red-400" />
+                          )}
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -287,7 +320,96 @@ export default function ApiKeysPage() {
           </tbody>
         </table>
       </div>
+
+      {/* Create Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => setShowCreateModal(false)}
+          />
+          <div className="relative w-full max-w-md glass-card rounded-2xl p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-white">Generate API Key</h2>
+              <button
+                onClick={() => setShowCreateModal(false)}
+                className="p-2 rounded-lg hover:bg-white/[0.05] transition-colors"
+              >
+                <X className="w-5 h-5 text-white/60" />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-white/70 mb-2">
+                  Customer / Organization Name
+                </label>
+                <input
+                  type="text"
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  className="glass-input w-full px-4 py-2.5 rounded-lg text-sm"
+                  placeholder="e.g., Boston College"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-white/70 mb-2">
+                  Key Name
+                </label>
+                <input
+                  type="text"
+                  value={keyName}
+                  onChange={(e) => setKeyName(e.target.value)}
+                  className="glass-input w-full px-4 py-2.5 rounded-lg text-sm"
+                  placeholder="e.g., Production Key"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-white/70 mb-2">
+                  Environment
+                </label>
+                <select
+                  value={environment}
+                  onChange={(e) => setEnvironment(e.target.value as 'production' | 'development' | 'test')}
+                  className="glass-input w-full px-4 py-2.5 rounded-lg text-sm"
+                >
+                  <option value="production">Production</option>
+                  <option value="development">Development</option>
+                  <option value="test">Test</option>
+                </select>
+              </div>
+              
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  onClick={() => setShowCreateModal(false)}
+                  className="px-4 py-2.5 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-white/[0.03] transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={createApiKey}
+                  disabled={!customerName || !keyName || creating}
+                  className="glass-button px-6 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 disabled:opacity-50"
+                >
+                  {creating ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Key className="w-4 h-4" />
+                      Generate Key
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-

@@ -1,14 +1,14 @@
-import { Metadata } from 'next';
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, FileText, Scale, Shield, AlertTriangle, Users, Globe, Ban, CreditCard } from 'lucide-react';
 import { Footer } from '@/components/Footer';
-
-export const metadata: Metadata = {
-  title: 'Terms of Service',
-  description: 'Flock Terms of Service - The legal agreement governing your use of the Flock platform.',
-};
+import { ContactModal } from '@/components/ContactForm';
 
 export default function TermsPage() {
+  const [contactOpen, setContactOpen] = useState(false);
+  
   return (
     <div className="min-h-screen bg-[var(--color-bg)] flex flex-col">
       {/* Header */}
@@ -44,7 +44,7 @@ export default function TermsPage() {
           </div>
           <div className="mt-6 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
             <p className="text-sm text-white/60">
-              These Terms of Service (&quot;Terms&quot;) constitute a legally binding agreement between you and Flock, Inc. (&quot;Flock,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) governing your access to and use of the Flock platform, including our website, mobile applications, and API services.
+              These Terms of Service (&quot;Terms&quot;) constitute a legally binding agreement between you and Flock (&quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) governing your access to and use of the Flock platform, including our website, mobile applications, and API services.
             </p>
           </div>
         </div>
@@ -136,7 +136,7 @@ export default function TermsPage() {
                 <strong className="text-white">3.2 Authentication.</strong> Flock uses passwordless authentication via magic links sent to your registered email address. You are responsible for maintaining the security of your email account. Any activities conducted through your Flock account are your responsibility.
               </p>
               <p>
-                <strong className="text-white">3.3 Unauthorized Access.</strong> You must immediately notify us at <a href="mailto:security@flock.app" className="text-[var(--color-accent)] hover:underline">security@flock.app</a> if you suspect any unauthorized access to or use of your account.
+                <strong className="text-white">3.3 Unauthorized Access.</strong> You must immediately <button onClick={() => setContactOpen(true)} className="text-[var(--color-accent)] hover:underline">notify us</button> if you suspect any unauthorized access to or use of your account.
               </p>
               <p>
                 <strong className="text-white">3.4 One Account Per Person.</strong> Each individual may maintain only one Flock account. Creating multiple accounts may result in termination of all associated accounts.
@@ -273,7 +273,7 @@ export default function TermsPage() {
                 <strong className="text-white">8.2 Premium Features.</strong> We may offer premium features or services for a fee. Any fees will be clearly disclosed before you purchase, and purchases are subject to additional terms provided at the time of purchase.
               </p>
               <p>
-                <strong className="text-white">8.3 API Pricing.</strong> Institutional API access is provided under separate commercial agreements with pricing based on tier, usage volume, and scope of access. Contact <a href="mailto:api@flock.app" className="text-[var(--color-accent)] hover:underline">api@flock.app</a> for details.
+                <strong className="text-white">8.3 API Pricing.</strong> Institutional API access is available for free with standard rate limits. For higher limits or custom features, <button onClick={() => setContactOpen(true)} className="text-[var(--color-accent)] hover:underline">contact us</button>.
               </p>
             </div>
           </section>
@@ -376,15 +376,15 @@ export default function TermsPage() {
           <section className="bg-gradient-to-br from-[var(--color-accent)]/10 to-transparent border border-[var(--color-accent)]/20 rounded-2xl p-8 text-center">
             <h3 className="text-xl font-semibold text-white mb-3">Questions About These Terms?</h3>
             <p className="text-white/60 mb-6 max-w-lg mx-auto">
-              If you have any questions about these Terms of Service, please don&apos;t hesitate to contact our legal team.
+              If you have any questions about these Terms of Service, please don&apos;t hesitate to reach out.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="mailto:legal@flock.app"
+              <button
+                onClick={() => setContactOpen(true)}
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[var(--color-accent)] text-white text-sm font-semibold hover:bg-[var(--color-accent)]/90 transition-all"
               >
-                Contact Legal Team
-              </a>
+                Contact Us
+              </button>
               <Link
                 href="/privacy"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white/[0.05] border border-white/[0.1] text-white/80 text-sm font-medium hover:bg-white/[0.08] transition-all"
@@ -397,6 +397,13 @@ export default function TermsPage() {
       </main>
       
       <Footer />
+      
+      <ContactModal 
+        isOpen={contactOpen}
+        onClose={() => setContactOpen(false)}
+        subject="Terms Inquiry"
+        title="Contact Us"
+      />
     </div>
   );
 }

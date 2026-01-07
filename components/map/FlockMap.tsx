@@ -112,8 +112,10 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect, hideContro
     return apiResponse as LocationData;
   }, [apiResponse]);
 
-  const [geoJson, setGeoJson] = React.useState<unknown>(null);
-  const [countriesGeoJson, setCountriesGeoJson] = React.useState<unknown>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [geoJson, setGeoJson] = React.useState<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [countriesGeoJson, setCountriesGeoJson] = React.useState<any>(null);
 
   React.useEffect(() => {
     fetch(stateGeoUrl).then((res) => res.json()).then((data) => setGeoJson(data));
@@ -138,10 +140,11 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect, hideContro
     return ['match', ['get', 'name'], ...pairs, 'rgba(255,255,255,0.03)'] as unknown as PropertyValueSpecification<string>;
   }, [locationData, selectedState, selectedCountry, viewLevel, colorScale]);
 
-  const handleCountryClick = (feature: { properties?: { name?: string }; geometry: { coordinates: [number, number] } }) => {
+  const handleCountryClick = (feature: { properties?: { name?: string }; geometry: { type: string; coordinates: unknown } }) => {
     const clickedCountry = feature.properties?.name;
     if (!clickedCountry) return;
-    const centroid = center(feature);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const centroid = center(feature as any);
     const [lon, lat] = centroid.geometry.coordinates;
 
     if (clickedCountry === 'United States of America') {
@@ -158,12 +161,13 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect, hideContro
     }
   };
 
-  const handleStateClick = (feature: { properties?: { name?: string }; geometry: { coordinates: [number, number] } }) => {
+  const handleStateClick = (feature: { properties?: { name?: string }; geometry: { type: string; coordinates: unknown } }) => {
     const clickedState = feature.properties?.name;
     if (!clickedState) return;
     const stateAbbrev = STATE_NAME_TO_ABBREV[clickedState];
     if (!stateAbbrev) return;
-    const centroid = center(feature);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const centroid = center(feature as any);
     const [lon, lat] = centroid.geometry.coordinates;
 
     setSelectedState(clickedState);
@@ -174,7 +178,8 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect, hideContro
   };
 
   const handleMouseMove = React.useCallback(
-    (event: { features?: Array<{ id?: number; properties?: { name?: string } }>; point: { x: number; y: number } }) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (event: any) => {
       const feature = event.features?.[0];
       if (feature && mapRef.current) {
         const name = feature.properties?.name || 'Unknown';
@@ -246,8 +251,10 @@ export const FlockMap: React.FC<FlockMapProps> = ({ onLocationSelect, hideContro
         onClick={(event) => {
           const feature = event.features?.[0];
           if (feature) {
-            if (viewLevel === 'world') handleCountryClick(feature);
-            else if (viewLevel === 'country' && !selectedState) handleStateClick(feature);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            if (viewLevel === 'world') handleCountryClick(feature as any);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            else if (viewLevel === 'country' && !selectedState) handleStateClick(feature as any);
           }
         }}
         onMouseMove={handleMouseMove}

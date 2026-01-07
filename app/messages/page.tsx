@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -18,7 +18,23 @@ import type { ConversationWithUser, MessageWithSender } from '@/lib/types/messag
 import { MessageCircle, ArrowLeft } from 'lucide-react';
 import { Footer } from '@/components/Footer';
 
+function MessagesPageLoading() {
+  return (
+    <div className="min-h-screen bg-[var(--color-bg)] flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-white/20 border-t-[var(--color-accent)] rounded-full animate-spin" />
+    </div>
+  );
+}
+
 export default function MessagesPage() {
+  return (
+    <Suspense fallback={<MessagesPageLoading />}>
+      <MessagesPageContent />
+    </Suspense>
+  );
+}
+
+function MessagesPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClient();
@@ -156,7 +172,11 @@ export default function MessagesPage() {
                 sender_id: currentUserId,
                 content: content.trim(),
                 created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
                 is_read: false,
+                read_at: null,
+                deleted_by_sender: false,
+                deleted_by_receiver: false,
               },
               last_message_at: new Date().toISOString(),
             }

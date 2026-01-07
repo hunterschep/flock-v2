@@ -46,10 +46,10 @@ export async function getConversations(): Promise<ConversationWithUser[]> {
   }
   
   // Extract all other user IDs and conversation IDs in one pass
-  const otherUserIds = conversations.map(conv => 
+  const otherUserIds = conversations.map((conv: { user1_id: string; user2_id: string }) => 
     conv.user1_id === user.id ? conv.user2_id : conv.user1_id
   );
-  const conversationIds = conversations.map(conv => conv.id);
+  const conversationIds = conversations.map((conv: { id: string }) => conv.id);
       
   // Batch fetch all other users in ONE query
   const { data: otherUsers } = await supabase
@@ -71,7 +71,8 @@ export async function getConversations(): Promise<ConversationWithUser[]> {
     .in('id', otherUserIds);
   
   // Create lookup map for O(1) access
-  const userMap = new Map((otherUsers || []).map(u => [u.id, u]));
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const userMap = new Map((otherUsers || []).map((u: any) => [u.id, u]));
       
   // Batch fetch last messages for all conversations
   // Using a raw query approach to get latest message per conversation efficiently
@@ -83,7 +84,8 @@ export async function getConversations(): Promise<ConversationWithUser[]> {
   
   // Group messages by conversation and take first (latest) for each
   const lastMessageMap = new Map<string, Message>();
-  (lastMessages || []).forEach(msg => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (lastMessages || []).forEach((msg: any) => {
     if (!lastMessageMap.has(msg.conversation_id)) {
       lastMessageMap.set(msg.conversation_id, msg as Message);
     }
@@ -99,12 +101,14 @@ export async function getConversations(): Promise<ConversationWithUser[]> {
   
   // Count unread per conversation
   const unreadCountMap = new Map<string, number>();
-  (unreadMessages || []).forEach(msg => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (unreadMessages || []).forEach((msg: any) => {
     unreadCountMap.set(msg.conversation_id, (unreadCountMap.get(msg.conversation_id) || 0) + 1);
   });
   
   // Assemble final result (no async needed - all data fetched)
-  return conversations.map(conv => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return conversations.map((conv: any) => {
     const otherUserId = conv.user1_id === user.id ? conv.user2_id : conv.user1_id;
       
       return {
@@ -234,8 +238,8 @@ export function subscribeToConversation(
         table: 'messages',
         filter: `conversation_id=eq.${conversationId}`,
       },
-      (payload) => {
-        onMessage(payload.new as Message);
+      (payload: { new: Record<string, unknown> }) => {
+        onMessage(payload.new as unknown as Message);
       }
     )
     .subscribe();

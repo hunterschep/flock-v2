@@ -170,19 +170,33 @@ export const errors = {
 
 /**
  * Allowed CORS origins
- * In production, this should be a strict whitelist
+ * Configure via ALLOWED_ORIGINS environment variable (comma-separated)
+ * Falls back to sensible defaults for development
  */
-const ALLOWED_ORIGINS = [
-  'https://flock.app',
-  'https://www.flock.app',
-  'https://api.flock.app',
-  // Add customer domains here or use a database lookup
-];
-
-// Development origins
-if (process.env.NODE_ENV === 'development') {
-  ALLOWED_ORIGINS.push('http://localhost:3000', 'http://127.0.0.1:3000');
+function getAllowedOrigins(): string[] {
+  const envOrigins = process.env.ALLOWED_ORIGINS;
+  if (envOrigins) {
+    return envOrigins.split(',').map(o => o.trim());
+  }
+  
+  // Default origins
+  const origins = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+  ];
+  
+  // Add production URL from Vercel if available
+  if (process.env.VERCEL_URL) {
+    origins.push(`https://${process.env.VERCEL_URL}`);
+  }
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    origins.push(process.env.NEXT_PUBLIC_SITE_URL);
+  }
+  
+  return origins;
 }
+
+const ALLOWED_ORIGINS = getAllowedOrigins();
 
 /**
  * CORS headers for API responses

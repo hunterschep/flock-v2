@@ -1,15 +1,49 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowLeft, ArrowRight, Mail, CheckCircle, XCircle, Eye, EyeOff, Lock, KeyRound } from 'lucide-react'
 import InteractiveStarfield from '@/components/InteractiveStarfield'
+import { CollegeLogo, getDomainFromEmail } from '@/components/CollegeLogo'
 
 type AuthMode = 'signin' | 'signup' | 'forgot' | 'reset' | 'verify'
 
+function AuthPageLoading() {
+  return (
+    <div className="min-h-screen bg-[var(--color-bg)] flex flex-col relative overflow-hidden">
+      <InteractiveStarfield />
+      <div className="flex-1 flex items-center justify-center py-8 md:py-12 px-4 md:px-6 relative z-10">
+        <div className="max-w-sm w-full">
+          <div className="glass-strong rounded-2xl p-6 md:p-8">
+            <div className="text-center mb-6 md:mb-8">
+              <div className="inline-flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-xl bg-[var(--color-accent)]/10 mb-4 md:mb-5">
+                <Lock className="w-6 h-6 text-[var(--color-accent)]" />
+              </div>
+              <h1 className="text-xl md:text-2xl font-bold text-white mb-2">
+                Loading...
+              </h1>
+            </div>
+            <div className="min-h-[280px] flex items-center justify-center">
+              <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function AuthPage() {
+  return (
+    <Suspense fallback={<AuthPageLoading />}>
+      <AuthPageContent />
+    </Suspense>
+  )
+}
+
+function AuthPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const supabase = createClient()
@@ -282,17 +316,28 @@ export default function AuthPage() {
               <label htmlFor="email" className="block text-sm font-medium text-white/70 mb-2">
                 University Email
               </label>
-              <input
-                id="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="glass-input w-full px-4 py-3 rounded-lg text-white placeholder-white/30 text-sm"
-                placeholder="name@university.edu"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={loading}
-              />
+              <div className="relative">
+                <input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  className="glass-input w-full px-4 py-3 pr-12 rounded-lg text-white placeholder-white/30 text-sm"
+                  placeholder="name@university.edu"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={loading}
+                />
+                {getDomainFromEmail(email)?.endsWith('.edu') && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <CollegeLogo 
+                      domain={getDomainFromEmail(email) || ''} 
+                      size="sm"
+                      className="!rounded"
+                    />
+                  </div>
+                )}
+              </div>
             </div>
 
             <div>
@@ -371,17 +416,28 @@ export default function AuthPage() {
               <label htmlFor="email" className="block text-sm font-medium text-white/70 mb-2">
                 University Email
               </label>
-              <input
-                id="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="glass-input w-full px-4 py-3 rounded-lg text-white placeholder-white/30 text-sm"
-                placeholder="name@university.edu"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={loading}
-              />
+              <div className="relative">
+                <input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  className="glass-input w-full px-4 py-3 pr-12 rounded-lg text-white placeholder-white/30 text-sm"
+                  placeholder="name@university.edu"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={loading}
+                />
+                {getDomainFromEmail(email)?.endsWith('.edu') && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <CollegeLogo 
+                      domain={getDomainFromEmail(email) || ''} 
+                      size="sm"
+                      className="!rounded"
+                    />
+                  </div>
+                )}
+              </div>
             </div>
 
             {message && <MessageBox message={message} />}
@@ -479,17 +535,28 @@ export default function AuthPage() {
               <label htmlFor="email" className="block text-sm font-medium text-white/70 mb-2">
                 University Email
               </label>
-              <input
-                id="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="glass-input w-full px-4 py-3 rounded-lg text-white placeholder-white/30 text-sm"
-                placeholder="name@university.edu"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={loading}
-              />
+              <div className="relative">
+                <input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  className="glass-input w-full px-4 py-3 pr-12 rounded-lg text-white placeholder-white/30 text-sm"
+                  placeholder="name@university.edu"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={loading}
+                />
+                {getDomainFromEmail(email)?.endsWith('.edu') && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <CollegeLogo 
+                      domain={getDomainFromEmail(email) || ''} 
+                      size="sm"
+                      className="!rounded"
+                    />
+                  </div>
+                )}
+              </div>
             </div>
 
             <div>

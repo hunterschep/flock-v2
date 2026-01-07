@@ -14,14 +14,16 @@ import {
   Copy,
   Check,
   Building,
-  DollarSign,
   Shield,
-  AlertCircle
+  AlertCircle,
+  MessageSquare
 } from 'lucide-react';
+import { ContactModal } from '@/components/ContactForm';
 
 export default function ApiDocsPage() {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('overview');
+  const [contactOpen, setContactOpen] = useState(false);
 
   const copyCode = async (code: string, id: string) => {
     await navigator.clipboard.writeText(code);
@@ -29,58 +31,12 @@ export default function ApiDocsPage() {
     setTimeout(() => setCopiedCode(null), 2000);
   };
 
-  const tiers = [
-    {
-      name: 'Starter',
-      price: '$299/mo',
-      description: 'Perfect for single-institution analytics',
-      features: [
-        '1 institution',
-        '60 requests/minute',
-        '10,000 requests/day',
-        '100,000 requests/month',
-        'read:aggregates scope',
-        'Email support',
-      ],
-      scopes: ['read:aggregates'],
-    },
-    {
-      name: 'Pro',
-      price: '$999/mo',
-      description: 'Multi-institution access with trends',
-      features: [
-        'Up to 5 institutions',
-        '300 requests/minute',
-        '100,000 requests/day',
-        '1,000,000 requests/month',
-        'read:aggregates + read:trends',
-        'Priority support',
-      ],
-      scopes: ['read:aggregates', 'read:trends'],
-      popular: true,
-    },
-    {
-      name: 'Enterprise',
-      price: 'Custom',
-      description: 'Unlimited access with full features',
-      features: [
-        'Unlimited institutions',
-        '1,000 requests/minute',
-        '1,000,000 requests/day',
-        'Unlimited monthly requests',
-        'All scopes included',
-        'Dedicated support + SLA',
-      ],
-      scopes: ['read:aggregates', 'read:trends', 'read:compare', 'read:flows', 'read:all'],
-    },
-  ];
-
   const scopes = [
-    { name: 'read:aggregates', description: 'Access location, employment, and grad school data', tiers: ['Starter', 'Pro', 'Enterprise'] },
-    { name: 'read:trends', description: 'Access historical trend data and time-series', tiers: ['Pro', 'Enterprise'] },
-    { name: 'read:compare', description: 'Compare data across multiple institutions', tiers: ['Enterprise'] },
-    { name: 'read:flows', description: 'Access migration flow data between locations', tiers: ['Enterprise'] },
-    { name: 'read:all', description: 'Full access to all current and future endpoints', tiers: ['Enterprise'] },
+    { name: 'read:aggregates', description: 'Access location, employment, and grad school data' },
+    { name: 'read:trends', description: 'Access historical trend data and time-series' },
+    { name: 'read:compare', description: 'Compare data across multiple institutions' },
+    { name: 'read:flows', description: 'Access migration flow data between locations' },
+    { name: 'read:all', description: 'Full access to all current and future endpoints' },
   ];
 
   const endpoints = [
@@ -194,18 +150,13 @@ export default function ApiDocsPage() {
         { name: 'end_date', type: 'string', default: 'today', description: 'ISO 8601 date (YYYY-MM-DD)' },
       ],
       response: `{
-  "customer": { "id": "uuid", "name": "Your Company", "tier": "pro" },
+  "customer": { "id": "uuid", "name": "Your Organization" },
   "period": { "start": "2024-11-10", "end": "2024-12-10" },
   "usage": {
     "total_requests": 45200,
     "successful_requests": 44850,
     "failed_requests": 350,
     "avg_response_time_ms": 142
-  },
-  "billing_period": {
-    "total_requests": 89000,
-    "monthly_limit": 1000000,
-    "remaining": 911000
   }
 }`,
     },
@@ -224,13 +175,13 @@ export default function ApiDocsPage() {
     { code: 'INVALID_PARAMETER', status: 400, description: 'Query parameter is invalid' },
   ];
 
-  const curlExample = `curl -X GET "https://api.flock.app/v1/institutions/:id/locations?granularity=city" \\
+  const curlExample = `curl -X GET "https://api.yoursite.com/v1/institutions/:id/locations?granularity=city" \\
   -H "Authorization: Bearer flock_sk_your_api_key_here"`;
 
   const navItems = [
     { id: 'overview', label: 'Overview', icon: Globe },
-    { id: 'tiers', label: 'Pricing & Tiers', icon: DollarSign },
-    { id: 'authentication', label: 'Authentication', icon: Key },
+    { id: 'access', label: 'Getting Access', icon: Key },
+    { id: 'authentication', label: 'Authentication', icon: Lock },
     { id: 'scopes', label: 'Scopes', icon: Shield },
     { id: 'endpoints', label: 'Endpoints', icon: Code },
     { id: 'rate-limits', label: 'Rate Limits', icon: Zap },
@@ -260,13 +211,13 @@ export default function ApiDocsPage() {
               </div>
             </div>
           </div>
-          <a 
-            href="mailto:api@flock.app"
+          <button
+            onClick={() => setContactOpen(true)}
             className="glass-button px-4 py-2 rounded-lg text-sm font-medium hidden sm:inline-flex items-center gap-2"
           >
-            Get API Access
+            Request API Access
             <ChevronRight className="w-4 h-4" />
-          </a>
+          </button>
         </div>
       </header>
 
@@ -306,7 +257,7 @@ export default function ApiDocsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div className="glass-card rounded-xl p-5">
                   <div className="text-sm font-medium text-white/70 mb-2">Base URL</div>
-                  <code className="text-[var(--color-accent)] font-mono text-sm">https://api.flock.app/v1</code>
+                  <code className="text-[var(--color-accent)] font-mono text-sm">https://api.yoursite.com/v1</code>
                 </div>
                 <div className="glass-card rounded-xl p-5">
                   <div className="text-sm font-medium text-white/70 mb-2">Response Format</div>
@@ -327,37 +278,68 @@ export default function ApiDocsPage() {
               </div>
             </section>
 
-            {/* Pricing & Tiers */}
-            <section id="tiers">
-              <h2 className="text-2xl font-bold text-white mb-4">Pricing & Tiers</h2>
+            {/* Getting Access */}
+            <section id="access">
+              <h2 className="text-2xl font-bold text-white mb-4">Getting Access</h2>
               <p className="text-white/60 mb-6">
-                Choose the plan that fits your needs. All tiers include the same data quality and privacy protections.
+                The Flock API is available for free with reasonable rate limits. Need higher limits or custom integrations? Get in touch.
               </p>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {tiers.map((tier) => (
-                  <div 
-                    key={tier.name} 
-                    className={`glass-card rounded-xl p-6 relative ${tier.popular ? 'border-[var(--color-accent)]/30' : ''}`}
-                  >
-                    {tier.popular && (
-                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-[var(--color-accent)] text-black text-xs font-medium">
-                        Most Popular
-                      </div>
-                    )}
-                    <h3 className="text-lg font-semibold text-white mb-1">{tier.name}</h3>
-                    <div className="text-2xl font-bold text-white mb-2">{tier.price}</div>
-                    <p className="text-sm text-white/50 mb-4">{tier.description}</p>
-                    <ul className="space-y-2">
-                      {tier.features.map((feature, idx) => (
-                        <li key={idx} className="text-sm text-white/60 flex items-start gap-2">
-                          <Check className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="glass-card rounded-xl p-6 border-emerald-500/20">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="px-2 py-0.5 rounded text-xs font-medium bg-emerald-500/10 text-emerald-400">FREE</span>
                   </div>
-                ))}
+                  <h3 className="text-lg font-semibold text-white mb-2">Standard Access</h3>
+                  <p className="text-sm text-white/50 mb-4">Perfect for getting started and exploring the API</p>
+                  <ul className="space-y-2 mb-6">
+                    {[
+                      '30 requests/minute',
+                      '1,000 requests/day',
+                      'read:aggregates scope',
+                      'Email support',
+                    ].map((feature, idx) => (
+                      <li key={idx} className="text-sm text-white/60 flex items-start gap-2">
+                        <Check className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    onClick={() => setContactOpen(true)}
+                    className="w-full glass-button px-4 py-2.5 rounded-lg text-sm font-medium"
+                  >
+                    Request Access
+                  </button>
+                </div>
+
+                <div className="glass-card rounded-xl p-6 border-[var(--color-accent)]/20">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="px-2 py-0.5 rounded text-xs font-medium bg-[var(--color-accent)]/10 text-[var(--color-accent)]">CUSTOM</span>
+                  </div>
+                  <h3 className="text-lg font-semibold text-white mb-2">Extended Access</h3>
+                  <p className="text-sm text-white/50 mb-4">For institutions needing higher limits or custom features</p>
+                  <ul className="space-y-2 mb-6">
+                    {[
+                      'Higher rate limits',
+                      'Additional scopes',
+                      'Multiple institutions',
+                      'Priority support',
+                    ].map((feature, idx) => (
+                      <li key={idx} className="text-sm text-white/60 flex items-start gap-2">
+                        <Check className="w-4 h-4 text-[var(--color-accent)] mt-0.5 shrink-0" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    onClick={() => setContactOpen(true)}
+                    className="w-full px-4 py-2.5 rounded-lg text-sm font-medium text-white/60 hover:text-white border border-white/[0.06] hover:bg-white/[0.03] transition-all flex items-center justify-center gap-2"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    Contact Us
+                  </button>
+                </div>
               </div>
             </section>
 
@@ -415,7 +397,6 @@ export default function ApiDocsPage() {
                     <tr className="border-b border-white/[0.06]">
                       <th className="text-left px-4 py-3 text-sm font-medium text-white/70">Scope</th>
                       <th className="text-left px-4 py-3 text-sm font-medium text-white/70">Description</th>
-                      <th className="text-left px-4 py-3 text-sm font-medium text-white/70">Tiers</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -425,15 +406,6 @@ export default function ApiDocsPage() {
                           <code className="text-sm text-[var(--color-accent)]">{scope.name}</code>
                         </td>
                         <td className="px-4 py-3 text-sm text-white/60">{scope.description}</td>
-                        <td className="px-4 py-3">
-                          <div className="flex flex-wrap gap-1">
-                            {scope.tiers.map((tier) => (
-                              <span key={tier} className="px-2 py-0.5 rounded text-xs bg-white/[0.05] text-white/60">
-                                {tier}
-                              </span>
-                            ))}
-                          </div>
-                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -491,37 +463,28 @@ export default function ApiDocsPage() {
             <section id="rate-limits">
               <h2 className="text-2xl font-bold text-white mb-4">Rate Limits</h2>
               <p className="text-white/60 mb-6">
-                Rate limits vary by tier. Exceeding limits returns a <code className="px-1.5 py-0.5 rounded bg-white/[0.05] text-white/80 text-sm">429 Too Many Requests</code> response.
+                Rate limits help ensure fair usage and API stability. Exceeding limits returns a <code className="px-1.5 py-0.5 rounded bg-white/[0.05] text-white/80 text-sm">429 Too Many Requests</code> response.
               </p>
               
               <div className="glass-card rounded-xl overflow-hidden mb-6">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-white/[0.06]">
-                      <th className="text-left px-4 py-3 text-sm font-medium text-white/70">Tier</th>
+                      <th className="text-left px-4 py-3 text-sm font-medium text-white/70">Access Level</th>
                       <th className="text-left px-4 py-3 text-sm font-medium text-white/70">Per Minute</th>
                       <th className="text-left px-4 py-3 text-sm font-medium text-white/70">Per Day</th>
-                      <th className="text-left px-4 py-3 text-sm font-medium text-white/70">Per Month</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr className="border-b border-white/[0.06]">
-                      <td className="px-4 py-3 text-sm text-white">Starter</td>
-                      <td className="px-4 py-3 text-sm text-white/60">60</td>
-                      <td className="px-4 py-3 text-sm text-white/60">10,000</td>
-                      <td className="px-4 py-3 text-sm text-white/60">100,000</td>
-                    </tr>
-                    <tr className="border-b border-white/[0.06]">
-                      <td className="px-4 py-3 text-sm text-white">Pro</td>
-                      <td className="px-4 py-3 text-sm text-white/60">300</td>
-                      <td className="px-4 py-3 text-sm text-white/60">100,000</td>
-                      <td className="px-4 py-3 text-sm text-white/60">1,000,000</td>
+                      <td className="px-4 py-3 text-sm text-white">Free Tier</td>
+                      <td className="px-4 py-3 text-sm text-white/60">10</td>
+                      <td className="px-4 py-3 text-sm text-white/60">100</td>
                     </tr>
                     <tr>
-                      <td className="px-4 py-3 text-sm text-white">Enterprise</td>
-                      <td className="px-4 py-3 text-sm text-white/60">1,000</td>
-                      <td className="px-4 py-3 text-sm text-white/60">1,000,000</td>
-                      <td className="px-4 py-3 text-sm text-white/60">Unlimited</td>
+                      <td className="px-4 py-3 text-sm text-white">Extended (Contact Us)</td>
+                      <td className="px-4 py-3 text-sm text-white/60">Custom</td>
+                      <td className="px-4 py-3 text-sm text-white/60">Custom</td>
                     </tr>
                   </tbody>
                 </table>
@@ -533,8 +496,8 @@ export default function ApiDocsPage() {
                   Every response includes headers to help you track your usage:
                 </p>
                 <div className="space-y-1 text-sm font-mono">
-                  <div className="text-white/50"><span className="text-[var(--color-accent)]">X-RateLimit-Limit-Minute:</span> 300</div>
-                  <div className="text-white/50"><span className="text-[var(--color-accent)]">X-RateLimit-Remaining-Minute:</span> 298</div>
+                  <div className="text-white/50"><span className="text-[var(--color-accent)]">X-RateLimit-Limit-Minute:</span> 10</div>
+                  <div className="text-white/50"><span className="text-[var(--color-accent)]">X-RateLimit-Remaining-Minute:</span> 8</div>
                   <div className="text-white/50"><span className="text-[var(--color-accent)]">X-RateLimit-Reset-Minute:</span> 2024-12-10T12:01:00Z</div>
                 </div>
               </div>
@@ -641,16 +604,16 @@ export default function ApiDocsPage() {
             <section className="glass-card rounded-xl p-8 text-center">
               <h3 className="text-xl font-bold text-white mb-3">Ready to integrate?</h3>
               <p className="text-white/50 mb-6 max-w-md mx-auto">
-                Contact our team to get API access for your organization. We&apos;ll help you choose the right tier.
+                Get started with free API access. Need higher limits or custom features? Just reach out.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <a
-                  href="mailto:api@flock.app"
+                <button
+                  onClick={() => setContactOpen(true)}
                   className="inline-flex items-center justify-center gap-2 glass-button px-6 py-3 rounded-lg text-sm font-medium"
                 >
                   Request Access
                   <ChevronRight className="w-4 h-4" />
-                </a>
+                </button>
                 <Link
                   href="/"
                   className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg text-sm font-medium text-white/60 hover:text-white border border-white/[0.06] hover:bg-white/[0.03] transition-all"
@@ -662,6 +625,13 @@ export default function ApiDocsPage() {
           </main>
         </div>
       </div>
+
+      <ContactModal 
+        isOpen={contactOpen}
+        onClose={() => setContactOpen(false)}
+        subject="API Access Request"
+        title="Request API Access"
+      />
     </div>
   );
 }

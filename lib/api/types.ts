@@ -229,27 +229,31 @@ export const TIER_LIMITS: Record<ApiTier, {
   rateLimitPerDay: number;
   monthlyRequestLimit: number;
   maxInstitutions: number;
+  maxResultsPerQuery: number;
   scopes: string[];
 }> = {
   starter: {
-    rateLimitPerMinute: 60,
-    rateLimitPerDay: 10000,
-    monthlyRequestLimit: 100000,
+    rateLimitPerMinute: 10,
+    rateLimitPerDay: 100,
+    monthlyRequestLimit: 1000,
     maxInstitutions: 1,
+    maxResultsPerQuery: 50, // Limit data aggregations
     scopes: ['read:aggregates'],
   },
   pro: {
-    rateLimitPerMinute: 300,
-    rateLimitPerDay: 100000,
-    monthlyRequestLimit: 1000000,
+    rateLimitPerMinute: 60,
+    rateLimitPerDay: 5000,
+    monthlyRequestLimit: 50000,
     maxInstitutions: 5,
+    maxResultsPerQuery: 500,
     scopes: ['read:aggregates', 'read:trends'],
   },
   enterprise: {
-    rateLimitPerMinute: 1000,
-    rateLimitPerDay: 1000000,
+    rateLimitPerMinute: 500,
+    rateLimitPerDay: 100000,
     monthlyRequestLimit: -1, // Unlimited
     maxInstitutions: -1, // All
+    maxResultsPerQuery: -1, // Unlimited
     scopes: ['read:aggregates', 'read:trends', 'read:compare', 'read:flows', 'read:all'],
   },
 };
