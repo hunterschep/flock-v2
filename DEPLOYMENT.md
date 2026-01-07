@@ -181,7 +181,6 @@ const ADMIN_EMAILS = [
 | `RESEND_API_KEY` | None | Contact form email delivery |
 | `CONTACT_EMAIL` | `hunterschep@gmail.com` | Contact form recipient |
 | `ALLOWED_ORIGINS` | Auto-detected | CORS configuration |
-| `NEXT_PUBLIC_STADIA_MAPS_API_KEY` | None | Map tiles (optional) |
 
 ---
 

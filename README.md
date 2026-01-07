@@ -149,9 +149,6 @@ ALLOWED_ORIGINS=https://your-domain.com
 # Optional - Contact form email delivery
 RESEND_API_KEY=re_your-key
 CONTACT_EMAIL=your-email@gmail.com
-
-# Optional - Map tiles
-NEXT_PUBLIC_STADIA_MAPS_API_KEY=<stadia-key>
 ```
 
 ### Database Setup

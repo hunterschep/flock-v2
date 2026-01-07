@@ -261,7 +261,7 @@ export default function PrivacyPage() {
                   { name: 'Supabase', purpose: 'Database, authentication, real-time messaging' },
                   { name: 'Vercel', purpose: 'Website hosting and deployment' },
                   { name: 'OpenStreetMap', purpose: 'Location geocoding (city search only)' },
-                  { name: 'Stadia Maps', purpose: 'Map tile rendering' },
+                  { name: 'Carto', purpose: 'Map tile rendering' },
                 ].map((provider) => (
                   <div key={provider.name} className="p-3 rounded-lg bg-white/[0.02] border border-white/[0.06]">
                     <p className="text-white text-xs font-medium">{provider.name}</p>

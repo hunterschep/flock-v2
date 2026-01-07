@@ -32,8 +32,9 @@ function isLocationResponse(data: unknown): data is LocationResponse {
 const stateGeoUrl = 'https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json';
 const countriesGeoUrl = 'https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json';
 
-// Dark map style from Stadia Maps
-const MAP_STYLE = 'https://tiles.stadiamaps.com/styles/alidade_smooth_dark.json';
+// Dark map style - Carto Dark Matter (free, no API key required)
+// Falls back to a basic dark style if Carto is unavailable
+const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
 
 // Coral accent color scheme
 const colorSchemes: { [key: number]: string[] } = {
