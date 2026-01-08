@@ -137,10 +137,11 @@ function AuthPageContent() {
           .eq('id', user.id)
           .single()
 
+        // Use hard redirect to ensure session is properly established
         if (!userData || !userData.onboarding_completed) {
-          router.push('/onboarding')
+          window.location.href = '/onboarding'
         } else {
-          router.push('/dashboard')
+          window.location.href = '/dashboard'
         }
       }
     } catch (error: unknown) {

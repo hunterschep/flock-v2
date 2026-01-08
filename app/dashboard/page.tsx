@@ -229,8 +229,26 @@ export default function DashboardPage() {
     const gradSchoolCounts: Record<string, number> = {};
     const cityCounts: Record<string, number> = {};
     const companyCounts: Record<string, number> = {};
+    const statusCounts: Record<string, number> = { employed: 0, internship: 0, grad_school: 0, looking: 0 };
+    const gradYearCounts: Record<number, number> = {};
+    const stateCounts: Record<string, number> = {};
 
     sameInstitutionUsers.forEach(user => {
+      // Status counts
+      if (user.status && statusCounts[user.status] !== undefined) {
+        statusCounts[user.status]++;
+      }
+      
+      // Grad year counts
+      if (user.grad_year) {
+        gradYearCounts[user.grad_year] = (gradYearCounts[user.grad_year] || 0) + 1;
+      }
+      
+      // State counts
+      if (user.state) {
+        stateCounts[user.state] = (stateCounts[user.state] || 0) + 1;
+      }
+
       if (user.status === 'grad_school' && user.grad_school) {
         gradSchoolCounts[user.grad_school] = (gradSchoolCounts[user.grad_school] || 0) + 1;
       }
@@ -243,11 +261,28 @@ export default function DashboardPage() {
       }
     });
 
+    // Find users looking for roommates
+    const roommateCount = sameInstitutionUsers.filter(u => u.looking_for_roommate).length;
+    
+    // Calculate status percentages
+    const totalWithStatus = Object.values(statusCounts).reduce((a, b) => a + b, 0);
+    const statusPercentages = {
+      employed: totalWithStatus > 0 ? Math.round((statusCounts.employed / totalWithStatus) * 100) : 0,
+      internship: totalWithStatus > 0 ? Math.round((statusCounts.internship / totalWithStatus) * 100) : 0,
+      grad_school: totalWithStatus > 0 ? Math.round((statusCounts.grad_school / totalWithStatus) * 100) : 0,
+      looking: totalWithStatus > 0 ? Math.round((statusCounts.looking / totalWithStatus) * 100) : 0,
+    };
+
     return {
       gradSchools: Object.entries(gradSchoolCounts).sort(([,a], [,b]) => b - a).map(([name, count]) => ({ name, count })),
       cities: Object.entries(cityCounts).sort(([,a], [,b]) => b - a).map(([name, count]) => ({ name, count })),
       companies: Object.entries(companyCounts).sort(([,a], [,b]) => b - a).map(([name, count]) => ({ name, count })),
+      states: Object.entries(stateCounts).sort(([,a], [,b]) => b - a).map(([name, count]) => ({ name, count })),
+      gradYears: Object.entries(gradYearCounts).sort(([a], [b]) => parseInt(a) - parseInt(b)).map(([year, count]) => ({ year: parseInt(year), count })),
+      statusCounts,
+      statusPercentages,
       totalClassmates: sameInstitutionUsers.length,
+      roommateCount,
     };
   }, [users, currentUser]);
 
@@ -610,7 +645,7 @@ export default function DashboardPage() {
 
           {/* Network Analytics */}
           {analytics.totalClassmates > 0 && (
-            <div className="mt-20 mb-8">
+            <div className="mt-16 mb-8">
               {/* Section header */}
               <div className="flex items-center justify-between mb-8">
                 <div>
@@ -624,113 +659,168 @@ export default function DashboardPage() {
                 <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg bg-white/[0.02] border border-white/[0.06]">
                   <Users className="w-4 h-4 text-[var(--color-accent)]" />
                   <span className="text-sm text-white font-medium">{analytics.totalClassmates}</span>
-                  <span className="text-sm text-white/40">alumni</span>
+                  <span className="text-sm text-white/40">in network</span>
                 </div>
               </div>
 
-              {/* Bento grid */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-8">
-                {/* Main stat */}
-                <div className="col-span-2 row-span-2 glass-card rounded-xl p-6 md:p-8 relative overflow-hidden group">
-                  <div className="absolute top-0 right-0 w-48 h-48 bg-[var(--color-accent)]/5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-110 transition-transform duration-500" />
-                  <div className="relative">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="w-12 h-12 rounded-xl bg-[var(--color-accent)]/10 flex items-center justify-center">
-                        <MapPin className="w-6 h-6 text-[var(--color-accent)]" />
-                      </div>
-                      <div>
-                        <div className="text-sm font-medium text-white/60">Top Destination</div>
-                        <div className="text-lg md:text-xl font-bold text-white">{analytics.cities[0]?.name || 'N/A'}</div>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <div className="text-3xl md:text-4xl font-bold text-white">{analytics.cities.length}</div>
-                        <div className="text-xs text-white/40">Cities worldwide</div>
-                      </div>
-                      <div>
-                        <div className="text-3xl md:text-4xl font-bold text-white">{analytics.cities[0]?.count || 0}</div>
-                        <div className="text-xs text-white/40">In top city</div>
-                      </div>
-                    </div>
-
-                    {/* Mini bar chart */}
-                    <div className="mt-6 flex items-end gap-1 h-16">
-                    {analytics.cities.slice(0, 8).map((city) => (
-                        <div 
-                          key={city.name}
-                          className="flex-1 bg-[var(--color-accent)] rounded-t opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
-                          style={{ height: `${Math.max(8, (city.count / (analytics.cities[0]?.count || 1)) * 100)}%` }}
-                          title={`${city.name}: ${city.count}`}
-                        />
-                      ))}
-                    </div>
-                  </div>
+              {/* Status breakdown - the main visual */}
+              <div className="glass-card rounded-2xl p-6 mb-6">
+                <h3 className="text-sm font-medium text-white/60 mb-6">What alumni are doing</h3>
+                
+                {/* Status bar visualization */}
+                <div className="flex h-3 rounded-full overflow-hidden mb-6 bg-white/[0.03]">
+                  {analytics.statusPercentages.employed > 0 && (
+                    <div 
+                      className="bg-emerald-500 transition-all duration-500" 
+                      style={{ width: `${analytics.statusPercentages.employed}%` }}
+                      title={`Employed: ${analytics.statusPercentages.employed}%`}
+                    />
+                  )}
+                  {analytics.statusPercentages.internship > 0 && (
+                    <div 
+                      className="bg-blue-500 transition-all duration-500" 
+                      style={{ width: `${analytics.statusPercentages.internship}%` }}
+                      title={`Internship: ${analytics.statusPercentages.internship}%`}
+                    />
+                  )}
+                  {analytics.statusPercentages.grad_school > 0 && (
+                    <div 
+                      className="bg-violet-500 transition-all duration-500" 
+                      style={{ width: `${analytics.statusPercentages.grad_school}%` }}
+                      title={`Grad School: ${analytics.statusPercentages.grad_school}%`}
+                    />
+                  )}
+                  {analytics.statusPercentages.looking > 0 && (
+                    <div 
+                      className="bg-amber-500 transition-all duration-500" 
+                      style={{ width: `${analytics.statusPercentages.looking}%` }}
+                      title={`Looking: ${analytics.statusPercentages.looking}%`}
+                    />
+                  )}
                 </div>
 
-                {/* Companies stat */}
-                <div className="glass-card rounded-xl p-5 flex flex-col justify-between">
-                  <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-auto">
-                    <Briefcase className="w-5 h-5 text-emerald-400" />
+                {/* Status legend */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                    <div>
+                      <p className="text-sm font-medium text-white">{analytics.statusCounts.employed}</p>
+                      <p className="text-xs text-white/40">Employed</p>
+                    </div>
                   </div>
-                  <div>
-                    <div className="text-2xl md:text-3xl font-bold text-white">{analytics.companies.length}</div>
-                    <div className="text-xs text-white/40">Companies</div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 rounded-full bg-blue-500" />
+                    <div>
+                      <p className="text-sm font-medium text-white">{analytics.statusCounts.internship}</p>
+                      <p className="text-xs text-white/40">Internship</p>
+                    </div>
                   </div>
-                </div>
-
-                {/* Grad schools stat */}
-                <div className="glass-card rounded-xl p-5 flex flex-col justify-between">
-                  <div className="w-10 h-10 rounded-lg bg-violet-500/10 flex items-center justify-center mb-auto">
-                    <GraduationCap className="w-5 h-5 text-violet-400" />
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 rounded-full bg-violet-500" />
+                    <div>
+                      <p className="text-sm font-medium text-white">{analytics.statusCounts.grad_school}</p>
+                      <p className="text-xs text-white/40">Grad School</p>
+                    </div>
                   </div>
-                  <div>
-                    <div className="text-2xl md:text-3xl font-bold text-white">{analytics.gradSchools.length}</div>
-                    <div className="text-xs text-white/40">Grad Schools</div>
-                  </div>
-                </div>
-
-                {/* Top company */}
-                <div className="col-span-2 glass-card rounded-xl p-5 flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0">
-                    <Briefcase className="w-6 h-6 text-emerald-400" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs text-white/40 mb-0.5">Top Employer</div>
-                    <div className="text-base font-semibold text-white truncate">{analytics.companies[0]?.name || 'N/A'}</div>
-                    <div className="text-xs text-emerald-400">{analytics.companies[0]?.count || 0} alumni</div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 rounded-full bg-amber-500" />
+                    <div>
+                      <p className="text-sm font-medium text-white">{analytics.statusCounts.looking}</p>
+                      <p className="text-xs text-white/40">Looking</p>
+                    </div>
                   </div>
                 </div>
               </div>
+
+              {/* Stats row */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                <div className="glass-card rounded-xl p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <MapPin className="w-4 h-4 text-[var(--color-accent)]" />
+                    <span className="text-xs text-white/40">Top City</span>
+                  </div>
+                  <p className="text-sm font-semibold text-white truncate">{analytics.cities[0]?.name.split(',')[0] || 'N/A'}</p>
+                  <p className="text-xs text-white/30">{analytics.cities[0]?.count || 0} alumni</p>
+                </div>
+                <div className="glass-card rounded-xl p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Briefcase className="w-4 h-4 text-emerald-400" />
+                    <span className="text-xs text-white/40">Top Employer</span>
+                  </div>
+                  <p className="text-sm font-semibold text-white truncate">{analytics.companies[0]?.name || 'N/A'}</p>
+                  <p className="text-xs text-white/30">{analytics.companies[0]?.count || 0} alumni</p>
+                </div>
+                <div className="glass-card rounded-xl p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <GraduationCap className="w-4 h-4 text-violet-400" />
+                    <span className="text-xs text-white/40">Top Grad School</span>
+                  </div>
+                  <p className="text-sm font-semibold text-white truncate">{analytics.gradSchools[0]?.name || 'N/A'}</p>
+                  <p className="text-xs text-white/30">{analytics.gradSchools[0]?.count || 0} alumni</p>
+                </div>
+                <div className="glass-card rounded-xl p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <HomeIcon className="w-4 h-4 text-[var(--color-accent)]" />
+                    <span className="text-xs text-white/40">Need Roommates</span>
+                  </div>
+                  <p className="text-sm font-semibold text-white">{analytics.roommateCount}</p>
+                  <p className="text-xs text-white/30">looking</p>
+                </div>
+              </div>
+
+              {/* Graduation year distribution */}
+              {analytics.gradYears.length > 1 && (
+                <div className="glass-card rounded-xl p-5 mb-6">
+                  <h3 className="text-sm font-medium text-white/60 mb-4">Graduation years in network</h3>
+                  <div className="flex items-end gap-1 h-20">
+                    {analytics.gradYears.map((item) => {
+                      const maxCount = Math.max(...analytics.gradYears.map(y => y.count));
+                      const height = Math.max(8, (item.count / maxCount) * 100);
+                      const isCurrentYear = item.year === currentUser?.grad_year;
+                      return (
+                        <div key={item.year} className="flex-1 flex flex-col items-center gap-1">
+                          <div 
+                            className={`w-full rounded-t transition-all ${isCurrentYear ? 'bg-[var(--color-accent)]' : 'bg-white/20 hover:bg-white/30'}`}
+                            style={{ height: `${height}%` }}
+                            title={`'${String(item.year).slice(-2)}: ${item.count} alumni`}
+                          />
+                          <span className={`text-[10px] ${isCurrentYear ? 'text-[var(--color-accent)] font-medium' : 'text-white/30'}`}>
+                            &apos;{String(item.year).slice(-2)}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               {/* Lists section */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
                 {/* Companies list */}
                 <div className="glass-card rounded-xl p-5">
-                  <div className="flex items-center justify-between mb-5">
+                  <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                       <Briefcase className="w-4 h-4 text-emerald-400" />
-                      <span className="font-medium text-white text-sm">Where Alumni Work</span>
+                      <span className="font-medium text-white text-sm">Where alumni work</span>
                     </div>
                     <span className="text-xs text-white/30">{analytics.companies.length} companies</span>
                   </div>
                   {analytics.companies.length > 0 ? (
-                    <div className="space-y-3">
-                      {analytics.companies.slice(0, 5).map((company, idx) => {
+                    <div className="space-y-2">
+                      {analytics.companies.slice(0, 6).map((company, idx) => {
                         const percentage = (company.count / analytics.companies[0].count) * 100;
                         return (
                           <div key={company.name} className="group">
                             <div className="flex items-center justify-between mb-1">
                               <div className="flex items-center gap-2 min-w-0">
-                                <span className="text-xs text-white/30 w-4">{idx + 1}</span>
-                                <span className="text-sm text-white truncate group-hover:text-emerald-400 transition-colors">{company.name}</span>
+                                <span className="text-xs text-white/20 w-4 font-mono">{idx + 1}</span>
+                                <span className="text-sm text-white/80 truncate group-hover:text-white transition-colors">{company.name}</span>
                               </div>
-                              <span className="text-xs text-white/50 tabular-nums">{company.count}</span>
+                              <span className="text-xs text-white/40 tabular-nums ml-2">{company.count}</span>
                             </div>
-                            <div className="h-1 bg-white/[0.03] rounded-full overflow-hidden">
+                            <div className="h-0.5 bg-white/[0.03] rounded-full overflow-hidden ml-6">
                               <div 
-                                className="h-full bg-gradient-to-r from-emerald-500/60 to-emerald-400/40 rounded-full transition-all duration-500"
+                                className="h-full bg-emerald-500/50 rounded-full transition-all duration-500"
                                 style={{ width: `${percentage}%` }}
                               />
                             </div>
@@ -739,35 +829,35 @@ export default function DashboardPage() {
                       })}
                     </div>
                   ) : (
-                    <p className="text-sm text-white/30 text-center py-8">No data yet</p>
+                    <p className="text-sm text-white/30 text-center py-6">No data yet</p>
                   )}
                 </div>
 
                 {/* Grad schools list */}
                 <div className="glass-card rounded-xl p-5">
-                  <div className="flex items-center justify-between mb-5">
+                  <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                       <GraduationCap className="w-4 h-4 text-violet-400" />
-                      <span className="font-medium text-white text-sm">Graduate Studies</span>
+                      <span className="font-medium text-white text-sm">Graduate schools</span>
                     </div>
                     <span className="text-xs text-white/30">{analytics.gradSchools.length} schools</span>
                   </div>
                   {analytics.gradSchools.length > 0 ? (
-                    <div className="space-y-3">
-                      {analytics.gradSchools.slice(0, 5).map((school, idx) => {
+                    <div className="space-y-2">
+                      {analytics.gradSchools.slice(0, 6).map((school, idx) => {
                         const percentage = (school.count / analytics.gradSchools[0].count) * 100;
                         return (
                           <div key={school.name} className="group">
                             <div className="flex items-center justify-between mb-1">
                               <div className="flex items-center gap-2 min-w-0">
-                                <span className="text-xs text-white/30 w-4">{idx + 1}</span>
-                                <span className="text-sm text-white truncate group-hover:text-violet-400 transition-colors">{school.name}</span>
+                                <span className="text-xs text-white/20 w-4 font-mono">{idx + 1}</span>
+                                <span className="text-sm text-white/80 truncate group-hover:text-white transition-colors">{school.name}</span>
                               </div>
-                              <span className="text-xs text-white/50 tabular-nums">{school.count}</span>
+                              <span className="text-xs text-white/40 tabular-nums ml-2">{school.count}</span>
                             </div>
-                            <div className="h-1 bg-white/[0.03] rounded-full overflow-hidden">
+                            <div className="h-0.5 bg-white/[0.03] rounded-full overflow-hidden ml-6">
                               <div 
-                                className="h-full bg-gradient-to-r from-violet-500/60 to-violet-400/40 rounded-full transition-all duration-500"
+                                className="h-full bg-violet-500/50 rounded-full transition-all duration-500"
                                 style={{ width: `${percentage}%` }}
                               />
                             </div>
@@ -776,17 +866,20 @@ export default function DashboardPage() {
                       })}
                     </div>
                   ) : (
-                    <p className="text-sm text-white/30 text-center py-8">No data yet</p>
+                    <p className="text-sm text-white/30 text-center py-6">No data yet</p>
                   )}
                 </div>
               </div>
 
               {/* Clickable cities */}
               {analytics.cities.length > 0 && (
-                <div className="mt-6">
-                  <div className="flex items-center gap-2 mb-3">
-                    <MapPin className="w-3.5 h-3.5 text-white/30" />
-                    <span className="text-xs text-white/40">Click to filter by city</span>
+                <div className="glass-card rounded-xl p-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-[var(--color-accent)]" />
+                      <span className="font-medium text-white text-sm">Popular cities</span>
+                    </div>
+                    <span className="text-xs text-white/30">Click to filter</span>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {analytics.cities.slice(0, 12).map((city) => (
@@ -799,7 +892,7 @@ export default function DashboardPage() {
                             setSelectedState(parts[1]);
                           }
                         }}
-                        className="px-3 py-1.5 rounded-lg bg-white/[0.02] border border-white/[0.06] text-xs text-white/60 hover:bg-white/[0.04] hover:border-white/10 hover:text-white transition-all cursor-pointer"
+                        className="px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06] text-xs text-white/60 hover:bg-white/[0.06] hover:border-white/12 hover:text-white transition-all cursor-pointer"
                       >
                         {city.name}
                         <span className="ml-1.5 text-white/30">{city.count}</span>
