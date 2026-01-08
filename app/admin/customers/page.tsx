@@ -1,15 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { 
   Plus, 
   Search, 
-  MoreVertical,
-  Building
+  Building,
+  Loader2,
+  Edit2,
+  Globe,
+  X
 } from 'lucide-react';
-
-// TODO: In production, use service role on the server via API routes
 
 interface Customer {
   id: string;
@@ -19,6 +19,7 @@ interface Customer {
   contact_email: string;
   tier: 'starter' | 'pro' | 'enterprise';
   status: 'active' | 'suspended' | 'cancelled' | 'pending';
+  allowed_institution_ids: string[];
   created_at: string;
   api_keys_count?: number;
 }
@@ -28,6 +29,7 @@ export default function CustomersPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
 
   useEffect(() => {
     loadCustomers();
@@ -35,42 +37,11 @@ export default function CustomersPage() {
 
   const loadCustomers = async () => {
     try {
-      // Mock data for now - replace with actual query
-      setCustomers([
-        {
-          id: '1',
-          name: 'Boston College',
-          slug: 'boston-college',
-          contact_name: 'John Smith',
-          contact_email: 'jsmith@bc.edu',
-          tier: 'pro',
-          status: 'active',
-          created_at: '2024-01-15T00:00:00Z',
-          api_keys_count: 3,
-        },
-        {
-          id: '2',
-          name: 'Stanford Analytics',
-          slug: 'stanford-analytics',
-          contact_name: 'Jane Doe',
-          contact_email: 'jdoe@stanford.edu',
-          tier: 'enterprise',
-          status: 'active',
-          created_at: '2024-02-20T00:00:00Z',
-          api_keys_count: 5,
-        },
-        {
-          id: '3',
-          name: 'MIT Career Services',
-          slug: 'mit-career',
-          contact_name: 'Bob Johnson',
-          contact_email: 'bjohnson@mit.edu',
-          tier: 'starter',
-          status: 'active',
-          created_at: '2024-03-10T00:00:00Z',
-          api_keys_count: 1,
-        },
-      ]);
+      const response = await fetch('/api/admin/customers');
+      if (response.ok) {
+        const data = await response.json();
+        setCustomers(data.customers || []);
+      }
     } catch (error) {
       console.error('Error loading customers:', error);
     } finally {
@@ -100,6 +71,16 @@ export default function CustomersPage() {
     }
   };
 
+  const getInstitutionAccessLabel = (customer: Customer) => {
+    if (customer.tier === 'enterprise' && customer.allowed_institution_ids.length === 0) {
+      return 'All';
+    }
+    if (customer.allowed_institution_ids.length === 0) {
+      return 'None';
+    }
+    return `${customer.allowed_institution_ids.length}`;
+  };
+
   return (
     <div className="p-8">
       {/* Header */}
@@ -117,6 +98,16 @@ export default function CustomersPage() {
           <Plus className="w-4 h-4" />
           Add Customer
         </button>
+      </div>
+
+      {/* Info Box */}
+      <div className="mb-6 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
+        <h3 className="text-sm font-medium text-blue-400 mb-2">Institution Access Rules</h3>
+        <ul className="text-sm text-white/60 space-y-1">
+          <li>• <strong className="text-white/80">Enterprise</strong> with empty institution list = access to ALL institutions</li>
+          <li>• <strong className="text-white/80">Starter/Pro</strong> must have specific institutions assigned</li>
+          <li>• Add institution UUIDs to the allowed list to grant specific access</li>
+        </ul>
       </div>
 
       {/* Search */}
@@ -148,13 +139,13 @@ export default function CustomersPage() {
                 Tier
               </th>
               <th className="text-left px-6 py-4 text-xs font-medium text-white/40 uppercase tracking-wider">
+                Institutions
+              </th>
+              <th className="text-left px-6 py-4 text-xs font-medium text-white/40 uppercase tracking-wider">
                 Status
               </th>
               <th className="text-left px-6 py-4 text-xs font-medium text-white/40 uppercase tracking-wider">
                 API Keys
-              </th>
-              <th className="text-left px-6 py-4 text-xs font-medium text-white/40 uppercase tracking-wider">
-                Created
               </th>
               <th className="px-6 py-4"></th>
             </tr>
@@ -169,7 +160,7 @@ export default function CustomersPage() {
             ) : filteredCustomers.length === 0 ? (
               <tr>
                 <td colSpan={7} className="px-6 py-12 text-center text-white/40 text-sm">
-                  No customers found
+                  {customers.length === 0 ? 'No customers yet. Add one to get started.' : 'No customers found'}
                 </td>
               </tr>
             ) : (
@@ -196,25 +187,35 @@ export default function CustomersPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4">
+                    <div className="flex items-center gap-2">
+                      <Globe className="w-4 h-4 text-white/30" />
+                      <span className={`text-sm ${
+                        getInstitutionAccessLabel(customer) === 'All' 
+                          ? 'text-violet-400' 
+                          : getInstitutionAccessLabel(customer) === 'None' 
+                            ? 'text-amber-400' 
+                            : 'text-white'
+                      }`}>
+                        {getInstitutionAccessLabel(customer)}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
                     <span className={`inline-flex px-2.5 py-1 rounded-md text-xs font-medium ${getStatusBadgeClass(customer.status)}`}>
                       {customer.status}
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="text-sm text-white">{customer.api_keys_count}</span>
+                    <span className="text-sm text-white">{customer.api_keys_count || 0}</span>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="text-sm text-white/50">
-                      {new Date(customer.created_at).toLocaleDateString()}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <Link
-                      href={`/admin/customers/${customer.id}`}
+                    <button
+                      onClick={() => setEditingCustomer(customer)}
                       className="p-2 rounded-lg hover:bg-white/[0.05] transition-colors inline-flex"
+                      title="Edit customer"
                     >
-                      <MoreVertical className="w-4 h-4 text-white/40" />
-                    </Link>
+                      <Edit2 className="w-4 h-4 text-white/40" />
+                    </button>
                   </td>
                 </tr>
               ))
@@ -223,9 +224,18 @@ export default function CustomersPage() {
         </table>
       </div>
 
-      {/* Create Modal would go here */}
+      {/* Create Modal */}
       {showCreateModal && (
         <CreateCustomerModal onClose={() => setShowCreateModal(false)} onCreated={loadCustomers} />
+      )}
+
+      {/* Edit Modal */}
+      {editingCustomer && (
+        <EditCustomerModal 
+          customer={editingCustomer} 
+          onClose={() => setEditingCustomer(null)} 
+          onUpdated={loadCustomers} 
+        />
       )}
     </div>
   );
@@ -247,26 +257,35 @@ function CreateCustomerModal({
     tier: 'starter',
   });
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+    setError(null);
 
     try {
-      // TODO: In production, call your API to create the customer
-      // For now, simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      onCreated();
-      onClose();
-    } catch (error) {
-      console.error('Error creating customer:', error);
+      const response = await fetch('/api/admin/customers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        onCreated();
+        onClose();
+      } else {
+        const data = await response.json();
+        setError(data.error || 'Failed to create customer');
+      }
+    } catch (err) {
+      console.error('Error creating customer:', err);
+      setError('Failed to create customer');
     } finally {
       setSaving(false);
     }
   };
 
-  // Auto-generate slug from name
   const handleNameChange = (name: string) => {
     const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
     setFormData({ ...formData, name, slug });
@@ -276,7 +295,18 @@ function CreateCustomerModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       <div className="relative glass-strong rounded-2xl p-6 w-full max-w-md">
-        <h2 className="text-lg font-semibold text-white mb-6">Add New Customer</h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-semibold text-white">Add New Customer</h2>
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-white/[0.05]">
+            <X className="w-5 h-5 text-white/60" />
+          </button>
+        </div>
+        
+        {error && (
+          <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-sm text-red-400">
+            {error}
+          </div>
+        )}
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -344,9 +374,9 @@ function CreateCustomerModal({
               onChange={(e) => setFormData({ ...formData, tier: e.target.value })}
               className="glass-input w-full px-4 py-2.5 rounded-lg text-sm"
             >
-              <option value="starter">Starter</option>
-              <option value="pro">Pro</option>
-              <option value="enterprise">Enterprise</option>
+              <option value="starter">Starter (Free) - 10 req/min, 100 req/day, 1 institution</option>
+              <option value="pro">Pro - 60 req/min, 5,000 req/day, 5 institutions</option>
+              <option value="enterprise">Enterprise - 500 req/min, 100k req/day, ALL institutions</option>
             </select>
           </div>
 
@@ -361,9 +391,16 @@ function CreateCustomerModal({
             <button
               type="submit"
               disabled={saving}
-              className="flex-1 glass-button px-4 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50"
+              className="flex-1 glass-button px-4 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {saving ? 'Creating...' : 'Create Customer'}
+              {saving ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                'Create Customer'
+              )}
             </button>
           </div>
         </form>
@@ -372,3 +409,194 @@ function CreateCustomerModal({
   );
 }
 
+// Edit Customer Modal
+function EditCustomerModal({ 
+  customer,
+  onClose, 
+  onUpdated 
+}: { 
+  customer: Customer;
+  onClose: () => void; 
+  onUpdated: () => void;
+}) {
+  const [formData, setFormData] = useState({
+    tier: customer.tier,
+    status: customer.status,
+    contact_name: customer.contact_name,
+    contact_email: customer.contact_email,
+    allowed_institution_ids: customer.allowed_institution_ids.join('\n'),
+  });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    setError(null);
+
+    // Parse institution IDs from textarea (one per line)
+    const institutionIds = formData.allowed_institution_ids
+      .split('\n')
+      .map(id => id.trim())
+      .filter(id => id.length > 0);
+
+    try {
+      const response = await fetch('/api/admin/customers', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: customer.id,
+          tier: formData.tier,
+          status: formData.status,
+          contact_name: formData.contact_name,
+          contact_email: formData.contact_email,
+          allowed_institution_ids: institutionIds,
+        }),
+      });
+
+      if (response.ok) {
+        onUpdated();
+        onClose();
+      } else {
+        const data = await response.json();
+        setError(data.error || 'Failed to update customer');
+      }
+    } catch (err) {
+      console.error('Error updating customer:', err);
+      setError('Failed to update customer');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative glass-strong rounded-2xl p-6 w-full max-w-lg">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-lg font-semibold text-white">Edit Customer</h2>
+            <p className="text-sm text-white/50">{customer.name}</p>
+          </div>
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-white/[0.05]">
+            <X className="w-5 h-5 text-white/60" />
+          </button>
+        </div>
+        
+        {error && (
+          <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-sm text-red-400">
+            {error}
+          </div>
+        )}
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-white/70 mb-2">
+                Contact Name
+              </label>
+              <input
+                type="text"
+                value={formData.contact_name}
+                onChange={(e) => setFormData({ ...formData, contact_name: e.target.value })}
+                className="glass-input w-full px-4 py-2.5 rounded-lg text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-white/70 mb-2">
+                Contact Email
+              </label>
+              <input
+                type="email"
+                value={formData.contact_email}
+                onChange={(e) => setFormData({ ...formData, contact_email: e.target.value })}
+                className="glass-input w-full px-4 py-2.5 rounded-lg text-sm"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-white/70 mb-2">
+                Tier
+              </label>
+              <select
+                value={formData.tier}
+                onChange={(e) => setFormData({ ...formData, tier: e.target.value as Customer['tier'] })}
+                className="glass-input w-full px-4 py-2.5 rounded-lg text-sm"
+              >
+                <option value="starter">Starter</option>
+                <option value="pro">Pro</option>
+                <option value="enterprise">Enterprise</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-white/70 mb-2">
+                Status
+              </label>
+              <select
+                value={formData.status}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value as Customer['status'] })}
+                className="glass-input w-full px-4 py-2.5 rounded-lg text-sm"
+              >
+                <option value="active">Active</option>
+                <option value="suspended">Suspended</option>
+                <option value="cancelled">Cancelled</option>
+                <option value="pending">Pending</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-white/70 mb-2">
+              Allowed Institution IDs
+              <span className="text-white/40 font-normal ml-2">(one UUID per line)</span>
+            </label>
+            <textarea
+              value={formData.allowed_institution_ids}
+              onChange={(e) => setFormData({ ...formData, allowed_institution_ids: e.target.value })}
+              className="glass-input w-full px-4 py-2.5 rounded-lg text-sm font-mono h-32 resize-none"
+              placeholder={formData.tier === 'enterprise' 
+                ? "Leave empty for ALL institutions access"
+                : "Enter institution UUIDs, one per line\ne.g.\n550e8400-e29b-41d4-a716-446655440000"}
+            />
+            {formData.tier === 'enterprise' && !formData.allowed_institution_ids.trim() && (
+              <p className="text-xs text-violet-400 mt-1">
+                ✓ Enterprise with empty list = access to ALL institutions
+              </p>
+            )}
+            {formData.tier !== 'enterprise' && !formData.allowed_institution_ids.trim() && (
+              <p className="text-xs text-amber-400 mt-1">
+                ⚠ Non-enterprise customers need specific institution access to work
+              </p>
+            )}
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-4 py-2.5 rounded-lg bg-white/[0.03] border border-white/[0.06] text-white/70 hover:bg-white/[0.05] text-sm font-medium transition-all"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={saving}
+              className="flex-1 glass-button px-4 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              {saving ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                'Save Changes'
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}

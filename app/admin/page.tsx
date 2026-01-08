@@ -13,8 +13,26 @@ interface DashboardStats {
   avgResponseTime: number;
 }
 
+interface ActivityItem {
+  action: string;
+  customer: string;
+  time: string;
+}
+
+interface EndpointStats {
+  endpoint: string;
+  requests: number;
+  percentage: number;
+}
+
+interface DashboardData {
+  stats: DashboardStats;
+  recentActivity: ActivityItem[];
+  topEndpoints: EndpointStats[];
+}
+
 export default function AdminDashboard() {
-  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,17 +41,11 @@ export default function AdminDashboard() {
 
   const loadStats = async () => {
     try {
-      // These would be real queries in production
-      // For now, show placeholder stats
-      setStats({
-        totalCustomers: 12,
-        activeCustomers: 10,
-        totalApiKeys: 28,
-        activeApiKeys: 24,
-        requestsToday: 15420,
-        requestsYesterday: 14890,
-        avgResponseTime: 142,
-      });
+      const response = await fetch('/api/admin/overview');
+      if (response.ok) {
+        const dashboardData = await response.json();
+        setData(dashboardData);
+      }
     } catch (error) {
       console.error('Error loading stats:', error);
     } finally {
@@ -41,7 +53,8 @@ export default function AdminDashboard() {
     }
   };
 
-  const requestChange = stats 
+  const stats = data?.stats;
+  const requestChange = stats && stats.requestsYesterday > 0
     ? ((stats.requestsToday - stats.requestsYesterday) / stats.requestsYesterday * 100).toFixed(1)
     : '0';
   const isPositive = Number(requestChange) >= 0;
@@ -67,10 +80,10 @@ export default function AdminDashboard() {
             <span className="text-xs text-white/40">Customers</span>
           </div>
           <div className="text-2xl font-bold text-white mb-1">
-            {loading ? '—' : stats?.totalCustomers}
+            {loading ? '—' : stats?.totalCustomers || 0}
           </div>
           <div className="text-xs text-white/50">
-            {loading ? '—' : `${stats?.activeCustomers} active`}
+            {loading ? '—' : `${stats?.activeCustomers || 0} active`}
           </div>
         </div>
 
@@ -83,10 +96,10 @@ export default function AdminDashboard() {
             <span className="text-xs text-white/40">API Keys</span>
           </div>
           <div className="text-2xl font-bold text-white mb-1">
-            {loading ? '—' : stats?.totalApiKeys}
+            {loading ? '—' : stats?.totalApiKeys || 0}
           </div>
           <div className="text-xs text-white/50">
-            {loading ? '—' : `${stats?.activeApiKeys} active`}
+            {loading ? '—' : `${stats?.activeApiKeys || 0} active`}
           </div>
         </div>
 
@@ -99,12 +112,18 @@ export default function AdminDashboard() {
             <span className="text-xs text-white/40">Today</span>
           </div>
           <div className="text-2xl font-bold text-white mb-1">
-            {loading ? '—' : stats?.requestsToday.toLocaleString()}
+            {loading ? '—' : (stats?.requestsToday || 0).toLocaleString()}
           </div>
-          <div className={`text-xs flex items-center gap-1 ${isPositive ? 'text-emerald-400' : 'text-red-400'}`}>
-            {isPositive ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
-            {requestChange}% vs yesterday
-          </div>
+          {stats && stats.requestsYesterday > 0 ? (
+            <div className={`text-xs flex items-center gap-1 ${isPositive ? 'text-emerald-400' : 'text-red-400'}`}>
+              {isPositive ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+              {requestChange}% vs yesterday
+            </div>
+          ) : (
+            <div className="text-xs text-white/50">
+              {loading ? '—' : 'No data yesterday'}
+            </div>
+          )}
         </div>
 
         {/* Avg Response Time */}
@@ -116,10 +135,10 @@ export default function AdminDashboard() {
             <span className="text-xs text-white/40">Avg Response</span>
           </div>
           <div className="text-2xl font-bold text-white mb-1">
-            {loading ? '—' : `${stats?.avgResponseTime}ms`}
+            {loading ? '—' : `${stats?.avgResponseTime || 0}ms`}
           </div>
           <div className="text-xs text-white/50">
-            P95: ~280ms
+            {stats?.avgResponseTime ? 'Average today' : 'No requests yet'}
           </div>
         </div>
       </div>
@@ -129,51 +148,60 @@ export default function AdminDashboard() {
         {/* Recent Activity */}
         <div className="glass-card rounded-xl p-6">
           <h2 className="text-lg font-semibold text-white mb-4">Recent Activity</h2>
-          <div className="space-y-3">
-            {[
-              { action: 'API key created', customer: 'Boston College', time: '2 min ago' },
-              { action: 'Rate limit hit', customer: 'Stanford Analytics', time: '15 min ago' },
-              { action: 'New customer', customer: 'MIT Career Services', time: '1 hour ago' },
-              { action: 'Subscription upgraded', customer: 'Harvard Research', time: '3 hours ago' },
-            ].map((item, idx) => (
-              <div key={idx} className="flex items-center justify-between py-2 border-b border-white/[0.06] last:border-0">
-                <div>
-                  <div className="text-sm text-white">{item.action}</div>
-                  <div className="text-xs text-white/40">{item.customer}</div>
+          {loading ? (
+            <div className="flex justify-center py-8">
+              <div className="w-6 h-6 border-2 border-white/20 border-t-[var(--color-accent)] rounded-full animate-spin" />
+            </div>
+          ) : data?.recentActivity && data.recentActivity.length > 0 ? (
+            <div className="space-y-3">
+              {data.recentActivity.map((item, idx) => (
+                <div key={idx} className="flex items-center justify-between py-2 border-b border-white/[0.06] last:border-0">
+                  <div>
+                    <div className="text-sm text-white">{item.action}</div>
+                    <div className="text-xs text-white/40">{item.customer}</div>
+                  </div>
+                  <div className="text-xs text-white/30">{item.time}</div>
                 </div>
-                <div className="text-xs text-white/30">{item.time}</div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-sm text-white/40 text-center py-8">
+              No recent activity
+            </div>
+          )}
         </div>
 
         {/* Top Endpoints */}
         <div className="glass-card rounded-xl p-6">
           <h2 className="text-lg font-semibold text-white mb-4">Top Endpoints (24h)</h2>
-          <div className="space-y-3">
-            {[
-              { endpoint: '/v1/institutions/:id/locations', requests: 8420, percentage: 55 },
-              { endpoint: '/v1/institutions/:id/employment', requests: 4210, percentage: 27 },
-              { endpoint: '/v1/institutions', requests: 1890, percentage: 12 },
-              { endpoint: '/v1/institutions/:id/grad-schools', requests: 900, percentage: 6 },
-            ].map((item, idx) => (
-              <div key={idx} className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <code className="text-xs text-white/70 font-mono">{item.endpoint}</code>
-                  <span className="text-xs text-white/50">{item.requests.toLocaleString()}</span>
+          {loading ? (
+            <div className="flex justify-center py-8">
+              <div className="w-6 h-6 border-2 border-white/20 border-t-[var(--color-accent)] rounded-full animate-spin" />
+            </div>
+          ) : data?.topEndpoints && data.topEndpoints.length > 0 ? (
+            <div className="space-y-3">
+              {data.topEndpoints.map((item, idx) => (
+                <div key={idx} className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <code className="text-xs text-white/70 font-mono">{item.endpoint}</code>
+                    <span className="text-xs text-white/50">{item.requests.toLocaleString()}</span>
+                  </div>
+                  <div className="h-1.5 bg-white/[0.03] rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-[var(--color-accent)]/60 rounded-full"
+                      style={{ width: `${item.percentage}%` }}
+                    />
+                  </div>
                 </div>
-                <div className="h-1.5 bg-white/[0.03] rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-[var(--color-accent)]/60 rounded-full"
-                    style={{ width: `${item.percentage}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-sm text-white/40 text-center py-8">
+              No endpoint data yet
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 }
-

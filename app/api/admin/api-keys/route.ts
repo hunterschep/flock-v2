@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { generateApiKey } from '@/lib/api/auth';
+import { TIER_LIMITS, type ApiTier } from '@/lib/api/types';
 
 // Admin emails that can manage API keys
 const ADMIN_EMAILS = [
@@ -14,6 +15,11 @@ async function isAdmin(request: NextRequest): Promise<boolean> {
   
   if (!user?.email) return false;
   return ADMIN_EMAILS.includes(user.email);
+}
+
+// Get scopes based on tier
+function getScopesForTier(tier: ApiTier): string[] {
+  return TIER_LIMITS[tier]?.scopes || ['read:aggregates'];
 }
 
 // GET - List all API keys
@@ -81,7 +87,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { customer_name, key_name, scopes = ['read:aggregates'], environment = 'production' } = body;
+    const { customer_name, key_name, environment = 'production' } = body;
 
     if (!customer_name || !key_name) {
       return NextResponse.json(
@@ -94,16 +100,18 @@ export async function POST(request: NextRequest) {
 
     // Create or find customer
     let customerId: string;
+    let customerTier: ApiTier = 'starter';
     const slug = customer_name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     
     const { data: existingCustomer } = await supabase
       .from('api_customers')
-      .select('id')
+      .select('id, tier')
       .eq('slug', slug)
       .single();
 
     if (existingCustomer) {
       customerId = existingCustomer.id;
+      customerTier = existingCustomer.tier as ApiTier;
     } else {
       const { data: newCustomer, error: customerError } = await supabase
         .from('api_customers')
@@ -115,7 +123,7 @@ export async function POST(request: NextRequest) {
           tier: 'starter',
           status: 'active',
         })
-        .select('id')
+        .select('id, tier')
         .single();
 
       if (customerError || !newCustomer) {
@@ -123,12 +131,16 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Failed to create customer' }, { status: 500 });
       }
       customerId = newCustomer.id;
+      customerTier = newCustomer.tier as ApiTier;
     }
+
+    // Get scopes based on customer tier
+    const scopes = getScopesForTier(customerTier);
 
     // Generate the API key
     const { key, hash, prefix } = generateApiKey();
 
-    // Insert the key
+    // Insert the key with tier-appropriate scopes
     const { error: keyError } = await supabase
       .from('api_keys')
       .insert({
@@ -151,6 +163,8 @@ export async function POST(request: NextRequest) {
       success: true,
       key, // Full key - only returned once
       prefix,
+      tier: customerTier,
+      scopes,
     });
   } catch (error) {
     console.error('Error in POST /api/admin/api-keys:', error);
