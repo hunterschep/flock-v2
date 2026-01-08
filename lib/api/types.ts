@@ -224,6 +224,10 @@ export type ApiErrorCode = typeof API_ERROR_CODES[keyof typeof API_ERROR_CODES];
 // Tier Configuration
 // ============================================
 
+/**
+ * Tier limits - MUST match the get_tier_limits() function in Supabase
+ * See: supabase/api_tier_limits_fix.sql
+ */
 export const TIER_LIMITS: Record<ApiTier, {
   rateLimitPerMinute: number;
   rateLimitPerDay: number;
@@ -233,11 +237,11 @@ export const TIER_LIMITS: Record<ApiTier, {
   scopes: string[];
 }> = {
   starter: {
-    rateLimitPerMinute: 10,
+    rateLimitPerMinute: 10,      // Free tier: strict limits
     rateLimitPerDay: 100,
     monthlyRequestLimit: 1000,
     maxInstitutions: 1,
-    maxResultsPerQuery: 50, // Limit data aggregations
+    maxResultsPerQuery: 50,      // Limit data aggregations
     scopes: ['read:aggregates'],
   },
   pro: {
@@ -251,9 +255,9 @@ export const TIER_LIMITS: Record<ApiTier, {
   enterprise: {
     rateLimitPerMinute: 500,
     rateLimitPerDay: 100000,
-    monthlyRequestLimit: -1, // Unlimited
-    maxInstitutions: -1, // All
-    maxResultsPerQuery: -1, // Unlimited
+    monthlyRequestLimit: -1,     // Unlimited
+    maxInstitutions: -1,         // All institutions
+    maxResultsPerQuery: -1,      // Unlimited
     scopes: ['read:aggregates', 'read:trends', 'read:compare', 'read:flows', 'read:all'],
   },
 };
