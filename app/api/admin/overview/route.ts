@@ -89,16 +89,26 @@ export async function GET(_request: NextRequest) {
       .order('created_at', { ascending: false })
       .limit(5);
 
+    // Helper to extract customer name from join result
+    const getCustomerName = (apiCustomers: unknown): string => {
+      if (!apiCustomers) return 'Unknown';
+      // Handle both array and object cases from Supabase joins
+      if (Array.isArray(apiCustomers)) {
+        return (apiCustomers[0] as { name?: string })?.name || 'Unknown';
+      }
+      return (apiCustomers as { name?: string })?.name || 'Unknown';
+    };
+
     // Format recent activity
     const recentActivity = [
       ...(recentKeys || []).map(k => ({
         action: 'API key created',
-        customer: (k.api_customers as { name: string } | null)?.name || 'Unknown',
+        customer: getCustomerName(k.api_customers),
         time: k.created_at,
       })),
       ...(recentErrors || []).map(e => ({
         action: e.status_code === 429 ? 'Rate limit hit' : `Error ${e.status_code}`,
-        customer: (e.api_customers as { name: string } | null)?.name || 'Unknown',
+        customer: getCustomerName(e.api_customers),
         time: e.created_at,
       })),
     ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
