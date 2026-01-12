@@ -28,6 +28,8 @@ export async function POST(request: NextRequest) {
     // Check for Resend API key (production)
     const resendApiKey = process.env.RESEND_API_KEY;
     const recipientEmail = process.env.CONTACT_EMAIL || 'h2cubed@live.com';
+    // Use verified domain for production, or resend.dev for testing (only sends to account email)
+    const fromEmail = process.env.RESEND_FROM_EMAIL || 'Flock Contact <onboarding@resend.dev>';
 
     if (resendApiKey) {
       // Send via Resend
@@ -38,7 +40,7 @@ export async function POST(request: NextRequest) {
           'Authorization': `Bearer ${resendApiKey}`,
         },
         body: JSON.stringify({
-          from: 'Flock Contact <onboarding@resend.dev>',
+          from: fromEmail,
           to: recipientEmail,
           reply_to: email,
           subject: `[Flock Contact] ${subject}`,
