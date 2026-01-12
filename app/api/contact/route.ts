@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
 
     // Check for Resend API key (production)
     const resendApiKey = process.env.RESEND_API_KEY;
-    const recipientEmail = process.env.CONTACT_EMAIL || 'hunterschep@gmail.com';
+    const recipientEmail = process.env.CONTACT_EMAIL || 'h2cubed@live.com';
 
     if (resendApiKey) {
       // Send via Resend
