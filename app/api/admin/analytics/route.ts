@@ -1,18 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-
-// Admin emails that can view analytics
-const ADMIN_EMAILS = [
-  'scheppat@bc.edu',
-  'hunterschep@gmail.com',
-];
+import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { isAdminEmail } from '@/lib/constants/admin';
 
 async function isAdmin(): Promise<boolean> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   
-  if (!user?.email) return false;
-  return ADMIN_EMAILS.includes(user.email);
+  return isAdminEmail(user?.email);
 }
 
 export async function GET(request: NextRequest) {
@@ -23,7 +17,8 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const range = searchParams.get('range') || '7d';
 
-  const supabase = await createClient();
+  // Use service role client to bypass RLS on api_usage/api_customers tables
+  const supabase = createServiceRoleClient();
 
   // Calculate date range
   let daysAgo = 7;

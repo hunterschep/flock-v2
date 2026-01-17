@@ -1,20 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { generateApiKey } from '@/lib/api/auth';
 import { TIER_LIMITS, type ApiTier } from '@/lib/api/types';
-
-// Admin emails that can manage API keys
-const ADMIN_EMAILS = [
-  'scheppat@bc.edu',
-  'hunterschep@gmail.com',
-];
+import { isAdminEmail } from '@/lib/constants/admin';
 
 async function isAdmin(request: NextRequest): Promise<boolean> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   
-  if (!user?.email) return false;
-  return ADMIN_EMAILS.includes(user.email);
+  return isAdminEmail(user?.email);
 }
 
 // Get scopes based on tier
@@ -28,7 +22,8 @@ export async function GET(_request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const supabase = await createClient();
+  // Use service role client to bypass RLS on api_keys/api_customers tables
+  const supabase = createServiceRoleClient();
   
   const { data: keys, error } = await supabase
     .from('api_keys')
@@ -96,7 +91,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = await createClient();
+    // Use service role client to bypass RLS on api_keys/api_customers tables
+    const supabase = createServiceRoleClient();
 
     // Create or find customer
     let customerId: string;
@@ -186,7 +182,8 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Key ID is required' }, { status: 400 });
     }
 
-    const supabase = await createClient();
+    // Use service role client to bypass RLS on api_keys table
+    const supabase = createServiceRoleClient();
 
     const { error } = await supabase
       .from('api_keys')

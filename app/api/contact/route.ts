@@ -3,8 +3,54 @@ import { NextRequest, NextResponse } from 'next/server';
 // Contact form API route
 // Sends email via Resend or logs for development
 
+// Simple in-memory rate limiting for contact form
+const contactRateLimit = new Map<string, { count: number; resetAt: number }>();
+const CONTACT_RATE_LIMIT = 5; // 5 requests per hour
+const CONTACT_RATE_WINDOW = 60 * 60 * 1000; // 1 hour
+
+function checkContactRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = contactRateLimit.get(ip);
+  
+  if (!entry || entry.resetAt < now) {
+    contactRateLimit.set(ip, { count: 1, resetAt: now + CONTACT_RATE_WINDOW });
+    return true;
+  }
+  
+  if (entry.count >= CONTACT_RATE_LIMIT) {
+    return false;
+  }
+  
+  entry.count++;
+  return true;
+}
+
+// HTML entity encoding to prevent XSS
+function escapeHtml(text: string): string {
+  const htmlEscapes: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  };
+  return text.replace(/[&<>"']/g, char => htmlEscapes[char]);
+}
+
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim() 
+      || request.headers.get('x-real-ip') 
+      || '0.0.0.0';
+    
+    if (!checkContactRateLimit(ip)) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { name, email, subject, message } = body;
 
@@ -12,6 +58,14 @@ export async function POST(request: NextRequest) {
     if (!name || !email || !subject || !message) {
       return NextResponse.json(
         { error: 'All fields are required' },
+        { status: 400 }
+      );
+    }
+
+    // Length validation to prevent abuse
+    if (name.length > 100 || email.length > 254 || subject.length > 200 || message.length > 5000) {
+      return NextResponse.json(
+        { error: 'Input too long' },
         { status: 400 }
       );
     }
@@ -58,19 +112,19 @@ ${message}
   <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
     <tr>
       <td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">Name</td>
-      <td style="padding: 10px; border-bottom: 1px solid #eee;">${name}</td>
+      <td style="padding: 10px; border-bottom: 1px solid #eee;">${escapeHtml(name)}</td>
     </tr>
     <tr>
       <td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">Email</td>
-      <td style="padding: 10px; border-bottom: 1px solid #eee;"><a href="mailto:${email}">${email}</a></td>
+      <td style="padding: 10px; border-bottom: 1px solid #eee;"><a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></td>
     </tr>
     <tr>
       <td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">Subject</td>
-      <td style="padding: 10px; border-bottom: 1px solid #eee;">${subject}</td>
+      <td style="padding: 10px; border-bottom: 1px solid #eee;">${escapeHtml(subject)}</td>
     </tr>
   </table>
   <h3 style="color: #333;">Message:</h3>
-  <div style="background: #f5f5f5; padding: 15px; border-radius: 5px; white-space: pre-wrap;">${message}</div>
+  <div style="background: #f5f5f5; padding: 15px; border-radius: 5px; white-space: pre-wrap;">${escapeHtml(message)}</div>
 </div>
           `.trim(),
         }),

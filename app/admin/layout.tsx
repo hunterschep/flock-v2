@@ -13,12 +13,7 @@ import {
   ChevronRight,
   LogOut
 } from 'lucide-react';
-
-// Admin email whitelist - add your admin emails here
-const ADMIN_EMAILS = [
-  'scheppat@bc.edu',
-  'hunterschep@gmail.com',
-];
+import { isAdminEmail } from '@/lib/constants/admin';
 
 export default function AdminLayout({
   children,
@@ -45,7 +40,7 @@ export default function AdminLayout({
       }
 
       // Check if user is admin
-      const isAdminUser = ADMIN_EMAILS.includes(user.email || '');
+      const isAdminUser = isAdminEmail(user.email);
       
       if (!isAdminUser) {
         router.push('/dashboard');

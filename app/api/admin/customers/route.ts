@@ -1,18 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-
-// Admin emails
-const ADMIN_EMAILS = [
-  'scheppat@bc.edu',
-  'hunterschep@gmail.com',
-];
+import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { isAdminEmail } from '@/lib/constants/admin';
 
 async function isAdmin(): Promise<boolean> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   
-  if (!user?.email) return false;
-  return ADMIN_EMAILS.includes(user.email);
+  return isAdminEmail(user?.email);
 }
 
 // GET - List all customers
@@ -21,7 +15,8 @@ export async function GET(_request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const supabase = await createClient();
+  // Use service role client to bypass RLS on api_customers/api_keys tables
+  const supabase = createServiceRoleClient();
 
   try {
     // Get customers with their API key count
@@ -92,7 +87,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = await createClient();
+    // Use service role client to bypass RLS on api_customers table
+    const supabase = createServiceRoleClient();
 
     // Generate slug if not provided
     const customerSlug = slug || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -170,7 +166,8 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    const supabase = await createClient();
+    // Use service role client to bypass RLS on api_customers table
+    const supabase = createServiceRoleClient();
 
     // Build update object with only provided fields
     const updateData: Record<string, unknown> = {};
