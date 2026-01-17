@@ -82,11 +82,19 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { customer_name, key_name, environment = 'production' } = body;
+    const { customer_id, customer_name, key_name, environment = 'production' } = body;
 
-    if (!customer_name || !key_name) {
+    // Validate: need either customer_id (existing) or customer_name (new)
+    if (!customer_id && !customer_name) {
       return NextResponse.json(
-        { error: 'Customer name and key name are required' },
+        { error: 'Either customer_id or customer_name is required' },
+        { status: 400 }
+      );
+    }
+
+    if (!key_name) {
+      return NextResponse.json(
+        { error: 'Key name is required' },
         { status: 400 }
       );
     }
@@ -94,21 +102,44 @@ export async function POST(request: NextRequest) {
     // Use service role client to bypass RLS on api_keys/api_customers tables
     const supabase = createServiceRoleClient();
 
-    // Create or find customer
     let customerId: string;
     let customerTier: ApiTier = 'starter';
-    const slug = customer_name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    
-    const { data: existingCustomer } = await supabase
-      .from('api_customers')
-      .select('id, tier')
-      .eq('slug', slug)
-      .single();
 
-    if (existingCustomer) {
+    if (customer_id) {
+      // Use existing customer - verify it exists
+      const { data: existingCustomer, error: lookupError } = await supabase
+        .from('api_customers')
+        .select('id, tier')
+        .eq('id', customer_id)
+        .single();
+
+      if (lookupError || !existingCustomer) {
+        return NextResponse.json(
+          { error: 'Customer not found' },
+          { status: 404 }
+        );
+      }
+
       customerId = existingCustomer.id;
       customerTier = existingCustomer.tier as ApiTier;
     } else {
+      // Create new customer
+      const slug = customer_name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      
+      // Check if slug already exists to prevent duplicates
+      const { data: existingSlug } = await supabase
+        .from('api_customers')
+        .select('id')
+        .eq('slug', slug)
+        .single();
+
+      if (existingSlug) {
+        return NextResponse.json(
+          { error: `A customer with similar name already exists. Please select them from the dropdown.` },
+          { status: 400 }
+        );
+      }
+
       const { data: newCustomer, error: customerError } = await supabase
         .from('api_customers')
         .insert({

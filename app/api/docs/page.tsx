@@ -267,21 +267,21 @@ export default function ApiDocsPage() {
       step: 2,
       title: 'List your institutions',
       description: 'First, see which institutions you can access.',
-      code: `curl -X GET "https://yoursite.com/api/v1/institutions" \\
+      code: `curl -X GET "https://flock-v2-prod.vercel.app/api/v1/institutions" \\
   -H "Authorization: Bearer flock_sk_your_api_key"`,
     },
     {
       step: 3,
       title: 'Get location data',
       description: 'Use the institution ID to fetch alumni location distribution.',
-      code: `curl -X GET "https://yoursite.com/api/v1/institutions/INST_ID/locations?granularity=city" \\
+      code: `curl -X GET "https://flock-v2-prod.vercel.app/api/v1/institutions/INST_ID/locations?granularity=city" \\
   -H "Authorization: Bearer flock_sk_your_api_key"`,
     },
     {
       step: 4,
       title: 'Filter by graduation year',
       description: 'Add filters to narrow down your data.',
-      code: `curl -X GET "https://yoursite.com/api/v1/institutions/INST_ID/employment?grad_year_min=2020&grad_year_max=2024" \\
+      code: `curl -X GET "https://flock-v2-prod.vercel.app/api/v1/institutions/INST_ID/employment?grad_year_min=2020&grad_year_max=2024" \\
   -H "Authorization: Bearer flock_sk_your_api_key"`,
     },
   ];
@@ -366,7 +366,7 @@ export default function ApiDocsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div className="glass-card rounded-xl p-5">
                   <div className="text-sm font-medium text-white/70 mb-2">Base URL</div>
-                  <code className="text-[var(--color-accent)] font-mono text-sm">https://yoursite.com/api/v1</code>
+                  <code className="text-[var(--color-accent)] font-mono text-sm">https://flock-v2-prod.vercel.app/api/v1</code>
                 </div>
                 <div className="glass-card rounded-xl p-5">
                   <div className="text-sm font-medium text-white/70 mb-2">Response Format</div>
@@ -543,7 +543,7 @@ export default function ApiDocsPage() {
                   </button>
                 </div>
                 <pre className="p-4 text-sm font-mono text-white/80 overflow-x-auto">
-{`curl -X GET "https://yoursite.com/api/v1/institutions" \\
+{`curl -X GET "https://flock-v2-prod.vercel.app/api/v1/institutions" \\
   -H "Authorization: Bearer flock_sk_your_api_key_here" \\
   -H "Content-Type: application/json"`}
                 </pre>

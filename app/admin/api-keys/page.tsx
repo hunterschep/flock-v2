@@ -26,8 +26,16 @@ interface ApiKey {
   created_at: string;
 }
 
+interface Customer {
+  id: string;
+  name: string;
+  slug: string;
+  tier: string;
+}
+
 export default function ApiKeysPage() {
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -37,12 +45,15 @@ export default function ApiKeysPage() {
   const [deleting, setDeleting] = useState<string | null>(null);
   
   // Form state
-  const [customerName, setCustomerName] = useState('');
+  const [selectedCustomerId, setSelectedCustomerId] = useState('');
+  const [createNewCustomer, setCreateNewCustomer] = useState(false);
+  const [newCustomerName, setNewCustomerName] = useState('');
   const [keyName, setKeyName] = useState('');
   const [environment, setEnvironment] = useState<'production' | 'development' | 'test'>('production');
 
   useEffect(() => {
     loadApiKeys();
+    loadCustomers();
   }, []);
 
   const loadApiKeys = async () => {
@@ -59,8 +70,23 @@ export default function ApiKeysPage() {
     }
   };
 
+  const loadCustomers = async () => {
+    try {
+      const response = await fetch('/api/admin/customers');
+      if (response.ok) {
+        const data = await response.json();
+        setCustomers(data.customers || []);
+      }
+    } catch (error) {
+      console.error('Error loading customers:', error);
+    }
+  };
+
   const createApiKey = async () => {
-    if (!customerName || !keyName) return;
+    // Validate: either selected existing customer OR creating new with name
+    if (createNewCustomer && !newCustomerName) return;
+    if (!createNewCustomer && !selectedCustomerId) return;
+    if (!keyName) return;
     
     setCreating(true);
     try {
@@ -68,10 +94,13 @@ export default function ApiKeysPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          customer_name: customerName,
+          // Send customer_id for existing, customer_name for new
+          ...(createNewCustomer 
+            ? { customer_name: newCustomerName }
+            : { customer_id: selectedCustomerId }
+          ),
           key_name: keyName,
           environment,
-          scopes: ['read:aggregates'],
         }),
       });
 
@@ -79,16 +108,26 @@ export default function ApiKeysPage() {
         const data = await response.json();
         setNewKeyValue(data.key);
         setShowCreateModal(false);
-        setCustomerName('');
-        setKeyName('');
-        setEnvironment('production');
-        loadApiKeys(); // Reload the list
+        resetForm();
+        loadApiKeys();
+        loadCustomers(); // Refresh customers if new one was created
+      } else {
+        const error = await response.json();
+        alert(error.error || 'Failed to create API key');
       }
     } catch (error) {
       console.error('Error creating API key:', error);
     } finally {
       setCreating(false);
     }
+  };
+
+  const resetForm = () => {
+    setSelectedCustomerId('');
+    setCreateNewCustomer(false);
+    setNewCustomerName('');
+    setKeyName('');
+    setEnvironment('production');
   };
 
   const revokeApiKey = async (keyId: string) => {
@@ -326,13 +365,13 @@ export default function ApiKeysPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div 
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-            onClick={() => setShowCreateModal(false)}
+            onClick={() => { setShowCreateModal(false); resetForm(); }}
           />
           <div className="relative w-full max-w-md glass-card rounded-2xl p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-white">Generate API Key</h2>
               <button
-                onClick={() => setShowCreateModal(false)}
+                onClick={() => { setShowCreateModal(false); resetForm(); }}
                 className="p-2 rounded-lg hover:bg-white/[0.05] transition-colors"
               >
                 <X className="w-5 h-5 text-white/60" />
@@ -340,17 +379,54 @@ export default function ApiKeysPage() {
             </div>
             
             <div className="space-y-4">
+              {/* Customer Selection */}
               <div>
                 <label className="block text-sm font-medium text-white/70 mb-2">
-                  Customer / Organization Name
+                  Customer
                 </label>
-                <input
-                  type="text"
-                  value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
-                  className="glass-input w-full px-4 py-2.5 rounded-lg text-sm"
-                  placeholder="e.g., Boston College"
-                />
+                {!createNewCustomer ? (
+                  <>
+                    <select
+                      value={selectedCustomerId}
+                      onChange={(e) => setSelectedCustomerId(e.target.value)}
+                      className="glass-input w-full px-4 py-2.5 rounded-lg text-sm"
+                    >
+                      <option value="">Select a customer...</option>
+                      {customers.map((customer) => (
+                        <option key={customer.id} value={customer.id}>
+                          {customer.name} ({customer.tier})
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      onClick={() => setCreateNewCustomer(true)}
+                      className="mt-2 text-xs text-[var(--color-accent)] hover:underline"
+                    >
+                      + Create new customer instead
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <input
+                      type="text"
+                      value={newCustomerName}
+                      onChange={(e) => setNewCustomerName(e.target.value)}
+                      className="glass-input w-full px-4 py-2.5 rounded-lg text-sm"
+                      placeholder="e.g., Boston College"
+                    />
+                    <p className="mt-1 text-xs text-white/40">
+                      A new customer will be created with &quot;starter&quot; tier
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => { setCreateNewCustomer(false); setNewCustomerName(''); }}
+                      className="mt-2 text-xs text-[var(--color-accent)] hover:underline"
+                    >
+                      ← Select existing customer instead
+                    </button>
+                  </>
+                )}
               </div>
               
               <div>
@@ -383,14 +459,19 @@ export default function ApiKeysPage() {
               
               <div className="flex justify-end gap-3 mt-6">
                 <button
-                  onClick={() => setShowCreateModal(false)}
+                  onClick={() => { setShowCreateModal(false); resetForm(); }}
                   className="px-4 py-2.5 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-white/[0.03] transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={createApiKey}
-                  disabled={!customerName || !keyName || creating}
+                  disabled={
+                    (!createNewCustomer && !selectedCustomerId) ||
+                    (createNewCustomer && !newCustomerName) ||
+                    !keyName ||
+                    creating
+                  }
                   className="glass-button px-6 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 disabled:opacity-50"
                 >
                   {creating ? (
